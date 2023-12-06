@@ -1,14 +1,9 @@
-data "azurerm_resource_group" "rg" {
+data "azurerm_resource_group" "parent" {
   name = var.resource_group_name
 }
-resource "azapi_resource" "this_environment" {
-  type                      = "Microsoft.App/managedEnvironments@2023-05-01"
-  schema_validation_enabled = false
-  name                      = var.name
-  parent_id                 = data.azurerm_resource_group.rg.id
-  location                  = local.location
-  tags                      = var.tags
 
+resource "azapi_resource" "this_environment" {
+  type = "Microsoft.App/managedEnvironments@2023-05-01"
   body = jsonencode({
     properties = {
       appLogsConfiguration = {
@@ -28,7 +23,7 @@ resource "azapi_resource" "this_environment" {
           "enabled" = var.peer_authentication_enabled
         }
       }
-      infrastructureResourceGroup = "rg-${var.name}"
+      infrastructureResourceGroup = local.infrastructure_resource_group_name
       vnetConfiguration = var.vnet_subnet_id != null ? {
         "internal"               = var.vnet_internal_only
         "infrastructureSubnetId" = var.vnet_subnet_id
@@ -43,23 +38,30 @@ resource "azapi_resource" "this_environment" {
       zoneRedundant = var.zone_redundancy_enabled
     }
   })
+  location                  = data.azurerm_resource_group.parent.location
+  name                      = var.name
+  parent_id                 = data.azurerm_resource_group.parent.id
+  schema_validation_enabled = false
+  tags                      = var.tags
 }
 
 resource "azurerm_management_lock" "this" {
-  count      = var.lock.kind != "None" ? 1 : 0
+  count = var.lock.kind != "None" ? 1 : 0
+
+  lock_level = var.lock.kind
   name       = coalesce(var.lock.name, "lock-${var.name}")
   scope      = azapi_resource.this_environment.id
-  lock_level = var.lock.kind
 }
 
 resource "azurerm_role_assignment" "this" {
-  for_each                               = var.role_assignments
-  scope                                  = azapi_resource.this_environment.id
-  role_definition_id                     = strcontains(lower(each.value.role_definition_id_or_name), lower(local.role_definition_resource_substring)) ? each.value.role_definition_id_or_name : null
-  role_definition_name                   = strcontains(lower(each.value.role_definition_id_or_name), lower(local.role_definition_resource_substring)) ? null : each.value.role_definition_id_or_name
+  for_each = var.role_assignments
+
   principal_id                           = each.value.principal_id
+  scope                                  = azapi_resource.this_environment.id
   condition                              = each.value.condition
   condition_version                      = each.value.condition_version
-  skip_service_principal_aad_check       = each.value.skip_service_principal_aad_check
   delegated_managed_identity_resource_id = each.value.delegated_managed_identity_resource_id
+  role_definition_id                     = strcontains(lower(each.value.role_definition_id_or_name), lower(local.role_definition_resource_substring)) ? each.value.role_definition_id_or_name : null
+  role_definition_name                   = strcontains(lower(each.value.role_definition_id_or_name), lower(local.role_definition_resource_substring)) ? null : each.value.role_definition_id_or_name
+  skip_service_principal_aad_check       = each.value.skip_service_principal_aad_check
 }

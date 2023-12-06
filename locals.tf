@@ -1,4 +1,4 @@
 locals {
   role_definition_resource_substring = "/providers/Microsoft.Authorization/roleDefinitions"
-  location                           = var.location != null ? var.location : data.azurerm_resource_group.rg.location
+  infrastructure_resource_group_name = coalesce(var.infrastructure_resource_group_name, replace(var.resource_group_name, "rg-", "rg-managed-"))
 }
