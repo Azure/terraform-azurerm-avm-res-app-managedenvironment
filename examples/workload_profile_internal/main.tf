@@ -73,7 +73,7 @@ module "managedenvironment" {
   workload_profiles_enabled          = true
   zone_redundancy_enabled            = true
   vnet_internal_only                 = true
-  infrastructure_resource_group_name = "rg-${module.naming.container_app_environment.name_unique}"
+  infrastructure_resource_group_name = "rg-managed-${module.naming.container_app_environment.name_unique}"
 
   log_analytics_workspace_customer_id        = azurerm_log_analytics_workspace.this.workspace_id
   log_analytics_workspace_primary_shared_key = azurerm_log_analytics_workspace.this.primary_shared_key
