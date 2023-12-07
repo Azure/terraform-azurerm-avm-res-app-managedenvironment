@@ -82,7 +82,7 @@ variable "infrastructure_resource_group_name" {
   description = <<DESCRIPTION
 Name of the platform-managed resource group created for the Managed Environment to host infrastructure resources. 
 If a subnet ID is provided, this resource group will be created in the same subscription as the subnet.
-If not specified, then one will be generated automatically from the resource group name.
+If not specified, then one will be generated automatically, in the form ``ME_<app_managed_environment_name>_<resource_group>_<location>``.
 DESCRIPTION
 }
 

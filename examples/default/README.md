@@ -32,7 +32,7 @@ provider "azurerm" {
 # This ensures we have unique CAF compliant names for our resources.
 module "naming" {
   source  = "Azure/naming/azurerm"
-  version = "0.3.0"
+  version = "0.4.0"
 }
 
 # This is required for resource modules
@@ -47,11 +47,11 @@ resource "azurerm_log_analytics_workspace" "this" {
   location            = azurerm_resource_group.this.location
 }
 
-# This is the module call
 module "managedenvironment" {
   source = "../../"
-  # source             = "Azure/avm-res-app-managedenvironment/azurerm"
-  name                = module.naming.container_group.name_unique
+  # source = "Azure/avm-res-app-managedenvironment/azurerm"
+
+  name                = module.naming.container_app_environment.name_unique
   resource_group_name = azurerm_resource_group.this.name
 
   log_analytics_workspace_customer_id        = azurerm_log_analytics_workspace.this.workspace_id
@@ -118,7 +118,7 @@ Version:
 
 Source: Azure/naming/azurerm
 
-Version: 0.3.0
+Version: 0.4.0
 
 <!-- markdownlint-disable-next-line MD041 -->
 ## Data Collection

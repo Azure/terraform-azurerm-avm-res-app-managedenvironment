@@ -1,11 +1,7 @@
 <!-- BEGIN_TF_DOCS -->
 # Consumption workload profile with integrated vnet
 
-This deploys a Container Apps Managed Environment using the consumption-based workload profile, using vnet integration and an external load balancer.
-
-To modify this to use an internal load balancer, set the following parameter: `vnet_internal_only = true`.
-
-This will create an additional resource group for platform managed resources that is prefixed with "ME-".  To choose a different name, set the parameter: `infrastructure_resource_group_name`.
+This deploys a Container Apps Managed Environment using the consumption-based workload profile, using vnet integration and an internal load balancer.
 
 ```hcl
 terraform {
@@ -77,11 +73,13 @@ module "managedenvironment" {
   source = "../../"
   # source = "Azure/avm-res-app-managedenvironment/azurerm"
 
-  name                      = module.naming.container_app_environment.name_unique
-  resource_group_name       = azurerm_resource_group.this.name
-  vnet_subnet_id            = azurerm_subnet.this.id
-  workload_profiles_enabled = true
-  zone_redundancy_enabled   = true
+  name                               = module.naming.container_app_environment.name_unique
+  resource_group_name                = azurerm_resource_group.this.name
+  vnet_subnet_id                     = azurerm_subnet.this.id
+  workload_profiles_enabled          = true
+  zone_redundancy_enabled            = true
+  vnet_internal_only                 = true
+  infrastructure_resource_group_name = "rg-${module.naming.container_app_environment.name_unique}"
 
   log_analytics_workspace_customer_id        = azurerm_log_analytics_workspace.this.workspace_id
   log_analytics_workspace_primary_shared_key = azurerm_log_analytics_workspace.this.primary_shared_key
