@@ -23,7 +23,7 @@ resource "azapi_resource" "this_environment" {
           "enabled" = var.peer_authentication_enabled
         }
       }
-      infrastructureResourceGroup = local.infrastructure_resource_group_name
+      infrastructureResourceGroup = var.infrastructure_resource_group_name
       vnetConfiguration = var.vnet_subnet_id != null ? {
         "internal"               = var.vnet_internal_only
         "infrastructureSubnetId" = var.vnet_subnet_id
@@ -38,7 +38,7 @@ resource "azapi_resource" "this_environment" {
       zoneRedundant = var.zone_redundancy_enabled
     }
   })
-  location                  = data.azurerm_resource_group.parent.location
+  location                  = coalesce(var.location, data.azurerm_resource_group.parent.location)
   name                      = var.name
   parent_id                 = data.azurerm_resource_group.parent.id
   schema_validation_enabled = false
