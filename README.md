@@ -5,7 +5,7 @@ This is a template repo for Terraform Azure Verified Modules.
 
 Things to do:
 
-1. Set up a GitHub repo environment called `test`.
+1. Set up a GitHub repo environment called `test`.s
 1. Configure environment protection rule to ensure that approval is required before deploying to this environment.
 1. Create a user-assigned managed identity in your test subscription.
 1. Create a role assignment for the managed identity on your test subscription, use the minimum required role.
