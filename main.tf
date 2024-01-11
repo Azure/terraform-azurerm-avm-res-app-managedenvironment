@@ -17,23 +17,23 @@ resource "azapi_resource" "this_environment" {
         "certificatePassword" = var.custom_domain_certificate_password
         "dnsSuffix"           = var.custom_domain_dns_suffix
       }
-      daprAIInstrumentationKey = var.instrumentation_key
+      daprAIInstrumentationKey = var.dapr_application_insights_connection_string
       peerAuthentication = {
         "mtls" : {
           "enabled" = var.peer_authentication_enabled
         }
       }
       infrastructureResourceGroup = var.infrastructure_resource_group_name
-      vnetConfiguration = var.vnet_subnet_id != null ? {
-        "internal"               = var.vnet_internal_only
-        "infrastructureSubnetId" = var.vnet_subnet_id
+      vnetConfiguration = var.infrastructure_subnet_id != null ? {
+        "internal"               = var.internal_load_balancer_enabled
+        "infrastructureSubnetId" = var.infrastructure_subnet_id
       } : null
-      workloadProfiles = var.workload_profiles_enabled ? setunion([
+      workloadProfiles = var.workload_consumption_profile_enabled ? setunion([
         {
           name                = "Consumption"
           workloadProfileType = "Consumption"
         }],
-        var.workload_profiles
+        var.workload_profile
       ) : null
       zoneRedundant = var.zone_redundancy_enabled
     }
@@ -43,6 +43,15 @@ resource "azapi_resource" "this_environment" {
   parent_id                 = data.azurerm_resource_group.parent.id
   schema_validation_enabled = false
   tags                      = var.tags
+  dynamic "timeouts" {
+    for_each = var.timeouts == null ? [] : [var.timeouts]
+    content {
+      create = timeouts.value.create
+      delete = timeouts.value.delete
+      read   = timeouts.value.read
+      update = timeouts.value.update
+    }
+  }
 }
 
 resource "azurerm_management_lock" "this" {
