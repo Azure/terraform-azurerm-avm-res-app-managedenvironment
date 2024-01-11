@@ -40,4 +40,7 @@ module "managedenvironment" {
 
   log_analytics_workspace_customer_id        = azurerm_log_analytics_workspace.this.workspace_id
   log_analytics_workspace_primary_shared_key = azurerm_log_analytics_workspace.this.primary_shared_key
+
+  # zone redundancy must be disabled unless we supply a subnet for vnet integration.
+  zone_redundancy_enabled = false
 }

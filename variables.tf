@@ -208,7 +208,8 @@ variable "workload_profile" {
     name                  = string
     workload_profile_type = string
   }))
-  default     = null
+  default     = []
+  nullable    = false
   description = <<-EOT
 
 This lists the workload profiles that will be configured for the Managed Environment.

@@ -297,7 +297,7 @@ set(object({
   }))
 ```
 
-Default: `null`
+Default: `[]`
 
 ### <a name="input_zone_redundancy_enabled"></a> [zone\_redundancy\_enabled](#input\_zone\_redundancy\_enabled)
 
