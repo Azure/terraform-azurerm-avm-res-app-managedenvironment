@@ -17,23 +17,23 @@ resource "azapi_resource" "this_environment" {
         "certificatePassword" = var.custom_domain_certificate_password
         "dnsSuffix"           = var.custom_domain_dns_suffix
       }
-      daprAIInstrumentationKey = var.instrumentation_key
+      daprAIInstrumentationKey = var.dapr_application_insights_connection_string
       peerAuthentication = {
         "mtls" : {
           "enabled" = var.peer_authentication_enabled
         }
       }
       infrastructureResourceGroup = var.infrastructure_resource_group_name
-      vnetConfiguration = var.vnet_subnet_id != null ? {
-        "internal"               = var.vnet_internal_only
-        "infrastructureSubnetId" = var.vnet_subnet_id
+      vnetConfiguration = var.infrastructure_subnet_id != null ? {
+        "internal"               = var.internal_load_balancer_enabled
+        "infrastructureSubnetId" = var.infrastructure_subnet_id
       } : null
-      workloadProfiles = var.workload_profiles_enabled ? setunion([
+      workloadProfiles = var.workload_consumption_profile_enabled ? setunion([
         {
           name                = "Consumption"
           workloadProfileType = "Consumption"
         }],
-        var.workload_profiles
+        var.workload_profile
       ) : null
       zoneRedundant = var.zone_redundancy_enabled
     }
@@ -43,6 +43,15 @@ resource "azapi_resource" "this_environment" {
   parent_id                 = data.azurerm_resource_group.parent.id
   schema_validation_enabled = false
   tags                      = var.tags
+  dynamic "timeouts" {
+    for_each = var.timeouts == null ? [] : [var.timeouts]
+    content {
+      create = timeouts.value.create
+      delete = timeouts.value.delete
+      read   = timeouts.value.read
+      update = timeouts.value.update
+    }
+  }
 }
 
 resource "azurerm_management_lock" "this" {
@@ -64,4 +73,37 @@ resource "azurerm_role_assignment" "this" {
   role_definition_id                     = strcontains(lower(each.value.role_definition_id_or_name), lower(local.role_definition_resource_substring)) ? each.value.role_definition_id_or_name : null
   role_definition_name                   = strcontains(lower(each.value.role_definition_id_or_name), lower(local.role_definition_resource_substring)) ? null : each.value.role_definition_id_or_name
   skip_service_principal_aad_check       = each.value.skip_service_principal_aad_check
+}
+
+resource "azurerm_monitor_diagnostic_setting" "this" {
+  for_each                       = var.diagnostic_settings
+  name                           = each.value.name != null ? each.value.name : "diag-${var.name}"
+  target_resource_id             = azapi_resource.this_environment.id
+  storage_account_id             = each.value.storage_account_resource_id
+  eventhub_authorization_rule_id = each.value.event_hub_authorization_rule_resource_id
+  eventhub_name                  = each.value.event_hub_name
+  partner_solution_id            = each.value.marketplace_partner_resource_id
+  log_analytics_workspace_id     = each.value.workspace_resource_id
+  log_analytics_destination_type = each.value.log_analytics_destination_type
+
+  dynamic "enabled_log" {
+    for_each = each.value.log_categories
+    content {
+      category = enabled_log.value
+    }
+  }
+
+  dynamic "enabled_log" {
+    for_each = each.value.log_groups
+    content {
+      category_group = enabled_log.value
+    }
+  }
+
+  dynamic "metric" {
+    for_each = each.value.metric_categories
+    content {
+      category = metric.value
+    }
+  }
 }

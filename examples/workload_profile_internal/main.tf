@@ -8,16 +8,6 @@ terraform {
   }
 }
 
-variable "enable_telemetry" {
-  type        = bool
-  default     = true
-  description = <<DESCRIPTION
-This variable controls whether or not telemetry is enabled for the module.
-For more information see <https://aka.ms/avm/telemetryinfo>.
-If it is set to false, then no telemetry will be collected.
-DESCRIPTION
-}
-
 provider "azurerm" {
   skip_provider_registration = true
   features {}
@@ -67,13 +57,13 @@ module "managedenvironment" {
   source = "../../"
   # source = "Azure/avm-res-app-managedenvironment/azurerm"
 
-  name                               = module.naming.container_app_environment.name_unique
-  resource_group_name                = azurerm_resource_group.this.name
-  vnet_subnet_id                     = azurerm_subnet.this.id
-  workload_profiles_enabled          = true
-  zone_redundancy_enabled            = true
-  vnet_internal_only                 = true
-  infrastructure_resource_group_name = "rg-managed-${module.naming.container_app_environment.name_unique}"
+  name                                 = module.naming.container_app_environment.name_unique
+  resource_group_name                  = azurerm_resource_group.this.name
+  infrastructure_subnet_id             = azurerm_subnet.this.id
+  workload_consumption_profile_enabled = true
+  zone_redundancy_enabled              = true
+  internal_load_balancer_enabled       = true
+  infrastructure_resource_group_name   = "rg-managed-${module.naming.container_app_environment.name_unique}"
 
   log_analytics_workspace_customer_id        = azurerm_log_analytics_workspace.this.workspace_id
   log_analytics_workspace_primary_shared_key = azurerm_log_analytics_workspace.this.primary_shared_key

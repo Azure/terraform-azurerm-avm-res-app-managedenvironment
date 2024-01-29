@@ -1,12 +1,19 @@
-variable "name" {
+variable "location" {
   type        = string
-  description = "Name for the resource."
+  default     = null
+  description = "Azure region where the resource should be deployed.  If null, the location will be inferred from the resource group location."
 }
 
-# This is required for most resource modules
+variable "name" {
+  type        = string
+  description = "The name of the Container Apps Managed Environment."
+  nullable    = false
+}
+
 variable "resource_group_name" {
   type        = string
-  description = "The resource group where the resources will be deployed."
+  description = "(Required) The name of the resource group in which the Container App Environment is to be created. Changing this forces a new resource to be created."
+  nullable    = false
 }
 
 variable "custom_domain_certificate_password" {
@@ -19,6 +26,13 @@ variable "custom_domain_dns_suffix" {
   type        = string
   default     = null
   description = "DNS suffix for custom domain."
+}
+
+variable "dapr_application_insights_connection_string" {
+  type        = string
+  default     = null
+  description = "Application Insights connection string used by Dapr to export Service to Service communication telemetry."
+  sensitive   = true
 }
 
 variable "diagnostic_settings" {
@@ -75,6 +89,11 @@ For more information see <https://aka.ms/avm/telemetryinfo>.
 If it is set to false, then no telemetry will be collected.
 DESCRIPTION
 }
+variable "infrastructure_subnet_id" {
+  type        = string
+  default     = null
+  description = "The existing Subnet to use for the Container Apps Control Plane. **NOTE:** The Subnet must have a `/21` or larger address space."
+}
 
 variable "infrastructure_resource_group_name" {
   type        = string
@@ -85,17 +104,10 @@ If a subnet ID is provided, this resource group will be created in the same subs
 If not specified, then one will be generated automatically, in the form ``ME_<app_managed_environment_name>_<resource_group>_<location>``.
 DESCRIPTION
 }
-
-variable "instrumentation_key" {
-  type        = string
-  default     = null
-  description = "Instrumentation key for Dapr AI."
-}
-
-variable "location" {
-  type        = string
-  default     = null
-  description = "Azure region where the resource should be deployed.  If null, the location will be inferred from the resource group location."
+variable "internal_load_balancer_enabled" {
+  type        = bool
+  default     = false
+  description = "Should the Container Environment operate in Internal Load Balancing Mode? Defaults to `false`. **Note:** can only be set to `true` if `infrastructure_subnet_id` is specified."
 }
 
 variable "lock" {
@@ -116,7 +128,7 @@ variable "lock" {
 variable "log_analytics_workspace_customer_id" {
   type        = string
   default     = null
-  description = "Customer ID for Log Analytics workspace."
+  description = "The ID for the Log Analytics Workspace to link this Container Apps Managed Environment to."
 }
 
 variable "log_analytics_workspace_destination" {
@@ -168,52 +180,58 @@ DESCRIPTION
 }
 
 variable "tags" {
-  type        = map(any)
-  default     = {}
-  description = "Custom tags to apply to the resource."
-}
-
-variable "vnet_internal_only" {
-  type        = bool
-  default     = false
-  description = "Restrict access to internal resources within VNet."
-}
-
-variable "vnet_subnet_id" {
-  type        = string
+  type        = map(string)
   default     = null
-  description = "ID of the VNet subnet."
+  description = "(Optional) A mapping of tags to assign to the resource."
 }
 
-variable "workload_profiles" {
-  type = list(object({
-    name                = string
-    workloadProfileType = string
-    minimumCount        = optional(number, 3)
-    maximumCount        = optional(number, 5)
+variable "timeouts" {
+  type = object({
+    create = optional(string)
+    delete = optional(string)
+    read   = optional(string)
+    update = optional(string)
+  })
+  default     = null
+  description = <<-EOT
+ - `create` - (Defaults to 30 minutes) Used when creating the Container App Environment.
+ - `delete` - (Defaults to 30 minutes) Used when deleting the Container App Environment.
+ - `read` - (Defaults to 5 minutes) Used when retrieving the Container App Environment.
+ - `update` - (Defaults to 30 minutes) Used when updating the Container App Environment.
+EOT
+}
+
+variable "workload_profile" {
+  type = set(object({
+    maximum_count         = number
+    minimum_count         = number
+    name                  = string
+    workload_profile_type = string
   }))
   default     = []
-  description = <<DESCRIPTION
+  nullable    = false
+  description = <<-EOT
+
 This lists the workload profiles that will be configured for the Managed Environment.
 This is in addition to the default Consumpion Plan workload profile.
 
-- `name` - the name of the workload profile.
-- `workloadProfileType` - workload profile type, this determines the amount of compute and memory resource available to the container apps deployed in an environment.
-- `minimiumCount` - the minimum number of instances that must be deployed.
-- `maximiumCount` - the maximum number of instances that may be deployed.
-DESCRIPTION
+ - `maximum_count` - (Optional) The maximum number of instances of workload profile that can be deployed in the Container App Environment.
+ - `minimum_count` - (Optional) The minimum number of instances of workload profile that can be deployed in the Container App Environment.
+ - `name` - (Required) The name of the workload profile.
+ - `workload_profile_type` - (Required) Workload profile type for the workloads to run on. Possible values include `D4`, `D8`, `D16`, `D32`, `E4`, `E8`, `E16` and `E32`.
+EOT
 
   validation {
-    condition     = var.workload_profiles == null ? true : can([for wp in var.workload_profiles : regex("^[a-zA-Z][a-zA-Z0-9_-]{0,14}[a-zA-Z0-9]$", wp.name)])
+    condition     = var.workload_profile == null ? true : can([for wp in var.workload_profile : regex("^[a-zA-Z][a-zA-Z0-9_-]{0,14}[a-zA-Z0-9]$", wp.name)])
     error_message = "Invalid value for workload_profile_name. It must start with a letter, contain only letters, numbers, underscores, or dashes, and not end with an underscore or dash. Maximum 15 characters."
   }
   validation {
-    condition     = var.workload_profiles == null ? true : can([for wp in var.workload_profiles : index(["D4", "D8", "D16", "D32", "E4", "E8", "E16", "E32"], wp.workloadProfileType) >= 0])
+    condition     = var.workload_profile == null ? true : can([for wp in var.workload_profile : index(["D4", "D8", "D16", "D32", "E4", "E8", "E16", "E32"], wp.workload_profile_type) >= 0])
     error_message = "Invalid value for workload_profile_type. Valid options are 'D4', 'D8', 'D16', 'D32', 'E4', 'E8', 'E16', 'E32'."
   }
 }
 
-variable "workload_profiles_enabled" {
+variable "workload_consumption_profile_enabled" {
   type        = bool
   default     = false
   description = "Whether to use workload profiles, this will create the default Consumption Plan, for dedicated plans use `workload_profiles`"
@@ -221,6 +239,6 @@ variable "workload_profiles_enabled" {
 
 variable "zone_redundancy_enabled" {
   type        = bool
-  default     = false
-  description = "Enable zone-redundancy for the resource, this feature requires supplying an available subnet via `vnet_subnet_id`."
+  default     = true
+  description = "(Optional) Should the Container App Environment be created with Zone Redundancy enabled? Defaults to `false`. Changing this forces a new resource to be created."
 }

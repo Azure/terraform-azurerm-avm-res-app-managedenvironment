@@ -4,7 +4,7 @@
 Module to deploy Container Apps Managed Environments in Azure.
 
 > [!WARNING]
-> Major version Zero (0.1.0) is for initial development. Anything MAY change at any time. A module SHOULD NOT be considered stable till at least it is major version one (1.0.0) or greater. Changes will always be via new versions being published and no changes will be made to existing published versions. For more details please go to <https://semver.org/>
+> Major version Zero (0.y.z) is for initial development. Anything MAY change at any time. A module SHOULD NOT be considered stable till at least it is major version one (1.0.0) or greater. Changes will always be via new versions being published and no changes will be made to existing published versions. For more details please go to <https://semver.org/>
 
 <!-- markdownlint-disable MD033 -->
 ## Requirements
@@ -35,6 +35,7 @@ The following resources are used by this module:
 
 - [azapi_resource.this_environment](https://registry.terraform.io/providers/Azure/azapi/latest/docs/resources/resource) (resource)
 - [azurerm_management_lock.this](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/management_lock) (resource)
+- [azurerm_monitor_diagnostic_setting.this](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/monitor_diagnostic_setting) (resource)
 - [azurerm_resource_group_template_deployment.telemetry](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/resource_group_template_deployment) (resource)
 - [azurerm_role_assignment.this](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/role_assignment) (resource)
 - [random_id.telem](https://registry.terraform.io/providers/hashicorp/random/latest/docs/resources/id) (resource)
@@ -47,13 +48,13 @@ The following input variables are required:
 
 ### <a name="input_name"></a> [name](#input\_name)
 
-Description: Name for the resource.
+Description: The name of the Container Apps Managed Environment.
 
 Type: `string`
 
 ### <a name="input_resource_group_name"></a> [resource\_group\_name](#input\_resource\_group\_name)
 
-Description: The resource group where the resources will be deployed.
+Description: (Required) The name of the resource group in which the Container App Environment is to be created. Changing this forces a new resource to be created.
 
 Type: `string`
 
@@ -72,6 +73,14 @@ Default: `null`
 ### <a name="input_custom_domain_dns_suffix"></a> [custom\_domain\_dns\_suffix](#input\_custom\_domain\_dns\_suffix)
 
 Description: DNS suffix for custom domain.
+
+Type: `string`
+
+Default: `null`
+
+### <a name="input_dapr_application_insights_connection_string"></a> [dapr\_application\_insights\_connection\_string](#input\_dapr\_application\_insights\_connection\_string)
+
+Description: Application Insights connection string used by Dapr to export Service to Service communication telemetry.
 
 Type: `string`
 
@@ -131,13 +140,21 @@ Type: `string`
 
 Default: `null`
 
-### <a name="input_instrumentation_key"></a> [instrumentation\_key](#input\_instrumentation\_key)
+### <a name="input_infrastructure_subnet_id"></a> [infrastructure\_subnet\_id](#input\_infrastructure\_subnet\_id)
 
-Description: Instrumentation key for Dapr AI.
+Description: The existing Subnet to use for the Container Apps Control Plane. **NOTE:** The Subnet must have a `/21` or larger address space.
 
 Type: `string`
 
 Default: `null`
+
+### <a name="input_internal_load_balancer_enabled"></a> [internal\_load\_balancer\_enabled](#input\_internal\_load\_balancer\_enabled)
+
+Description: Should the Container Environment operate in Internal Load Balancing Mode? Defaults to `false`. **Note:** can only be set to `true` if `infrastructure_subnet_id` is specified.
+
+Type: `bool`
+
+Default: `false`
 
 ### <a name="input_location"></a> [location](#input\_location)
 
@@ -164,7 +181,7 @@ Default: `{}`
 
 ### <a name="input_log_analytics_workspace_customer_id"></a> [log\_analytics\_workspace\_customer\_id](#input\_log\_analytics\_workspace\_customer\_id)
 
-Description: Customer ID for Log Analytics workspace.
+Description: The ID for the Log Analytics Workspace to link this Container Apps Managed Environment to.
 
 Type: `string`
 
@@ -225,52 +242,33 @@ Default: `{}`
 
 ### <a name="input_tags"></a> [tags](#input\_tags)
 
-Description: Custom tags to apply to the resource.
+Description: (Optional) A mapping of tags to assign to the resource.
 
-Type: `map(any)`
-
-Default: `{}`
-
-### <a name="input_vnet_internal_only"></a> [vnet\_internal\_only](#input\_vnet\_internal\_only)
-
-Description: Restrict access to internal resources within VNet.
-
-Type: `bool`
-
-Default: `false`
-
-### <a name="input_vnet_subnet_id"></a> [vnet\_subnet\_id](#input\_vnet\_subnet\_id)
-
-Description: ID of the VNet subnet.
-
-Type: `string`
+Type: `map(string)`
 
 Default: `null`
 
-### <a name="input_workload_profiles"></a> [workload\_profiles](#input\_workload\_profiles)
+### <a name="input_timeouts"></a> [timeouts](#input\_timeouts)
 
-Description: This lists the workload profiles that will be configured for the Managed Environment.  
-This is in addition to the default Consumpion Plan workload profile.
-
-- `name` - the name of the workload profile.
-- `workloadProfileType` - workload profile type, this determines the amount of compute and memory resource available to the container apps deployed in an environment.
-- `minimiumCount` - the minimum number of instances that must be deployed.
-- `maximiumCount` - the maximum number of instances that may be deployed.
+Description: - `create` - (Defaults to 30 minutes) Used when creating the Container App Environment.
+- `delete` - (Defaults to 30 minutes) Used when deleting the Container App Environment.
+- `read` - (Defaults to 5 minutes) Used when retrieving the Container App Environment.
+- `update` - (Defaults to 30 minutes) Used when updating the Container App Environment.
 
 Type:
 
 ```hcl
-list(object({
-    name                = string
-    workloadProfileType = string
-    minimumCount        = optional(number, 3)
-    maximumCount        = optional(number, 5)
-  }))
+object({
+    create = optional(string)
+    delete = optional(string)
+    read   = optional(string)
+    update = optional(string)
+  })
 ```
 
-Default: `[]`
+Default: `null`
 
-### <a name="input_workload_profiles_enabled"></a> [workload\_profiles\_enabled](#input\_workload\_profiles\_enabled)
+### <a name="input_workload_consumption_profile_enabled"></a> [workload\_consumption\_profile\_enabled](#input\_workload\_consumption\_profile\_enabled)
 
 Description: Whether to use workload profiles, this will create the default Consumption Plan, for dedicated plans use `workload_profiles`
 
@@ -278,17 +276,49 @@ Type: `bool`
 
 Default: `false`
 
+### <a name="input_workload_profile"></a> [workload\_profile](#input\_workload\_profile)
+
+Description:   
+This lists the workload profiles that will be configured for the Managed Environment.  
+This is in addition to the default Consumpion Plan workload profile.
+
+ - `maximum_count` - (Optional) The maximum number of instances of workload profile that can be deployed in the Container App Environment.
+ - `minimum_count` - (Optional) The minimum number of instances of workload profile that can be deployed in the Container App Environment.
+ - `name` - (Required) The name of the workload profile.
+ - `workload_profile_type` - (Required) Workload profile type for the workloads to run on. Possible values include `D4`, `D8`, `D16`, `D32`, `E4`, `E8`, `E16` and `E32`.
+
+Type:
+
+```hcl
+set(object({
+    maximum_count         = number
+    minimum_count         = number
+    name                  = string
+    workload_profile_type = string
+  }))
+```
+
+Default: `[]`
+
 ### <a name="input_zone_redundancy_enabled"></a> [zone\_redundancy\_enabled](#input\_zone\_redundancy\_enabled)
 
-Description: Enable zone-redundancy for the resource, this feature requires supplying an available subnet via `vnet_subnet_id`.
+Description: (Optional) Should the Container App Environment be created with Zone Redundancy enabled? Defaults to `false`. Changing this forces a new resource to be created.
 
 Type: `bool`
 
-Default: `false`
+Default: `true`
 
 ## Outputs
 
 The following outputs are exported:
+
+### <a name="output_id"></a> [id](#output\_id)
+
+Description: The ID of the resource.
+
+### <a name="output_name"></a> [name](#output\_name)
+
+Description: The name of the resource
 
 ### <a name="output_resource"></a> [resource](#output\_resource)
 
