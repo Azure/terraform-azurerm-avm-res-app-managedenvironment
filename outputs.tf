@@ -4,11 +4,23 @@
 output "resource" {
   description = "The Container Apps Managed Environment resource."
   value = {
-    id                               = azapi_resource.this_environment.id
+    id                  = azapi_resource.this_environment.id
+    name                = azapi_resource.this_environment.name
+    resource_group_name = data.azurerm_resource_group.parent.name
+    location            = jsondecode(data.azapi_resource.this_environment.output).location
+
+    dapr_application_insights_connection_string = try(jsondecode(data.azapi_resource.this_environment.output).properties.daprAIInstrumentationKey, null)
+    infrastructure_subnet_id                    = try(jsondecode(data.azapi_resource.this_environment.output).properties.vnetConfiguration.infrastructureSubnetId, null)
+    internal_load_balancer_enabled              = try(jsondecode(data.azapi_resource.this_environment.output).properties.vnetConfiguration.internal, null)
+    zone_redundancy_enabled                     = try(jsondecode(data.azapi_resource.this_environment.output).properties.zoneRedundant, null)
+    log_analytics_workspace_id                  = try(jsondecode(data.azapi_resource.this_environment.output).properties.AppLogsConfiguration.logAnalyticsConfiguration.customerId, null)
+    tags                                        = try(azapi_resource.this_environment.tags, null)
+    #workload_profiles TODO
+
     default_domain                   = jsondecode(data.azapi_resource.this_environment.output).properties.defaultDomain
-    docker_bridge_cidr               = jsondecode(data.azapi_resource.this_environment.output).properties.vnetConfiguration.dockerBridgeCidr
-    platform_reserved_cidr           = jsondecode(data.azapi_resource.this_environment.output).properties.vnetConfiguration.platformReservedCidr
-    platform_reserved_dns_ip_address = jsondecode(data.azapi_resource.this_environment.output).properties.vnetConfiguration.platformReservedDnsIP
+    docker_bridge_cidr               = try(jsondecode(data.azapi_resource.this_environment.output).properties.vnetConfiguration.dockerBridgeCidr, null)
+    platform_reserved_cidr           = try(jsondecode(data.azapi_resource.this_environment.output).properties.vnetConfiguration.platformReservedCidr, null)
+    platform_reserved_dns_ip_address = try(jsondecode(data.azapi_resource.this_environment.output).properties.vnetConfiguration.platformReservedDnsIP, null)
     static_ip_address                = jsondecode(data.azapi_resource.this_environment.output).properties.staticIp
   }
 }
