@@ -111,7 +111,11 @@ No optional inputs.
 
 ## Outputs
 
-No outputs.
+The following outputs are exported:
+
+### <a name="output_app_environment"></a> [app\_environment](#output\_app\_environment)
+
+Description: n/a
 
 ## Modules
 
