@@ -4,13 +4,12 @@
 output "resource" {
   description = "The Container Apps Managed Environment resource."
   value = {
-    # azapi_resource.this_environment
-    id = azapi_resource.this_environment.id
-    #default_domain
-    docker_bridge_cidr               = jsondecode(azapi_resource.this_environment).properties.vnetConfiguration.dockerBridgeCidr
-    platform_reserved_cidr           = jsondecode(azapi_resource.this_environment).properties.vnetConfiguration.platformReservedCidr
-    platform_reserved_dns_ip_address = jsondecode(azapi_resource.this_environment).properties.vnetConfiguration.platformReservedDnsIP
-    #static_ip_address 
+    id                               = azapi_resource.this_environment.id
+    default_domain                   = jsondecode(data.azapi_resource.this_environment.output).properties.defaultDomain
+    docker_bridge_cidr               = jsondecode(data.azapi_resource.this_environment.output).properties.vnetConfiguration.dockerBridgeCidr
+    platform_reserved_cidr           = jsondecode(data.azapi_resource.this_environment.output).properties.vnetConfiguration.platformReservedCidr
+    platform_reserved_dns_ip_address = jsondecode(data.azapi_resource.this_environment.output).properties.vnetConfiguration.platformReservedDnsIP
+    static_ip_address                = jsondecode(data.azapi_resource.this_environment.output).properties.staticIp
   }
 }
 

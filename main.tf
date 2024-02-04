@@ -54,6 +54,13 @@ resource "azapi_resource" "this_environment" {
   }
 }
 
+data "azapi_resource" "this_environment" {
+  type                   = "Microsoft.App/managedEnvironments@2023-05-01"
+  name                   = azapi_resource.this_environment.name
+  parent_id              = data.azurerm_resource_group.parent.id
+  response_export_values = ["*"]
+}
+
 resource "azurerm_management_lock" "this" {
   count = var.lock.kind != "None" ? 1 : 0
 
