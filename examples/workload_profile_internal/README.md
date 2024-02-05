@@ -115,7 +115,7 @@ The following outputs are exported:
 
 ### <a name="output_app_environment"></a> [app\_environment](#output\_app\_environment)
 
-Description: n/a
+Description: The outputs for the managed environment, this allows outputs to be inspected in the CI run.
 
 ## Modules
 

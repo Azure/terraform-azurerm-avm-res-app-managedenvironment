@@ -7,7 +7,7 @@ locals {
         name                  = wp.name
         workload_profile_type = wp.workloadProfileType
       },
-      // Only include minimumCount and maximumCount if workloadProfileType is not "Consumption"
+      # minimumCount and maximumCount are not applicable if the workloadProfileType is "Consumption"
       wp.workloadProfileType != "Consumption" ? {
         minimum_count = wp.minimumCount
         maximum_count = wp.maximumCount
@@ -15,5 +15,3 @@ locals {
     )
   ] : null
 }
-
-

@@ -10,14 +10,15 @@ output "resource" {
     location            = jsondecode(data.azapi_resource.this_environment.output).location
 
     # outputs provided by the AzureRM provider
-    dapr_application_insights_connection_string = try(jsondecode(data.azapi_resource.this_environment.output).properties.daprAIInstrumentationKey, null)
+    dapr_application_insights_connection_string = try(jsondecode(data.azapi_resource.this_environment.output).properties.daprAIConnectionString, null)
     infrastructure_subnet_id                    = try(jsondecode(data.azapi_resource.this_environment.output).properties.vnetConfiguration.infrastructureSubnetId, null)
     internal_load_balancer_enabled              = try(jsondecode(data.azapi_resource.this_environment.output).properties.vnetConfiguration.internal, null)
-    zone_redundancy_enabled                     = try(jsondecode(data.azapi_resource.this_environment.output).properties.zoneRedundant, null)
     log_analytics_workspace_id                  = try(jsondecode(data.azapi_resource.this_environment.output).properties.appLogsConfiguration.logAnalyticsConfiguration.customerId, null)
     tags                                        = try(azapi_resource.this_environment.tags, null)
     workload_profiles                           = local.workload_profile_outputs
+    zone_redundancy_enabled                     = try(jsondecode(data.azapi_resource.this_environment.output).properties.zoneRedundant, null)
 
+    # outputs provided by the AzureRM provider known after apply
     default_domain                   = jsondecode(data.azapi_resource.this_environment.output).properties.defaultDomain
     docker_bridge_cidr               = try(jsondecode(data.azapi_resource.this_environment.output).properties.vnetConfiguration.dockerBridgeCidr, null)
     platform_reserved_cidr           = try(jsondecode(data.azapi_resource.this_environment.output).properties.vnetConfiguration.platformReservedCidr, null)
@@ -25,10 +26,10 @@ output "resource" {
     static_ip_address                = jsondecode(data.azapi_resource.this_environment.output).properties.staticIp
 
     # additional outputs not yet supported by the AzureRM provider
-    custom_domain_verification_id = try(jsondecode(data.azapi_resource.this_environment.output).properties.customDomainConfiguration.customDomainVerificationId, null)
-    mtls_enabled                  = try(jsondecode(data.azapi_resource.this_environment.output).properties.peerAuthentication.mtls.enabled, false)
-    infrastructure_resource_group = try(jsondecode(data.azapi_resource.this_environment.output).properties.infrastructureResourceGroup, null)
-
+    custom_domain_verification_id          = try(jsondecode(data.azapi_resource.this_environment.output).properties.customDomainConfiguration.customDomainVerificationId, null)
+    dapr_azure_monitor_instrumentation_key = try(jsondecode(data.azapi_resource.this_environment.output).properties.daprAIInstrumentationKey, null)
+    infrastructure_resource_group          = try(jsondecode(data.azapi_resource.this_environment.output).properties.infrastructureResourceGroup, null)
+    mtls_enabled                           = try(jsondecode(data.azapi_resource.this_environment.output).properties.peerAuthentication.mtls.enabled, false)
   }
 }
 

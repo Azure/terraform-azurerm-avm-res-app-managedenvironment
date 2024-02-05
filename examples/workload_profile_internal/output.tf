@@ -1,3 +1,4 @@
 output "app_environment" {
-  value = module.managedenvironment.resource
+  description = "The outputs for the managed environment, this allows outputs to be inspected in the CI run."
+  value       = module.managedenvironment.resource
 }
