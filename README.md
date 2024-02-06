@@ -39,6 +39,7 @@ The following resources are used by this module:
 - [azurerm_resource_group_template_deployment.telemetry](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/resource_group_template_deployment) (resource)
 - [azurerm_role_assignment.this](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/role_assignment) (resource)
 - [random_id.telem](https://registry.terraform.io/providers/hashicorp/random/latest/docs/resources/id) (resource)
+- [azapi_resource.this_environment](https://registry.terraform.io/providers/Azure/azapi/latest/docs/data-sources/resource) (data source)
 - [azurerm_resource_group.parent](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/data-sources/resource_group) (data source)
 
 <!-- markdownlint-disable MD013 -->
