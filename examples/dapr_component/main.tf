@@ -42,7 +42,7 @@ module "managedenvironment" {
   log_analytics_workspace_primary_shared_key = azurerm_log_analytics_workspace.this.primary_shared_key
 
   dapr_components = {
-    "my_dapr_component" = {
+    "my-dapr-component" = {
       component_type = "state.azure.blobstorage"
       version        = "v1"
     }
