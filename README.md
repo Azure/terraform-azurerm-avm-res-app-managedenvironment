@@ -33,6 +33,8 @@ The following providers are used by this module:
 
 The following resources are used by this module:
 
+- [azapi_resource.dapr_components](https://registry.terraform.io/providers/Azure/azapi/latest/docs/resources/resource) (resource)
+- [azapi_resource.storages](https://registry.terraform.io/providers/Azure/azapi/latest/docs/resources/resource) (resource)
 - [azapi_resource.this_environment](https://registry.terraform.io/providers/Azure/azapi/latest/docs/resources/resource) (resource)
 - [azurerm_management_lock.this](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/management_lock) (resource)
 - [azurerm_monitor_diagnostic_setting.this](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/monitor_diagnostic_setting) (resource)
@@ -86,6 +88,61 @@ Description: Application Insights connection string used by Dapr to export Servi
 Type: `string`
 
 Default: `null`
+
+### <a name="input_dapr_components"></a> [dapr\_components](#input\_dapr\_components)
+
+Description: - `component_type` - (Required) The Dapr Component Type. For example `state.azure.blobstorage`. Changing this forces a new resource to be created.
+- `ignore_errors` - (Optional) Should the Dapr sidecar to continue initialisation if the component fails to load. Defaults to `false`
+- `init_timeout` - (Optional) The timeout for component initialisation as a `ISO8601` formatted string. e.g. `5s`, `2h`, `1m`. Defaults to `5s`.
+- `scopes` - (Optional) A list of scopes to which this component applies.
+- `version` - (Required) The version of the component.
+
+---
+`metadata` block supports the following:
+- `name` - (Required) The name of the Metadata configuration item.
+- `secret_name` - (Optional) The name of a secret specified in the `secrets` block that contains the value for this metadata configuration item.
+- `value` - (Optional) The value for this metadata configuration item.
+
+---
+`secret` block supports the following:
+- `name` - (Required) The Secret name.
+- `value` - (Required) The value for this secret.
+
+---
+`timeouts` block supports the following:
+- `create` - (Defaults to 30 minutes) Used when creating the Container App Environment Dapr Component.
+- `delete` - (Defaults to 30 minutes) Used when deleting the Container App Environment Dapr Component.
+- `read` - (Defaults to 5 minutes) Used when retrieving the Container App Environment Dapr Component.
+- `update` - (Defaults to 30 minutes) Used when updating the Container App Environment Dapr Component.
+
+Type:
+
+```hcl
+map(object({
+    component_type = string
+    ignore_errors  = optional(bool)
+    init_timeout   = optional(string)
+    scopes         = optional(list(string))
+    version        = string
+    metadata = optional(list(object({
+      name        = string
+      secret_name = optional(string)
+      value       = optional(string)
+    })))
+    secret = optional(set(object({
+      name  = string
+      value = string
+    })))
+    timeouts = optional(object({
+      create = optional(string)
+      delete = optional(string)
+      read   = optional(string)
+      update = optional(string)
+    }))
+  }))
+```
+
+Default: `{}`
 
 ### <a name="input_diagnostic_settings"></a> [diagnostic\_settings](#input\_diagnostic\_settings)
 
@@ -236,6 +293,39 @@ map(object({
     condition                              = optional(string, null)
     condition_version                      = optional(string, null)
     delegated_managed_identity_resource_id = optional(string, null)
+  }))
+```
+
+Default: `{}`
+
+### <a name="input_storages"></a> [storages](#input\_storages)
+
+Description: - `access_key` - (Required) The Storage Account Access Key.
+- `access_mode` - (Required) The access mode to connect this storage to the Container App. Possible values include `ReadOnly` and `ReadWrite`. Changing this forces a new resource to be created.
+- `account_name` - (Required) The Azure Storage Account in which the Share to be used is located. Changing this forces a new resource to be created.
+- `share_name` - (Required) The name of the Azure Storage Share to use. Changing this forces a new resource to be created.
+
+---
+`timeouts` block supports the following:
+- `create` - (Defaults to 30 minutes) Used when creating the Container App Environment Storage.
+- `delete` - (Defaults to 30 minutes) Used when deleting the Container App Environment Storage.
+- `read` - (Defaults to 5 minutes) Used when retrieving the Container App Environment Storage.
+- `update` - (Defaults to 30 minutes) Used when updating the Container App Environment Storage.
+
+Type:
+
+```hcl
+map(object({
+    access_key   = string
+    access_mode  = string
+    account_name = string
+    share_name   = string
+    timeouts = optional(object({
+      create = optional(string)
+      delete = optional(string)
+      read   = optional(string)
+      update = optional(string)
+    }))
   }))
 ```
 
