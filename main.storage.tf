@@ -1,7 +1,7 @@
 resource "azapi_resource" "storages" {
   for_each = var.storages
 
-  type      = "Microsoft.App/managedEnvironments/daprComponents@2023-05-01"
+  type      = "Microsoft.App/managedEnvironments/storages@2023-05-01"
   name      = each.key
   parent_id = azapi_resource.this_environment.id
   body = jsonencode({

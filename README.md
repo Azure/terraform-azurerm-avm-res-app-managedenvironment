@@ -121,7 +121,7 @@ Type:
 ```hcl
 map(object({
     component_type         = string
-    ignore_errors          = optional(bool)
+    ignore_errors          = optional(bool, true)
     init_timeout           = optional(string)
     secret_store_component = optional(string)
     scopes                 = optional(list(string))
