@@ -32,7 +32,7 @@ resource "azurerm_log_analytics_workspace" "this" {
 }
 
 resource "azurerm_storage_account" "this" {
-  name                     = "azureteststorage"
+  name                     = module.naming.storage_account.name_unique
   resource_group_name      = azurerm_resource_group.this.name
   location                 = azurerm_resource_group.this.location
   account_tier             = "Standard"
