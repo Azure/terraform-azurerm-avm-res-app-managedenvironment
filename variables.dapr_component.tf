@@ -1,10 +1,11 @@
 variable "dapr_components" {
   type = map(object({
-    component_type = string
-    ignore_errors  = optional(bool)
-    init_timeout   = optional(string)
-    scopes         = optional(list(string))
-    version        = string
+    component_type         = string
+    ignore_errors          = optional(bool)
+    init_timeout           = optional(string)
+    secret_store_component = optional(string)
+    scopes                 = optional(list(string))
+    version                = string
     metadata = optional(list(object({
       name        = string
       secret_name = optional(string)
@@ -26,6 +27,7 @@ variable "dapr_components" {
  - `component_type` - (Required) The Dapr Component Type. For example `state.azure.blobstorage`. Changing this forces a new resource to be created.
  - `ignore_errors` - (Optional) Should the Dapr sidecar to continue initialisation if the component fails to load. Defaults to `false`
  - `init_timeout` - (Optional) The timeout for component initialisation as a `ISO8601` formatted string. e.g. `5s`, `2h`, `1m`. Defaults to `5s`.
+ - `secret_store_component` - (Optional) Name of a Dapr component to retrieve component secrets from.
  - `scopes` - (Optional) A list of scopes to which this component applies.
  - `version` - (Required) The version of the component.
 
