@@ -52,3 +52,13 @@ output "dapr_components" {
   description = "A map of dapr components connected to this environment. The map key is the supplied input to var.storages. The map value is the azurerm-formatted version of the entire dapr_components resource."
   value       = local.dapr_component_outputs
 }
+
+output "id" {
+  description = "The ID of the resource."
+  value       = azapi_resource.this_environment.id
+}
+
+output "name" {
+  description = "The name of the resource"
+  value       = azapi_resource.this_environment.name
+}
