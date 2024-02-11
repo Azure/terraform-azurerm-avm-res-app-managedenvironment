@@ -405,6 +405,10 @@ Default: `true`
 
 The following outputs are exported:
 
+### <a name="output_dapr_components"></a> [dapr\_components](#output\_dapr\_components)
+
+Description: A map of dapr components connected to this environment. The map key is the supplied input to var.storages. The map value is the azurerm-formatted version of the entire dapr\_components resource.
+
 ### <a name="output_id"></a> [id](#output\_id)
 
 Description: The ID of the resource.
@@ -416,6 +420,10 @@ Description: The name of the resource
 ### <a name="output_resource"></a> [resource](#output\_resource)
 
 Description: The Container Apps Managed Environment resource.
+
+### <a name="output_storages"></a> [storages](#output\_storages)
+
+Description: A map of storage shares connected to this environment. The map key is the supplied input to var.storages. The map value is the azurerm-formatted version of the entire storage shares resource.
 
 ## Modules
 
