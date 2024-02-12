@@ -1,7 +1,7 @@
 <!-- BEGIN_TF_DOCS -->
-# Consumption workload profile with integrated vnet
+# Default example
 
-This deploys a Container Apps Managed Environment using the consumption-based workload profile, using vnet integration and an internal load balancer.
+This deploys the module with a environment-scoped dapr component.
 
 ```hcl
 terraform {
@@ -37,42 +37,25 @@ resource "azurerm_log_analytics_workspace" "this" {
   location            = azurerm_resource_group.this.location
 }
 
-# Create the vnet to use with vnet integration
-resource "azurerm_virtual_network" "this" {
-  name                = module.naming.virtual_network.name_unique
-  location            = azurerm_resource_group.this.location
-  resource_group_name = azurerm_resource_group.this.name
-  address_space       = ["192.168.0.0/23"]
-}
-
-resource "azurerm_subnet" "this" {
-  name                 = module.naming.subnet.name_unique
-  resource_group_name  = azurerm_resource_group.this.name
-  virtual_network_name = azurerm_virtual_network.this.name
-  address_prefixes     = ["192.168.0.0/23"]
-  delegation {
-    name = "Microsoft.App.environments"
-    service_delegation {
-      name    = "Microsoft.App/environments"
-      actions = ["Microsoft.Network/virtualNetworks/subnets/join/action"]
-    }
-  }
-}
-
 module "managedenvironment" {
   source = "../../"
   # source = "Azure/avm-res-app-managedenvironment/azurerm"
 
-  name                                 = module.naming.container_app_environment.name_unique
-  resource_group_name                  = azurerm_resource_group.this.name
-  infrastructure_subnet_id             = azurerm_subnet.this.id
-  workload_consumption_profile_enabled = true
-  zone_redundancy_enabled              = true
-  internal_load_balancer_enabled       = true
-  infrastructure_resource_group_name   = "rg-managed-${module.naming.container_app_environment.name_unique}"
+  name                = module.naming.container_app_environment.name_unique
+  resource_group_name = azurerm_resource_group.this.name
 
   log_analytics_workspace_customer_id        = azurerm_log_analytics_workspace.this.workspace_id
   log_analytics_workspace_primary_shared_key = azurerm_log_analytics_workspace.this.primary_shared_key
+
+  dapr_components = {
+    "my-dapr-component" = {
+      component_type = "state.azure.blobstorage"
+      version        = "v1"
+    }
+  }
+
+  # zone redundancy must be disabled unless we supply a subnet for vnet integration.
+  zone_redundancy_enabled = false
 }
 ```
 
@@ -97,8 +80,6 @@ The following resources are used by this module:
 
 - [azurerm_log_analytics_workspace.this](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/log_analytics_workspace) (resource)
 - [azurerm_resource_group.this](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/resource_group) (resource)
-- [azurerm_subnet.this](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/subnet) (resource)
-- [azurerm_virtual_network.this](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/virtual_network) (resource)
 
 <!-- markdownlint-disable MD013 -->
 ## Required Inputs
@@ -111,11 +92,7 @@ No optional inputs.
 
 ## Outputs
 
-The following outputs are exported:
-
-### <a name="output_app_environment"></a> [app\_environment](#output\_app\_environment)
-
-Description: The outputs for the managed environment, this allows outputs to be inspected in the CI run.
+No outputs.
 
 ## Modules
 
