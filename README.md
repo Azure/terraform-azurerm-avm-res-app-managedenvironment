@@ -3,8 +3,7 @@
 
 Module to deploy Container Apps Managed Environments in Azure.
 
-> [!WARNING]
-> Major version Zero (0.y.z) is for initial development. Anything MAY change at any time. A module SHOULD NOT be considered stable till at least it is major version one (1.0.0) or greater. Changes will always be via new versions being published and no changes will be made to existing published versions. For more details please go to <https://semver.org/>
+-> Major version Zero (0.y.z) is for initial development. Anything MAY change at any time. A module SHOULD NOT be considered stable till at least it is major version one (1.0.0) or greater. Changes will always be via new versions being published and no changes will be made to existing published versions. For more details please go to <https://semver.org/>
 
 <!-- markdownlint-disable MD033 -->
 ## Requirements
@@ -182,8 +181,8 @@ Default: `{}`
 
 ### <a name="input_enable_telemetry"></a> [enable\_telemetry](#input\_enable\_telemetry)
 
-Description: This variable controls whether or not telemetry is enabled for the module.  
-For more information see <https://aka.ms/avm/telemetryinfo>.  
+Description: This variable controls whether or not telemetry is enabled for the module.
+For more information see <https://aka.ms/avm/telemetryinfo>.
 If it is set to false, then no telemetry will be collected.
 
 Type: `bool`
@@ -192,8 +191,8 @@ Default: `true`
 
 ### <a name="input_infrastructure_resource_group_name"></a> [infrastructure\_resource\_group\_name](#input\_infrastructure\_resource\_group\_name)
 
-Description: Name of the platform-managed resource group created for the Managed Environment to host infrastructure resources.   
-If a subnet ID is provided, this resource group will be created in the same subscription as the subnet.  
+Description: Name of the platform-managed resource group created for the Managed Environment to host infrastructure resources.
+If a subnet ID is provided, this resource group will be created in the same subscription as the subnet.
 If not specified, then one will be generated automatically, in the form `ME_<app_managed_environment_name>_<resource_group>_<location>`.
 
 Type: `string`
@@ -371,8 +370,8 @@ Default: `false`
 
 ### <a name="input_workload_profile"></a> [workload\_profile](#input\_workload\_profile)
 
-Description:   
-This lists the workload profiles that will be configured for the Managed Environment.  
+Description:
+This lists the workload profiles that will be configured for the Managed Environment.
 This is in addition to the default Consumpion Plan workload profile.
 
  - `maximum_count` - (Optional) The maximum number of instances of workload profile that can be deployed in the Container App Environment.
