@@ -89,6 +89,7 @@ For more information see <https://aka.ms/avm/telemetryinfo>.
 If it is set to false, then no telemetry will be collected.
 DESCRIPTION
 }
+
 variable "infrastructure_subnet_id" {
   type        = string
   default     = null

@@ -40,7 +40,6 @@ The following resources are used by this module:
 - [azurerm_resource_group_template_deployment.telemetry](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/resource_group_template_deployment) (resource)
 - [azurerm_role_assignment.this](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/role_assignment) (resource)
 - [random_id.telem](https://registry.terraform.io/providers/hashicorp/random/latest/docs/resources/id) (resource)
-- [azapi_resource.this_environment](https://registry.terraform.io/providers/Azure/azapi/latest/docs/data-sources/resource) (data source)
 - [azurerm_resource_group.parent](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/data-sources/resource_group) (data source)
 
 <!-- markdownlint-disable MD013 -->
@@ -91,6 +90,7 @@ Default: `null`
 ### <a name="input_dapr_components"></a> [dapr\_components](#input\_dapr\_components)
 
 Description: - `component_type` - (Required) The Dapr Component Type. For example `state.azure.blobstorage`. Changing this forces a new resource to be created.
+
 - `ignore_errors` - (Optional) Should the Dapr sidecar to continue initialisation if the component fails to load. Defaults to `false`
 - `init_timeout` - (Optional) The timeout for component initialisation as a `ISO8601` formatted string. e.g. `5s`, `2h`, `1m`. Defaults to `5s`.
 - `secret_store_component` - (Optional) Name of a Dapr component to retrieve component secrets from.
@@ -99,17 +99,20 @@ Description: - `component_type` - (Required) The Dapr Component Type. For exampl
 
 ---
 `metadata` block supports the following:
+
 - `name` - (Required) The name of the Metadata configuration item.
 - `secret_name` - (Optional) The name of a secret specified in the `secrets` block that contains the value for this metadata configuration item.
 - `value` - (Optional) The value for this metadata configuration item.
 
 ---
 `secret` block supports the following:
+
 - `name` - (Required) The Secret name.
 - `value` - (Required) The value for this secret.
 
 ---
 `timeouts` block supports the following:
+
 - `create` - (Defaults to 30 minutes) Used when creating the Container App Environment Dapr Component.
 - `delete` - (Defaults to 30 minutes) Used when deleting the Container App Environment Dapr Component.
 - `read` - (Defaults to 5 minutes) Used when retrieving the Container App Environment Dapr Component.
@@ -181,8 +184,8 @@ Default: `{}`
 
 ### <a name="input_enable_telemetry"></a> [enable\_telemetry](#input\_enable\_telemetry)
 
-Description: This variable controls whether or not telemetry is enabled for the module.
-For more information see <https://aka.ms/avm/telemetryinfo>.
+Description: This variable controls whether or not telemetry is enabled for the module.  
+For more information see <https://aka.ms/avm/telemetryinfo>.  
 If it is set to false, then no telemetry will be collected.
 
 Type: `bool`
@@ -191,8 +194,8 @@ Default: `true`
 
 ### <a name="input_infrastructure_resource_group_name"></a> [infrastructure\_resource\_group\_name](#input\_infrastructure\_resource\_group\_name)
 
-Description: Name of the platform-managed resource group created for the Managed Environment to host infrastructure resources.
-If a subnet ID is provided, this resource group will be created in the same subscription as the subnet.
+Description: Name of the platform-managed resource group created for the Managed Environment to host infrastructure resources.   
+If a subnet ID is provided, this resource group will be created in the same subscription as the subnet.  
 If not specified, then one will be generated automatically, in the form `ME_<app_managed_environment_name>_<resource_group>_<location>`.
 
 Type: `string`
@@ -301,13 +304,15 @@ Default: `{}`
 
 ### <a name="input_storages"></a> [storages](#input\_storages)
 
-Description: - `access_key` - (Required) The Storage Account Access Key.
+Description:
+- `access_key` - (Required) The Storage Account Access Key.
 - `access_mode` - (Required) The access mode to connect this storage to the Container App. Possible values include `ReadOnly` and `ReadWrite`. Changing this forces a new resource to be created.
 - `account_name` - (Required) The Azure Storage Account in which the Share to be used is located. Changing this forces a new resource to be created.
 - `share_name` - (Required) The name of the Azure Storage Share to use. Changing this forces a new resource to be created.
 
 ---
 `timeouts` block supports the following:
+
 - `create` - (Defaults to 30 minutes) Used when creating the Container App Environment Storage.
 - `delete` - (Defaults to 30 minutes) Used when deleting the Container App Environment Storage.
 - `read` - (Defaults to 5 minutes) Used when retrieving the Container App Environment Storage.
@@ -370,8 +375,8 @@ Default: `false`
 
 ### <a name="input_workload_profile"></a> [workload\_profile](#input\_workload\_profile)
 
-Description:
-This lists the workload profiles that will be configured for the Managed Environment.
+Description:   
+This lists the workload profiles that will be configured for the Managed Environment.  
 This is in addition to the default Consumpion Plan workload profile.
 
  - `maximum_count` - (Optional) The maximum number of instances of workload profile that can be deployed in the Container App Environment.
