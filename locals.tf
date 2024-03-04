@@ -1,8 +1,8 @@
 locals {
   role_definition_resource_substring = "/providers/Microsoft.Authorization/roleDefinitions"
 
-  workload_profile_outputs = jsondecode(azapi_resource.this_environment.output.body).properties.workloadProfiles != null ? [
-    for wp in jsondecode(azapi_resource.this_environment.output.body).properties.workloadProfiles : merge(
+  workload_profile_outputs = jsondecode(azapi_resource.this_environment.body).properties.workloadProfiles != null ? [
+    for wp in jsondecode(azapi_resource.this_environment.body).properties.workloadProfiles : merge(
       {
         name                  = wp.name
         workload_profile_type = wp.workloadProfileType
