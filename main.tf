@@ -42,14 +42,14 @@ resource "azapi_resource" "this_environment" {
   name      = var.name
   parent_id = data.azurerm_resource_group.parent.id
   response_export_values = [
-    "customDomainConfiguration",
-    "daprAIInstrumentationKey",
-    "defaultDomain",
-    "infrastructureResourceGroup",
-    "peerAuthentication",
-    "staticIp",
-    "vnetConfiguration",
-    "workloadProfiles",
+    "properties.customDomainConfiguration",
+    "properties.daprAIInstrumentationKey",
+    "properties.defaultDomain",
+    "properties.infrastructureResourceGroup",
+    "properties.peerAuthentication",
+    "properties.staticIp",
+    "properties.vnetConfiguration",
+    "properties.workloadProfiles",
   ]
   schema_validation_enabled = true
   tags                      = var.tags
