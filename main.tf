@@ -38,19 +38,10 @@ resource "azapi_resource" "this_environment" {
       zoneRedundant = var.zone_redundancy_enabled
     }
   })
-  location  = coalesce(var.location, data.azurerm_resource_group.parent.location)
-  name      = var.name
-  parent_id = data.azurerm_resource_group.parent.id
-  response_export_values = [
-    "properties.customDomainConfiguration",
-    "properties.daprAIInstrumentationKey",
-    "properties.defaultDomain",
-    "properties.infrastructureResourceGroup",
-    "properties.peerAuthentication",
-    "properties.staticIp",
-    "properties.vnetConfiguration",
-    "properties.workloadProfiles",
-  ]
+  location                  = coalesce(var.location, data.azurerm_resource_group.parent.location)
+  name                      = var.name
+  parent_id                 = data.azurerm_resource_group.parent.id
+  response_export_values    = ["*"]
   schema_validation_enabled = true
   tags                      = var.tags
   dynamic "timeouts" {
