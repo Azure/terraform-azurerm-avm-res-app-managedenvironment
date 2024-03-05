@@ -41,6 +41,7 @@ resource "azapi_resource" "this_environment" {
   location                  = coalesce(var.location, data.azurerm_resource_group.parent.location)
   name                      = var.name
   parent_id                 = data.azurerm_resource_group.parent.id
+  response_export_values    = ["*"]
   schema_validation_enabled = false
   tags                      = var.tags
   dynamic "timeouts" {
