@@ -31,7 +31,6 @@ output "resource" {
     infrastructure_resource_group          = try(jsondecode(azapi_resource.this_environment.output).properties.infrastructureResourceGroup, null)
     mtls_enabled                           = try(jsondecode(azapi_resource.this_environment.output).properties.peerAuthentication.mtls.enabled, false)
   }
-  sensitive = true
 }
 
 output "id" {
