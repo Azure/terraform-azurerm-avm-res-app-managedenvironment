@@ -25,7 +25,6 @@ variable "dapr_components" {
   default     = {}
   description = <<-EOT
  - `component_type` - (Required) The Dapr Component Type. For example `state.azure.blobstorage`. Changing this forces a new resource to be created.
- 
  - `ignore_errors` - (Optional) Should the Dapr sidecar to continue initialisation if the component fails to load. Defaults to `false`
  - `init_timeout` - (Optional) The timeout for component initialisation as a `ISO8601` formatted string. e.g. `5s`, `2h`, `1m`. Defaults to `5s`.
  - `secret_store_component` - (Optional) Name of a Dapr component to retrieve component secrets from.
@@ -34,20 +33,17 @@ variable "dapr_components" {
 
  ---
  `metadata` block supports the following:
- 
  - `name` - (Required) The name of the Metadata configuration item.
  - `secret_name` - (Optional) The name of a secret specified in the `secrets` block that contains the value for this metadata configuration item.
  - `value` - (Optional) The value for this metadata configuration item.
 
  ---
  `secret` block supports the following:
-
  - `name` - (Required) The Secret name.
  - `value` - (Required) The value for this secret.
 
  ---
  `timeouts` block supports the following:
-
  - `create` - (Defaults to 30 minutes) Used when creating the Container App Environment Dapr Component.
  - `delete` - (Defaults to 30 minutes) Used when deleting the Container App Environment Dapr Component.
  - `read` - (Defaults to 5 minutes) Used when retrieving the Container App Environment Dapr Component.

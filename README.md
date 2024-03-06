@@ -90,7 +90,6 @@ Default: `null`
 ### <a name="input_dapr_components"></a> [dapr\_components](#input\_dapr\_components)
 
 Description: - `component_type` - (Required) The Dapr Component Type. For example `state.azure.blobstorage`. Changing this forces a new resource to be created.
-
 - `ignore_errors` - (Optional) Should the Dapr sidecar to continue initialisation if the component fails to load. Defaults to `false`
 - `init_timeout` - (Optional) The timeout for component initialisation as a `ISO8601` formatted string. e.g. `5s`, `2h`, `1m`. Defaults to `5s`.
 - `secret_store_component` - (Optional) Name of a Dapr component to retrieve component secrets from.
@@ -99,20 +98,17 @@ Description: - `component_type` - (Required) The Dapr Component Type. For exampl
 
 ---
 `metadata` block supports the following:
-
 - `name` - (Required) The name of the Metadata configuration item.
 - `secret_name` - (Optional) The name of a secret specified in the `secrets` block that contains the value for this metadata configuration item.
 - `value` - (Optional) The value for this metadata configuration item.
 
 ---
 `secret` block supports the following:
-
 - `name` - (Required) The Secret name.
 - `value` - (Required) The value for this secret.
 
 ---
 `timeouts` block supports the following:
-
 - `create` - (Defaults to 30 minutes) Used when creating the Container App Environment Dapr Component.
 - `delete` - (Defaults to 30 minutes) Used when deleting the Container App Environment Dapr Component.
 - `read` - (Defaults to 5 minutes) Used when retrieving the Container App Environment Dapr Component.
@@ -304,15 +300,13 @@ Default: `{}`
 
 ### <a name="input_storages"></a> [storages](#input\_storages)
 
-Description:
-- `access_key` - (Required) The Storage Account Access Key.
+Description: - `access_key` - (Required) The Storage Account Access Key.
 - `access_mode` - (Required) The access mode to connect this storage to the Container App. Possible values include `ReadOnly` and `ReadWrite`. Changing this forces a new resource to be created.
 - `account_name` - (Required) The Azure Storage Account in which the Share to be used is located. Changing this forces a new resource to be created.
 - `share_name` - (Required) The name of the Azure Storage Share to use. Changing this forces a new resource to be created.
 
 ---
 `timeouts` block supports the following:
-
 - `create` - (Defaults to 30 minutes) Used when creating the Container App Environment Storage.
 - `delete` - (Defaults to 30 minutes) Used when deleting the Container App Environment Storage.
 - `read` - (Defaults to 5 minutes) Used when retrieving the Container App Environment Storage.
