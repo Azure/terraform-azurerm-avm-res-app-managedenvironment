@@ -38,10 +38,20 @@ resource "azapi_resource" "this_environment" {
       zoneRedundant = var.zone_redundancy_enabled
     }
   })
-  location                  = coalesce(var.location, data.azurerm_resource_group.parent.location)
-  name                      = var.name
-  parent_id                 = data.azurerm_resource_group.parent.id
-  schema_validation_enabled = false
+  location  = coalesce(var.location, data.azurerm_resource_group.parent.location)
+  name      = var.name
+  parent_id = data.azurerm_resource_group.parent.id
+  response_export_values = [
+    "properties.customDomainConfiguration",
+    "properties.daprAIInstrumentationKey",
+    "properties.defaultDomain",
+    "properties.infrastructureResourceGroup",
+    "properties.peerAuthentication",
+    "properties.staticIp",
+    "properties.vnetConfiguration",
+    "properties.workloadProfiles",
+  ]
+  schema_validation_enabled = true
   tags                      = var.tags
   dynamic "timeouts" {
     for_each = var.timeouts == null ? [] : [var.timeouts]
@@ -52,13 +62,6 @@ resource "azapi_resource" "this_environment" {
       update = timeouts.value.update
     }
   }
-}
-
-data "azapi_resource" "this_environment" {
-  type                   = "Microsoft.App/managedEnvironments@2023-05-01"
-  name                   = azapi_resource.this_environment.name
-  parent_id              = data.azurerm_resource_group.parent.id
-  response_export_values = ["*"]
 }
 
 resource "azurerm_management_lock" "this" {

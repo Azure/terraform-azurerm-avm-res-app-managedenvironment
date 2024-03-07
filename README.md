@@ -40,7 +40,6 @@ The following resources are used by this module:
 - [azurerm_resource_group_template_deployment.telemetry](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/resource_group_template_deployment) (resource)
 - [azurerm_role_assignment.this](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/role_assignment) (resource)
 - [random_id.telem](https://registry.terraform.io/providers/hashicorp/random/latest/docs/resources/id) (resource)
-- [azapi_resource.this_environment](https://registry.terraform.io/providers/Azure/azapi/latest/docs/data-sources/resource) (data source)
 - [azurerm_resource_group.parent](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/data-sources/resource_group) (data source)
 
 <!-- markdownlint-disable MD013 -->
@@ -181,8 +180,8 @@ Default: `{}`
 
 ### <a name="input_enable_telemetry"></a> [enable\_telemetry](#input\_enable\_telemetry)
 
-Description: This variable controls whether or not telemetry is enabled for the module.
-For more information see <https://aka.ms/avm/telemetryinfo>.
+Description: This variable controls whether or not telemetry is enabled for the module.  
+For more information see <https://aka.ms/avm/telemetryinfo>.  
 If it is set to false, then no telemetry will be collected.
 
 Type: `bool`
@@ -191,8 +190,8 @@ Default: `true`
 
 ### <a name="input_infrastructure_resource_group_name"></a> [infrastructure\_resource\_group\_name](#input\_infrastructure\_resource\_group\_name)
 
-Description: Name of the platform-managed resource group created for the Managed Environment to host infrastructure resources.
-If a subnet ID is provided, this resource group will be created in the same subscription as the subnet.
+Description: Name of the platform-managed resource group created for the Managed Environment to host infrastructure resources.   
+If a subnet ID is provided, this resource group will be created in the same subscription as the subnet.  
 If not specified, then one will be generated automatically, in the form `ME_<app_managed_environment_name>_<resource_group>_<location>`.
 
 Type: `string`
@@ -370,8 +369,8 @@ Default: `false`
 
 ### <a name="input_workload_profile"></a> [workload\_profile](#input\_workload\_profile)
 
-Description:
-This lists the workload profiles that will be configured for the Managed Environment.
+Description:   
+This lists the workload profiles that will be configured for the Managed Environment.  
 This is in addition to the default Consumpion Plan workload profile.
 
  - `maximum_count` - (Optional) The maximum number of instances of workload profile that can be deployed in the Container App Environment.

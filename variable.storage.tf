@@ -24,6 +24,7 @@ variable "storages" {
  - `delete` - (Defaults to 30 minutes) Used when deleting the Container App Environment Storage.
  - `read` - (Defaults to 5 minutes) Used when retrieving the Container App Environment Storage.
  - `update` - (Defaults to 30 minutes) Used when updating the Container App Environment Storage.
+
 EOT
   nullable    = false
 }
