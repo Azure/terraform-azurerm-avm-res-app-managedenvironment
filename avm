@@ -19,3 +19,4 @@ if [ -z "$1" ]; then
 fi
 
 $CONTAINER_RUNTIME run --pull always --rm -v "$(pwd)":/src -w /src -e GITHUB_REPOSITORY -e GITHUB_REPOSITORY_OWNER mcr.microsoft.com/azterraform make "$1"
+#
