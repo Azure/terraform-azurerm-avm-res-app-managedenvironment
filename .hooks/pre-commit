@@ -1,0 +1,6 @@
+#!/bin/sh
+# Make sure to run `git config core.hooksPath .hooks` to add this path to the hooks
+# For Linux/MacOs: Make sure to run `chmod +x .hooks/pre-commit` to make this file executable
+
+../../avm pre-commit
+../../avm pr-check
