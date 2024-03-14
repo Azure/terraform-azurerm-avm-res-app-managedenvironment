@@ -1,31 +1,4 @@
 locals {
-  role_definition_resource_substring = "/providers/Microsoft.Authorization/roleDefinitions"
-
-  workload_profile_outputs = jsondecode(azapi_resource.this_environment.body).properties.workloadProfiles != null ? [
-    for wp in jsondecode(azapi_resource.this_environment.body).properties.workloadProfiles : merge(
-      {
-        name                  = wp.name
-        workload_profile_type = wp.workloadProfileType
-      },
-      # minimumCount and maximumCount are not applicable if the workloadProfileType is "Consumption"
-      wp.workloadProfileType != "Consumption" ? {
-        minimum_count = wp.minimumCount
-        maximum_count = wp.maximumCount
-      } : {}
-    )
-  ] : null
-
-  storages_outputs = {
-    for sk, sv in azapi_resource.storages :
-    sk => {
-      id           = sv.id
-      access_mode  = jsondecode(sv.body).properties.azureFile.accessMode
-      access_key   = jsondecode(sv.body).properties.azureFile.accountKey
-      account_name = jsondecode(sv.body).properties.azureFile.accountName
-      share_name   = jsondecode(sv.body).properties.azureFile.shareName
-    }
-  }
-
   dapr_component_outputs = {
     for dk, dv in azapi_resource.dapr_components :
     dk => {
@@ -53,4 +26,28 @@ locals {
       ] : null
     }
   }
+  role_definition_resource_substring = "/providers/Microsoft.Authorization/roleDefinitions"
+  storages_outputs = {
+    for sk, sv in azapi_resource.storages :
+    sk => {
+      id           = sv.id
+      access_mode  = jsondecode(sv.body).properties.azureFile.accessMode
+      access_key   = jsondecode(sv.body).properties.azureFile.accountKey
+      account_name = jsondecode(sv.body).properties.azureFile.accountName
+      share_name   = jsondecode(sv.body).properties.azureFile.shareName
+    }
+  }
+  workload_profile_outputs = jsondecode(azapi_resource.this_environment.body).properties.workloadProfiles != null ? [
+    for wp in jsondecode(azapi_resource.this_environment.body).properties.workloadProfiles : merge(
+      {
+        name                  = wp.name
+        workload_profile_type = wp.workloadProfileType
+      },
+      # minimumCount and maximumCount are not applicable if the workloadProfileType is "Consumption"
+      wp.workloadProfileType != "Consumption" ? {
+        minimum_count = wp.minimumCount
+        maximum_count = wp.maximumCount
+      } : {}
+    )
+  ] : null
 }

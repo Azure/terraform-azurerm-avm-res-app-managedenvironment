@@ -1,9 +1,7 @@
 resource "azapi_resource" "storages" {
   for_each = var.storages
 
-  type      = "Microsoft.App/managedEnvironments/storages@2023-05-01"
-  name      = each.key
-  parent_id = azapi_resource.this_environment.id
+  type = "Microsoft.App/managedEnvironments/storages@2023-05-01"
   body = jsonencode({
     properties = {
       azureFile = {
@@ -14,6 +12,8 @@ resource "azapi_resource" "storages" {
       }
     }
   })
+  name      = each.key
+  parent_id = azapi_resource.this_environment.id
 
   dynamic "timeouts" {
     for_each = each.value.timeouts == null ? [] : [each.value.timeouts]

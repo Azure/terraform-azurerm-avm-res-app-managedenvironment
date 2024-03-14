@@ -1,9 +1,3 @@
-variable "location" {
-  type        = string
-  default     = null
-  description = "Azure region where the resource should be deployed.  If null, the location will be inferred from the resource group location."
-}
-
 variable "name" {
   type        = string
   description = "The name of the Container Apps Managed Environment."
@@ -90,12 +84,6 @@ If it is set to false, then no telemetry will be collected.
 DESCRIPTION
 }
 
-variable "infrastructure_subnet_id" {
-  type        = string
-  default     = null
-  description = "The existing Subnet to use for the Container Apps Control Plane. **NOTE:** The Subnet must have a `/21` or larger address space."
-}
-
 variable "infrastructure_resource_group_name" {
   type        = string
   default     = null
@@ -105,10 +93,23 @@ If a subnet ID is provided, this resource group will be created in the same subs
 If not specified, then one will be generated automatically, in the form ``ME_<app_managed_environment_name>_<resource_group>_<location>``.
 DESCRIPTION
 }
+
+variable "infrastructure_subnet_id" {
+  type        = string
+  default     = null
+  description = "The existing Subnet to use for the Container Apps Control Plane. **NOTE:** The Subnet must have a `/21` or larger address space."
+}
+
 variable "internal_load_balancer_enabled" {
   type        = bool
   default     = false
   description = "Should the Container Environment operate in Internal Load Balancing Mode? Defaults to `false`. **Note:** can only be set to `true` if `infrastructure_subnet_id` is specified."
+}
+
+variable "location" {
+  type        = string
+  default     = null
+  description = "Azure region where the resource should be deployed.  If null, the location will be inferred from the resource group location."
 }
 
 variable "lock" {
@@ -202,6 +203,12 @@ variable "timeouts" {
 EOT
 }
 
+variable "workload_consumption_profile_enabled" {
+  type        = bool
+  default     = false
+  description = "Whether to use workload profiles, this will create the default Consumption Plan, for dedicated plans use `workload_profiles`"
+}
+
 variable "workload_profile" {
   type = set(object({
     maximum_count         = number
@@ -210,7 +217,6 @@ variable "workload_profile" {
     workload_profile_type = string
   }))
   default     = []
-  nullable    = false
   description = <<-EOT
 
 This lists the workload profiles that will be configured for the Managed Environment.
@@ -221,6 +227,7 @@ This is in addition to the default Consumpion Plan workload profile.
  - `name` - (Required) The name of the workload profile.
  - `workload_profile_type` - (Required) Workload profile type for the workloads to run on. Possible values include `D4`, `D8`, `D16`, `D32`, `E4`, `E8`, `E16` and `E32`.
 EOT
+  nullable    = false
 
   validation {
     condition     = var.workload_profile == null ? true : can([for wp in var.workload_profile : regex("^[a-zA-Z][a-zA-Z0-9_-]{0,14}[a-zA-Z0-9]$", wp.name)])
@@ -230,12 +237,6 @@ EOT
     condition     = var.workload_profile == null ? true : can([for wp in var.workload_profile : index(["D4", "D8", "D16", "D32", "E4", "E8", "E16", "E32"], wp.workload_profile_type) >= 0])
     error_message = "Invalid value for workload_profile_type. Valid options are 'D4', 'D8', 'D16', 'D32', 'E4', 'E8', 'E16', 'E32'."
   }
-}
-
-variable "workload_consumption_profile_enabled" {
-  type        = bool
-  default     = false
-  description = "Whether to use workload profiles, this will create the default Consumption Plan, for dedicated plans use `workload_profiles`"
 }
 
 variable "zone_redundancy_enabled" {
