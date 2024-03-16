@@ -1,9 +1,7 @@
 resource "azapi_resource" "dapr_components" {
   for_each = var.dapr_components
 
-  type      = "Microsoft.App/managedEnvironments/daprComponents@2023-05-01"
-  name      = each.key
-  parent_id = azapi_resource.this_environment.id
+  type = "Microsoft.App/managedEnvironments/daprComponents@2023-05-01"
   body = jsonencode({
     properties = {
       componentType        = each.value.component_type
@@ -31,6 +29,8 @@ resource "azapi_resource" "dapr_components" {
       ] : null
     }
   })
+  name      = each.key
+  parent_id = azapi_resource.this_environment.id
 
   dynamic "timeouts" {
     for_each = each.value.timeouts == null ? [] : [each.value.timeouts]
