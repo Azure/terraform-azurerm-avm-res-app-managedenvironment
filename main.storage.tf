@@ -12,8 +12,9 @@ resource "azapi_resource" "storages" {
       }
     }
   })
-  name      = each.key
-  parent_id = azapi_resource.this_environment.id
+  name                      = each.key
+  parent_id                 = azapi_resource.this_environment.id
+  schema_validation_enabled = true
 
   dynamic "timeouts" {
     for_each = each.value.timeouts == null ? [] : [each.value.timeouts]
@@ -21,7 +22,6 @@ resource "azapi_resource" "storages" {
       create = timeouts.value.create
       delete = timeouts.value.delete
       read   = timeouts.value.read
-      update = timeouts.value.update
     }
   }
 }

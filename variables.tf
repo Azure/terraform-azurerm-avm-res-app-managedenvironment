@@ -192,7 +192,6 @@ variable "timeouts" {
     create = optional(string)
     delete = optional(string)
     read   = optional(string)
-    update = optional(string)
   })
   default     = null
   description = <<-EOT

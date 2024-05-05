@@ -38,7 +38,7 @@ resource "azapi_resource" "this_environment" {
       zoneRedundant = var.zone_redundancy_enabled
     }
   })
-  location  = coalesce(var.location, data.azurerm_resource_group.parent.location)
+  location  = var.location
   name      = var.name
   parent_id = data.azurerm_resource_group.parent.id
   response_export_values = [
@@ -60,7 +60,6 @@ resource "azapi_resource" "this_environment" {
       create = timeouts.value.create
       delete = timeouts.value.delete
       read   = timeouts.value.read
-      update = timeouts.value.update
     }
   }
 }
