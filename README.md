@@ -12,21 +12,21 @@ The following requirements are needed by this module:
 
 - <a name="requirement_terraform"></a> [terraform](#requirement\_terraform) (>= 1.5.0)
 
-- <a name="requirement_azapi"></a> [azapi](#requirement\_azapi) (>= 1.9.0, < 2.0)
+- <a name="requirement_azapi"></a> [azapi](#requirement\_azapi) (~> 1.13)
 
-- <a name="requirement_azurerm"></a> [azurerm](#requirement\_azurerm) (>= 3.71.0, < 4.0)
+- <a name="requirement_azurerm"></a> [azurerm](#requirement\_azurerm) (~> 3.71)
 
-- <a name="requirement_random"></a> [random](#requirement\_random) (>= 3.5.0, < 4.0)
+- <a name="requirement_random"></a> [random](#requirement\_random) (~> 3.5)
 
 ## Providers
 
 The following providers are used by this module:
 
-- <a name="provider_azapi"></a> [azapi](#provider\_azapi) (>= 1.9.0, < 2.0)
+- <a name="provider_azapi"></a> [azapi](#provider\_azapi) (~> 1.13)
 
-- <a name="provider_azurerm"></a> [azurerm](#provider\_azurerm) (>= 3.71.0, < 4.0)
+- <a name="provider_azurerm"></a> [azurerm](#provider\_azurerm) (~> 3.71)
 
-- <a name="provider_random"></a> [random](#provider\_random) (>= 3.5.0, < 4.0)
+- <a name="provider_random"></a> [random](#provider\_random) (~> 3.5)
 
 ## Resources
 
@@ -90,7 +90,6 @@ Default: `null`
 ### <a name="input_dapr_components"></a> [dapr\_components](#input\_dapr\_components)
 
 Description: - `component_type` - (Required) The Dapr Component Type. For example `state.azure.blobstorage`. Changing this forces a new resource to be created.
-
 - `ignore_errors` - (Optional) Should the Dapr sidecar to continue initialisation if the component fails to load. Defaults to `false`
 - `init_timeout` - (Optional) The timeout for component initialisation as a `ISO8601` formatted string. e.g. `5s`, `2h`, `1m`. Defaults to `5s`.
 - `secret_store_component` - (Optional) Name of a Dapr component to retrieve component secrets from.
@@ -99,20 +98,17 @@ Description: - `component_type` - (Required) The Dapr Component Type. For exampl
 
 ---
 `metadata` block supports the following:
-
 - `name` - (Required) The name of the Metadata configuration item.
 - `secret_name` - (Optional) The name of a secret specified in the `secrets` block that contains the value for this metadata configuration item.
 - `value` - (Optional) The value for this metadata configuration item.
 
 ---
 `secret` block supports the following:
-
 - `name` - (Required) The Secret name.
 - `value` - (Required) The value for this secret.
 
 ---
 `timeouts` block supports the following:
-
 - `create` - (Defaults to 30 minutes) Used when creating the Container App Environment Dapr Component.
 - `delete` - (Defaults to 30 minutes) Used when deleting the Container App Environment Dapr Component.
 - `read` - (Defaults to 5 minutes) Used when retrieving the Container App Environment Dapr Component.
@@ -193,7 +189,7 @@ Default: `true`
 
 ### <a name="input_infrastructure_resource_group_name"></a> [infrastructure\_resource\_group\_name](#input\_infrastructure\_resource\_group\_name)
 
-Description: Name of the platform-managed resource group created for the Managed Environment to host infrastructure resources.
+Description: Name of the platform-managed resource group created for the Managed Environment to host infrastructure resources.   
 If a subnet ID is provided, this resource group will be created in the same subscription as the subnet.  
 If not specified, then one will be generated automatically, in the form `ME_<app_managed_environment_name>_<resource_group>_<location>`.
 
@@ -227,18 +223,21 @@ Default: `null`
 
 ### <a name="input_lock"></a> [lock](#input\_lock)
 
-Description: The lock level to apply. Default is `None`. Possible values are `None`, `CanNotDelete`, and `ReadOnly`.
+Description: Controls the Resource Lock configuration for this resource. The following properties can be specified:
+
+- `kind` - (Required) The type of lock. Possible values are `\"CanNotDelete\"` and `\"ReadOnly\"`.
+- `name` - (Optional) The name of the lock. If not specified, a name will be generated based on the `kind` value. Changing this forces the creation of a new resource.
 
 Type:
 
 ```hcl
 object({
+    kind = string
     name = optional(string, null)
-    kind = optional(string, "None")
   })
 ```
 
-Default: `{}`
+Default: `null`
 
 ### <a name="input_log_analytics_workspace_customer_id"></a> [log\_analytics\_workspace\_customer\_id](#input\_log\_analytics\_workspace\_customer\_id)
 
@@ -282,6 +281,7 @@ Description: A map of role assignments to create on this resource. The map key i
 - `skip_service_principal_aad_check` - If set to true, skips the Azure Active Directory check for the service principal in the tenant. Defaults to false.
 - `condition` - The condition which will be used to scope the role assignment.
 - `condition_version` - The version of the condition syntax. Valid values are '2.0'.
+- `delegated_managed_identity_resource_id` - (Optional) The delegated Azure Resource Id which contains a Managed Identity. Changing this forces a new resource to be created. This field is only used in cross-tenant scenario.
 
 > Note: only set `skip_service_principal_aad_check` to true if you are assigning a role to a service principal.
 
@@ -304,14 +304,12 @@ Default: `{}`
 ### <a name="input_storages"></a> [storages](#input\_storages)
 
 Description: - `access_key` - (Required) The Storage Account Access Key.
-
 - `access_mode` - (Required) The access mode to connect this storage to the Container App. Possible values include `ReadOnly` and `ReadWrite`. Changing this forces a new resource to be created.
 - `account_name` - (Required) The Azure Storage Account in which the Share to be used is located. Changing this forces a new resource to be created.
 - `share_name` - (Required) The name of the Azure Storage Share to use. Changing this forces a new resource to be created.
 
 ---
 `timeouts` block supports the following:
-
 - `create` - (Defaults to 30 minutes) Used when creating the Container App Environment Storage.
 - `delete` - (Defaults to 30 minutes) Used when deleting the Container App Environment Storage.
 - `read` - (Defaults to 5 minutes) Used when retrieving the Container App Environment Storage.
@@ -346,7 +344,6 @@ Default: `null`
 ### <a name="input_timeouts"></a> [timeouts](#input\_timeouts)
 
 Description: - `create` - (Defaults to 30 minutes) Used when creating the Container App Environment.
-
 - `delete` - (Defaults to 30 minutes) Used when deleting the Container App Environment.
 - `read` - (Defaults to 5 minutes) Used when retrieving the Container App Environment.
 - `update` - (Defaults to 30 minutes) Used when updating the Container App Environment.
@@ -373,14 +370,14 @@ Default: `false`
 
 ### <a name="input_workload_profile"></a> [workload\_profile](#input\_workload\_profile)
 
-Description:
+Description:   
 This lists the workload profiles that will be configured for the Managed Environment.  
 This is in addition to the default Consumpion Plan workload profile.
 
-- `maximum_count` - (Optional) The maximum number of instances of workload profile that can be deployed in the Container App Environment.
-- `minimum_count` - (Optional) The minimum number of instances of workload profile that can be deployed in the Container App Environment.
-- `name` - (Required) The name of the workload profile.
-- `workload_profile_type` - (Required) Workload profile type for the workloads to run on. Possible values include `D4`, `D8`, `D16`, `D32`, `E4`, `E8`, `E16` and `E32`.
+ - `maximum_count` - (Optional) The maximum number of instances of workload profile that can be deployed in the Container App Environment.
+ - `minimum_count` - (Optional) The minimum number of instances of workload profile that can be deployed in the Container App Environment.
+ - `name` - (Required) The name of the workload profile.
+ - `workload_profile_type` - (Required) Workload profile type for the workloads to run on. Possible values include `D4`, `D8`, `D16`, `D32`, `E4`, `E8`, `E16` and `E32`.
 
 Type:
 
