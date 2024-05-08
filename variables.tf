@@ -88,7 +88,7 @@ variable "infrastructure_resource_group_name" {
   type        = string
   default     = null
   description = <<DESCRIPTION
-Name of the platform-managed resource group created for the Managed Environment to host infrastructure resources. 
+Name of the platform-managed resource group created for the Managed Environment to host infrastructure resources.
 If a subnet ID is provided, this resource group will be created in the same subscription as the subnet.
 If not specified, then one will be generated automatically, in the form ``ME_<app_managed_environment_name>_<resource_group>_<location>``.
 DESCRIPTION
@@ -117,9 +117,8 @@ variable "lock" {
     name = optional(string, null)
     kind = optional(string, "None")
   })
-  default     = {}
+  default     = null
   description = "The lock level to apply. Default is `None`. Possible values are `None`, `CanNotDelete`, and `ReadOnly`."
-  nullable    = false
 
   validation {
     condition     = contains(["CanNotDelete", "ReadOnly", "None"], var.lock.kind)
@@ -179,6 +178,7 @@ A map of role assignments to create on this resource. The map key is deliberatel
 
 > Note: only set `skip_service_principal_aad_check` to true if you are assigning a role to a service principal.
 DESCRIPTION
+  nullable    = false
 }
 
 variable "tags" {
