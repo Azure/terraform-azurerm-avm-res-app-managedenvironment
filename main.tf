@@ -60,7 +60,6 @@ resource "azapi_resource" "this_environment" {
       create = timeouts.value.create
       delete = timeouts.value.delete
       read   = timeouts.value.read
-      update = timeouts.value.update
     }
   }
 }
