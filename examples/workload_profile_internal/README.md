@@ -74,10 +74,10 @@ module "managedenvironment" {
   location            = azurerm_resource_group.this.location
 
   infrastructure_subnet_id = azurerm_subnet.this.id
-  workload_profile = {
-    name                = "Consumption"
-    workloadProfileType = "Consumption"
-  }
+  workload_profile = [{
+    name                  = "Consumption"
+    workload_profile_type = "Consumption"
+  }]
   zone_redundancy_enabled            = true
   internal_load_balancer_enabled     = true
   infrastructure_resource_group_name = "rg-managed-${module.naming.container_app_environment.name_unique}"

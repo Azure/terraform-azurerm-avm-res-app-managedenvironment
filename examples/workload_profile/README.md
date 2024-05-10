@@ -78,10 +78,10 @@ module "managedenvironment" {
   location            = azurerm_resource_group.this.location
 
   infrastructure_subnet_id = azurerm_subnet.this.id
-  workload_profile = {
-    name                = "Consumption"
-    workloadProfileType = "Consumption"
-  }
+  workload_profile = [{
+    name                  = "Consumption"
+    workload_profile_type = "Consumption"
+  }]
   zone_redundancy_enabled = true
 
   log_analytics_workspace_customer_id        = azurerm_log_analytics_workspace.this.workspace_id
