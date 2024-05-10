@@ -3,21 +3,21 @@ locals {
     for dk, dv in azapi_resource.dapr_components :
     dk => {
       id                     = dv.id
-      component_type         = jsondecode(dv.body).properties.componentType
-      ignore_errors          = jsondecode(dv.body).properties.ignoreErrors
-      init_timeout           = jsondecode(dv.body).properties.initTimeout
-      secret_store_component = jsondecode(dv.body).properties.secretStoreComponent
-      scopes                 = jsondecode(dv.body).properties.scopes
-      version                = jsondecode(dv.body).properties.version
-      metadata = jsondecode(dv.body).properties.metadata != null ? [
-        for item in jsondecode(dv.body).properties.metadata : {
+      component_type         = dv.output.properties.componentType
+      ignore_errors          = dv.output.properties.ignoreErrors
+      init_timeout           = dv.output.properties.initTimeout
+      secret_store_component = dv.output.properties.secretStoreComponent
+      scopes                 = dv.output.properties.scopes
+      version                = dv.output.properties.version
+      metadata = dv.output.properties.metadata != null ? [
+        for item in dv.output.properties.metadata : {
           name        = item.name
           secret_name = item.secretRef
           value       = item.value
         }
       ] : null
-      secret = jsondecode(dv.body).properties.secrets != null ? [
-        for item in jsondecode(dv.body).properties.secrets : {
+      secret = dv.output.properties.secrets != null ? [
+        for item in dv.output.properties.secrets : {
           name                = item.name
           value               = item.value
           identity            = item.identity
@@ -31,14 +31,14 @@ locals {
     for sk, sv in azapi_resource.storages :
     sk => {
       id           = sv.id
-      access_mode  = jsondecode(sv.body).properties.azureFile.accessMode
-      access_key   = jsondecode(sv.body).properties.azureFile.accountKey
-      account_name = jsondecode(sv.body).properties.azureFile.accountName
-      share_name   = jsondecode(sv.body).properties.azureFile.shareName
+      access_mode  = sv.output.properties.azureFile.accessMode
+      access_key   = sv.output.properties.azureFile.accountKey
+      account_name = sv.output.properties.azureFile.accountName
+      share_name   = sv.output.properties.azureFile.shareName
     }
   }
-  workload_profile_outputs = jsondecode(azapi_resource.this_environment.body).properties.workloadProfiles != null ? [
-    for wp in jsondecode(azapi_resource.this_environment.body).properties.workloadProfiles : merge(
+  workload_profile_outputs = azapi_resource.this_environment.output.properties.workloadProfiles != null ? [
+    for wp in azapi_resource.this_environment.output.properties.workloadProfiles : merge(
       {
         name                  = wp.name
         workload_profile_type = wp.workloadProfileType
