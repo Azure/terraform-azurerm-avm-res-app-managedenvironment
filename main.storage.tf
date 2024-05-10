@@ -2,7 +2,7 @@ resource "azapi_resource" "storages" {
   for_each = var.storages
 
   type = "Microsoft.App/managedEnvironments/storages@2023-05-01"
-  body = jsonencode({
+  body = {
     properties = {
       azureFile = {
         accessMode  = each.value.access_mode
@@ -11,7 +11,7 @@ resource "azapi_resource" "storages" {
         shareName   = each.value.share_name
       }
     }
-  })
+  }
   name                      = each.key
   parent_id                 = azapi_resource.this_environment.id
   schema_validation_enabled = true

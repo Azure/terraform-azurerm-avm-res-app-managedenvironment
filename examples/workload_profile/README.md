@@ -73,11 +73,16 @@ module "managedenvironment" {
   source = "../../"
   # source = "Azure/avm-res-app-managedenvironment/azurerm"
 
-  name                                 = module.naming.container_app_environment.name_unique
-  resource_group_name                  = azurerm_resource_group.this.name
-  infrastructure_subnet_id             = azurerm_subnet.this.id
-  workload_consumption_profile_enabled = true
-  zone_redundancy_enabled              = true
+  name                = module.naming.container_app_environment.name_unique
+  resource_group_name = azurerm_resource_group.this.name
+  location            = azurerm_resource_group.this.location
+
+  infrastructure_subnet_id = azurerm_subnet.this.id
+  workload_profile = {
+    name                = "Consumption"
+    workloadProfileType = "Consumption"
+  }
+  zone_redundancy_enabled = true
 
   log_analytics_workspace_customer_id        = azurerm_log_analytics_workspace.this.workspace_id
   log_analytics_workspace_primary_shared_key = azurerm_log_analytics_workspace.this.primary_shared_key

@@ -4,7 +4,7 @@ data "azurerm_resource_group" "parent" {
 
 resource "azapi_resource" "this_environment" {
   type = "Microsoft.App/managedEnvironments@2023-05-01"
-  body = jsonencode({
+  body = {
     properties = {
       appLogsConfiguration = {
         "destination" = var.log_analytics_workspace_destination
@@ -28,16 +28,16 @@ resource "azapi_resource" "this_environment" {
         "internal"               = var.internal_load_balancer_enabled
         "infrastructureSubnetId" = var.infrastructure_subnet_id
       } : null
-      workloadProfiles = var.workload_consumption_profile_enabled ? setunion([
+      workloadProfiles = local.workload_profiles_consumption_enabled ? setunion([
         {
           name                = "Consumption"
           workloadProfileType = "Consumption"
         }],
-        var.workload_profile
+        local.workload_profiles
       ) : null
       zoneRedundant = var.zone_redundancy_enabled
     }
-  })
+  }
   location  = var.location
   name      = var.name
   parent_id = data.azurerm_resource_group.parent.id

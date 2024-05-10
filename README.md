@@ -360,14 +360,6 @@ object({
 
 Default: `null`
 
-### <a name="input_workload_consumption_profile_enabled"></a> [workload\_consumption\_profile\_enabled](#input\_workload\_consumption\_profile\_enabled)
-
-Description: Whether to use workload profiles, this will create the default Consumption Plan, for dedicated plans use `workload_profiles`
-
-Type: `bool`
-
-Default: `false`
-
 ### <a name="input_workload_profile"></a> [workload\_profile](#input\_workload\_profile)
 
 Description:   
@@ -383,8 +375,8 @@ Type:
 
 ```hcl
 set(object({
-    maximum_count         = number
-    minimum_count         = number
+    maximum_count         = optional(number)
+    minimum_count         = optional(number)
     name                  = string
     workload_profile_type = string
   }))

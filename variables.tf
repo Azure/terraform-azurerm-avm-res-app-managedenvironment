@@ -208,16 +208,10 @@ variable "timeouts" {
 EOT
 }
 
-variable "workload_consumption_profile_enabled" {
-  type        = bool
-  default     = false
-  description = "Whether to use workload profiles, this will create the default Consumption Plan, for dedicated plans use `workload_profiles`"
-}
-
 variable "workload_profile" {
   type = set(object({
-    maximum_count         = number
-    minimum_count         = number
+    maximum_count         = optional(number)
+    minimum_count         = optional(number)
     name                  = string
     workload_profile_type = string
   }))
@@ -239,8 +233,8 @@ EOT
     error_message = "Invalid value for workload_profile_name. It must start with a letter, contain only letters, numbers, underscores, or dashes, and not end with an underscore or dash. Maximum 15 characters."
   }
   validation {
-    condition     = var.workload_profile == null ? true : can([for wp in var.workload_profile : index(["D4", "D8", "D16", "D32", "E4", "E8", "E16", "E32"], wp.workload_profile_type) >= 0])
-    error_message = "Invalid value for workload_profile_type. Valid options are 'D4', 'D8', 'D16', 'D32', 'E4', 'E8', 'E16', 'E32'."
+    condition     = var.workload_profile == null ? true : can([for wp in var.workload_profile : index(["Consumption", "D4", "D8", "D16", "D32", "E4", "E8", "E16", "E32"], wp.workload_profile_type) >= 0])
+    error_message = "Invalid value for workload_profile_type. Valid options are 'Consumption', 'D4', 'D8', 'D16', 'D32', 'E4', 'E8', 'E16', 'E32'."
   }
 }
 
