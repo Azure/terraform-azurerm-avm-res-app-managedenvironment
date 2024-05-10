@@ -50,6 +50,10 @@ locals {
       } : {}
     )
   ] : null
+  workload_profiles = setsubtract(var.workload_profile, [{
+    name                = "Consumption"
+    workloadProfileType = "Consumption"
+  }])
   # these workload_profile_* locals are used to mimic the behaviour of the azurerm provider
   workload_profiles_consumption_enabled = contains(
     var.workload_profile,
@@ -58,8 +62,4 @@ locals {
       workloadProfileType = "Consumption"
     }
   )
-  workload_profiles = setsubtract(var.workload_profile, [{
-    name                = "Consumption"
-    workloadProfileType = "Consumption"
-  }])
 }
