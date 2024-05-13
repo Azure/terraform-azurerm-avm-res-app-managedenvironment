@@ -4,7 +4,7 @@ data "azurerm_resource_group" "parent" {
 
 resource "azapi_resource" "this_environment" {
   type = "Microsoft.App/managedEnvironments@2023-05-01"
-  body = jsonencode({
+  body = {
     properties = {
       appLogsConfiguration = {
         "destination" = var.log_analytics_workspace_destination
@@ -28,17 +28,17 @@ resource "azapi_resource" "this_environment" {
         "internal"               = var.internal_load_balancer_enabled
         "infrastructureSubnetId" = var.infrastructure_subnet_id
       } : null
-      workloadProfiles = var.workload_consumption_profile_enabled ? setunion([
+      workloadProfiles = local.workload_profiles_consumption_enabled ? setunion([
         {
           name                = "Consumption"
           workloadProfileType = "Consumption"
         }],
-        var.workload_profile
+        local.workload_profiles
       ) : null
       zoneRedundant = var.zone_redundancy_enabled
     }
-  })
-  location  = coalesce(var.location, data.azurerm_resource_group.parent.location)
+  }
+  location  = var.location
   name      = var.name
   parent_id = data.azurerm_resource_group.parent.id
   response_export_values = [
@@ -60,17 +60,17 @@ resource "azapi_resource" "this_environment" {
       create = timeouts.value.create
       delete = timeouts.value.delete
       read   = timeouts.value.read
-      update = timeouts.value.update
     }
   }
 }
 
 resource "azurerm_management_lock" "this" {
-  count = var.lock.kind != "None" ? 1 : 0
+  count = var.lock != null ? 1 : 0
 
   lock_level = var.lock.kind
-  name       = coalesce(var.lock.name, "lock-${var.name}")
+  name       = coalesce(var.lock.name, "lock-${var.lock.kind}")
   scope      = azapi_resource.this_environment.id
+  notes      = var.lock.kind == "CanNotDelete" ? "Cannot delete the resource or its child resources." : "Cannot delete or modify the resource or its child resources."
 }
 
 resource "azurerm_role_assignment" "this" {

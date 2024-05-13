@@ -2,7 +2,7 @@ resource "azapi_resource" "dapr_components" {
   for_each = var.dapr_components
 
   type = "Microsoft.App/managedEnvironments/daprComponents@2023-05-01"
-  body = jsonencode({
+  body = {
     properties = {
       componentType        = each.value.component_type
       ignoreErrors         = each.value.ignore_errors
@@ -28,9 +28,10 @@ resource "azapi_resource" "dapr_components" {
         }
       ] : null
     }
-  })
-  name      = each.key
-  parent_id = azapi_resource.this_environment.id
+  }
+  name                      = each.key
+  parent_id                 = azapi_resource.this_environment.id
+  schema_validation_enabled = true
 
   dynamic "timeouts" {
     for_each = each.value.timeouts == null ? [] : [each.value.timeouts]
@@ -38,7 +39,6 @@ resource "azapi_resource" "dapr_components" {
       create = timeouts.value.create
       delete = timeouts.value.delete
       read   = timeouts.value.read
-      update = timeouts.value.update
     }
   }
 }

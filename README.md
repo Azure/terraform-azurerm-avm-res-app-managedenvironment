@@ -12,21 +12,21 @@ The following requirements are needed by this module:
 
 - <a name="requirement_terraform"></a> [terraform](#requirement\_terraform) (>= 1.5.0)
 
-- <a name="requirement_azapi"></a> [azapi](#requirement\_azapi) (>= 1.9.0, < 2.0)
+- <a name="requirement_azapi"></a> [azapi](#requirement\_azapi) (~> 1.13)
 
-- <a name="requirement_azurerm"></a> [azurerm](#requirement\_azurerm) (>= 3.71.0, < 4.0)
+- <a name="requirement_azurerm"></a> [azurerm](#requirement\_azurerm) (~> 3.71)
 
-- <a name="requirement_random"></a> [random](#requirement\_random) (>= 3.5.0, < 4.0)
+- <a name="requirement_random"></a> [random](#requirement\_random) (~> 3.5)
 
 ## Providers
 
 The following providers are used by this module:
 
-- <a name="provider_azapi"></a> [azapi](#provider\_azapi) (>= 1.9.0, < 2.0)
+- <a name="provider_azapi"></a> [azapi](#provider\_azapi) (~> 1.13)
 
-- <a name="provider_azurerm"></a> [azurerm](#provider\_azurerm) (>= 3.71.0, < 4.0)
+- <a name="provider_azurerm"></a> [azurerm](#provider\_azurerm) (~> 3.71)
 
-- <a name="provider_random"></a> [random](#provider\_random) (>= 3.5.0, < 4.0)
+- <a name="provider_random"></a> [random](#provider\_random) (~> 3.5)
 
 ## Resources
 
@@ -137,7 +137,6 @@ map(object({
       create = optional(string)
       delete = optional(string)
       read   = optional(string)
-      update = optional(string)
     }))
   }))
 ```
@@ -224,18 +223,21 @@ Default: `null`
 
 ### <a name="input_lock"></a> [lock](#input\_lock)
 
-Description: The lock level to apply. Default is `None`. Possible values are `None`, `CanNotDelete`, and `ReadOnly`.
+Description: Controls the Resource Lock configuration for this resource. The following properties can be specified:
+
+- `kind` - (Required) The type of lock. Possible values are `\"CanNotDelete\"` and `\"ReadOnly\"`.
+- `name` - (Optional) The name of the lock. If not specified, a name will be generated based on the `kind` value. Changing this forces the creation of a new resource.
 
 Type:
 
 ```hcl
 object({
+    kind = string
     name = optional(string, null)
-    kind = optional(string, "None")
   })
 ```
 
-Default: `{}`
+Default: `null`
 
 ### <a name="input_log_analytics_workspace_customer_id"></a> [log\_analytics\_workspace\_customer\_id](#input\_log\_analytics\_workspace\_customer\_id)
 
@@ -279,6 +281,7 @@ Description: A map of role assignments to create on this resource. The map key i
 - `skip_service_principal_aad_check` - If set to true, skips the Azure Active Directory check for the service principal in the tenant. Defaults to false.
 - `condition` - The condition which will be used to scope the role assignment.
 - `condition_version` - The version of the condition syntax. Valid values are '2.0'.
+- `delegated_managed_identity_resource_id` - (Optional) The delegated Azure Resource Id which contains a Managed Identity. Changing this forces a new resource to be created. This field is only used in cross-tenant scenario.
 
 > Note: only set `skip_service_principal_aad_check` to true if you are assigning a role to a service principal.
 
@@ -324,7 +327,6 @@ map(object({
       create = optional(string)
       delete = optional(string)
       read   = optional(string)
-      update = optional(string)
     }))
   }))
 ```
@@ -353,19 +355,10 @@ object({
     create = optional(string)
     delete = optional(string)
     read   = optional(string)
-    update = optional(string)
   })
 ```
 
 Default: `null`
-
-### <a name="input_workload_consumption_profile_enabled"></a> [workload\_consumption\_profile\_enabled](#input\_workload\_consumption\_profile\_enabled)
-
-Description: Whether to use workload profiles, this will create the default Consumption Plan, for dedicated plans use `workload_profiles`
-
-Type: `bool`
-
-Default: `false`
 
 ### <a name="input_workload_profile"></a> [workload\_profile](#input\_workload\_profile)
 
@@ -382,8 +375,8 @@ Type:
 
 ```hcl
 set(object({
-    maximum_count         = number
-    minimum_count         = number
+    maximum_count         = optional(number)
+    minimum_count         = optional(number)
     name                  = string
     workload_profile_type = string
   }))
