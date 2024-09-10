@@ -1,5 +1,5 @@
 ---
-name: scanning
+name: trivy
 
 on:
   pull_request:
@@ -14,33 +14,22 @@ permissions:
 
 jobs:
   build:
-    name: scan
+    name: 'trivy scan'
     runs-on: ubuntu-latest
     steps:
       - name: Checkout code
         uses: actions/checkout@v3
 
-      - name: Run Trivy vulnerability scanner in repo mode
+      - name: Run Trivy vulnerability scanner (repo)
         uses: aquasecurity/trivy-action@0.24.0
         with:
           scan-type: 'fs'
           ignore-unfixed: true
           format: 'sarif'
-          output: trivy.sarif
+          output: report.sarif
           # severity: 'CRITICAL'
-
-      - name: Run tfsec
-        uses: aquasecurity/tfsec-sarif-action@v0.1.4
-        with:
-          sarif_file: tfsec.sarif
-          full_repo_scan: true
-
-      - name: Upload SARIF file
-        uses: github/codeql-action/upload-sarif@v3
-        with:
-          sarif_file: tfsec.sarif
 
       - name: Upload Trivy scan results to GitHub Security tab
         uses: github/codeql-action/upload-sarif@v3
         with:
-          sarif_file: trivy.sarif
+          sarif_file: report.sarif
