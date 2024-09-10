@@ -25,7 +25,20 @@ jobs:
           ignore-unfixed: true
           format: 'sarif'
           output: trivy.sarif
-          severity: 'CRITICAL'
+          # severity: 'CRITICAL'
+
+      - name: Build an image from Dockerfile
+        run: |
+          docker build -t docker.io/my-organization/my-app:${{ github.sha }} .
+
+      - name: Run Trivy vulnerability scanner
+        uses: aquasecurity/trivy-action@7b7aa264d83dc58691451798b4d117d53d21edfe
+        with:
+          image-ref: 'docker.io/my-organization/my-app:${{ github.sha }}'
+          format: 'template'
+          template: '@/contrib/sarif.tpl'
+          output: 'trivy-results.sarif'
+          # severity: 'CRITICAL,HIGH'
 
       - name: Run tfsec
         uses: aquasecurity/tfsec-sarif-action@21ded20e8ca120cd9d3d6ab04ef746477542a608
