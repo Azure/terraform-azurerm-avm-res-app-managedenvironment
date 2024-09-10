@@ -44,6 +44,6 @@ jobs:
           sarif_file: 'trivy-results.sarif'
 
       - name: Upload Trivy scan results (IaC) to GitHub Security tab
-      uses: github/codeql-action/upload-sarif@v2
-      with:
-        sarif_file: 'trivy-results.sarif'
+        uses: github/codeql-action/upload-sarif@v2
+        with:
+          sarif_file: 'trivy-results.sarif'
