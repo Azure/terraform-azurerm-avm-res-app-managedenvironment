@@ -23,7 +23,7 @@ jobs:
         with:
           scan-type: 'fs'
           ignore-unfixed: true
-          format: 'table'
+          format: 'sarif'
           output: 'trivy-results.sarif'
           severity: 'CRITICAL'
 
