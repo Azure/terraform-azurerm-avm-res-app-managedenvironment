@@ -1,0 +1,2 @@
+flask==0.12  # Older version with known vulnerabilities
+requests==2.18.0
