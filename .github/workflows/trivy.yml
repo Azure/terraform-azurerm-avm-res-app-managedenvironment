@@ -42,8 +42,10 @@ jobs:
         uses: github/codeql-action/upload-sarif@v3
         with:
           sarif_file: report-fs.sarif
+          category: 'fs'
 
       - name: Upload Trivy report (config) GitHub Security
         uses: github/codeql-action/upload-sarif@v3
         with:
           sarif_file: report-config.sarif
+          category: 'config'
