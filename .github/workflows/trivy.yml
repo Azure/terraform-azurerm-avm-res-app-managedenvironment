@@ -26,7 +26,7 @@ jobs:
           scan-type: 'fs'
           ignore-unfixed: true
           format: 'sarif'
-          scanners: 'vuln,secret'
+          scanners: 'vuln,secret,config'
           output: report.sarif
           severity: 'CRITICAL'
 
