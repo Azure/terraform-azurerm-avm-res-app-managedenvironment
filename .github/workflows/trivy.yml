@@ -26,7 +26,7 @@ jobs:
           scan-type: 'fs'
           ignore-unfixed: true
           scan-ref: .
-          format: 'json'
+          format: 'table'
           scanners: 'vuln,secret,config'
           # output: report-fs.sarif
 
@@ -36,7 +36,7 @@ jobs:
           scan-type: 'config'
           ignore-unfixed: true
           scan-ref: .
-          format: 'json'
+          format: 'table'
           # output: report-config.sarif
 
       # - name: Upload Trivy report (fs) GitHub Security
