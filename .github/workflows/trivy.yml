@@ -26,27 +26,12 @@ jobs:
           scan-type: 'fs'
           ignore-unfixed: true
           scan-ref: .
-          format: 'table'
+          format: 'sarif'
           scanners: 'vuln,secret,config'
-          # output: report-fs.sarif
+          output: report-fs.sarif
 
-      - name: Run Trivy vulnerability scanner (config)
-        uses: aquasecurity/trivy-action@0.24.0
+      - name: Upload Trivy report (fs) GitHub Security
+        uses: github/codeql-action/upload-sarif@v3
         with:
-          scan-type: 'config'
-          ignore-unfixed: true
-          scan-ref: .
-          format: 'table'
-          # output: report-config.sarif
-
-      # - name: Upload Trivy report (fs) GitHub Security
-      #   uses: github/codeql-action/upload-sarif@v3
-      #   with:
-      #     sarif_file: report-fs.sarif
-      #     category: 'fs'
-
-      # - name: Upload Trivy report (config) GitHub Security
-      #   uses: github/codeql-action/upload-sarif@v3
-      #   with:
-      #     sarif_file: report-config.sarif
-      #     category: 'config'
+          sarif_file: report.sarif
+          category: 'fs'
