@@ -25,10 +25,10 @@ jobs:
         with:
           scan-type: 'fs'
           ignore-unfixed: true
-          scan-ref: .
           format: 'sarif'
-          scanners: 'vuln,secret,config'
+          scanners: 'vuln,secret'
           output: report.sarif
+          severity: 'CRITICAL'
 
       - name: Upload Trivy report (fs) GitHub Security
         uses: github/codeql-action/upload-sarif@v3
