@@ -28,7 +28,7 @@ jobs:
           scan-ref: .
           format: 'sarif'
           scanners: 'vuln,secret,config'
-          output: report-fs.sarif
+          output: report.sarif
 
       - name: Upload Trivy report (fs) GitHub Security
         uses: github/codeql-action/upload-sarif@v3
