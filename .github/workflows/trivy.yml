@@ -26,9 +26,9 @@ jobs:
           scan-type: 'fs'
           ignore-unfixed: true
           scan-ref: .
-          format: 'table'
+          format: 'json'
+          scanners: 'vuln,secret,config'
           output: report-fs.sarif
-          severity: 'HIGH,CRITICAL'
 
       - name: Run Trivy vulnerability scanner (config)
         uses: aquasecurity/trivy-action@0.24.0
@@ -36,9 +36,9 @@ jobs:
           scan-type: 'config'
           ignore-unfixed: true
           scan-ref: .
-          format: 'table'
+          format: 'json'
+          scanners: 'vuln,secret,config'
           output: report-config.sarif
-          severity: 'HIGH,CRITICAL'
 
       # - name: Upload Trivy report (fs) GitHub Security
       #   uses: github/codeql-action/upload-sarif@v3
