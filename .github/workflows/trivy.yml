@@ -26,7 +26,7 @@ jobs:
           scan-type: 'fs'
           ignore-unfixed: true
           scan-ref: .
-          format: 'sarif'
+          format: 'table'
           output: report-fs.sarif
           severity: 'HIGH,CRITICAL'
 
@@ -36,7 +36,7 @@ jobs:
           scan-type: 'config'
           ignore-unfixed: true
           scan-ref: .
-          format: 'sarif'
+          format: 'table'
           output: report-config.sarif
           severity: 'HIGH,CRITICAL'
 
