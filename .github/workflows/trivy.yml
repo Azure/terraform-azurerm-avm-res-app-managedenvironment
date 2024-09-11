@@ -38,12 +38,12 @@ jobs:
           output: report-config.sarif
           severity: 'HIGH,CRITICAL'
 
-      - name: Upload Trivy scan results to GitHub Security tab
+      - name: Upload Trivy report (fs) GitHub Security
         uses: github/codeql-action/upload-sarif@v3
         with:
           sarif_file: report-fs.sarif
 
-          - name: Upload Trivy scan results to GitHub Security tab
-          uses: github/codeql-action/upload-sarif@v3
-          with:
-            sarif_file: report-config.sarif
+      - name: Upload Trivy report (config) GitHub Security
+      uses: github/codeql-action/upload-sarif@v3
+      with:
+        sarif_file: report-config.sarif
