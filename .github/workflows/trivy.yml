@@ -20,16 +20,30 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v3
 
-      - name: Run Trivy vulnerability scanner (repo)
+      - name: Run Trivy vulnerability scanner (file system)
         uses: aquasecurity/trivy-action@0.24.0
         with:
           scan-type: 'fs'
           ignore-unfixed: true
           format: 'sarif'
-          output: report.sarif
-          # severity: 'CRITICAL'
+          output: report-fs.sarif
+          severity: 'HIGH,CRITICAL'
+
+      - name: Run Trivy vulnerability scanner (config)
+        uses: aquasecurity/trivy-action@0.24.0
+        with:
+          scan-type: 'config'
+          ignore-unfixed: true
+          format: 'sarif'
+          output: report-config.sarif
+          severity: 'HIGH,CRITICAL'
 
       - name: Upload Trivy scan results to GitHub Security tab
         uses: github/codeql-action/upload-sarif@v3
         with:
-          sarif_file: report.sarif
+          sarif_file: report-fs.sarif
+
+          - name: Upload Trivy scan results to GitHub Security tab
+          uses: github/codeql-action/upload-sarif@v3
+          with:
+            sarif_file: report-config.sarif
