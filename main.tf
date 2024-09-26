@@ -28,12 +28,19 @@ resource "azapi_resource" "this_environment" {
         "internal"               = var.internal_load_balancer_enabled
         "infrastructureSubnetId" = var.infrastructure_subnet_id
       } : null
-      workloadProfiles = local.workload_profiles_consumption_enabled ? setunion([
+      workloadProfiles = local.workload_profile_consumption_enabled ? setunion([
         {
           name                = "Consumption"
           workloadProfileType = "Consumption"
         }],
-        local.workload_profiles
+        [for wp in var.workload_profile :
+          {
+            name                = wp.name
+            workloadProfileType = wp.workload_profile_type
+            minimumCount        = wp.minimum_count
+            maximumCount        = wp.maximum_count
+          } if wp.workload_profile_type != "Consumption"
+        ]
       ) : null
       zoneRedundant = var.zone_redundancy_enabled
     }
@@ -56,6 +63,7 @@ resource "azapi_resource" "this_environment" {
 
   dynamic "timeouts" {
     for_each = var.timeouts == null ? [] : [var.timeouts]
+
     content {
       create = timeouts.value.create
       delete = timeouts.value.delete
@@ -100,18 +108,21 @@ resource "azurerm_monitor_diagnostic_setting" "this" {
 
   dynamic "enabled_log" {
     for_each = each.value.log_categories
+
     content {
       category = enabled_log.value
     }
   }
   dynamic "enabled_log" {
     for_each = each.value.log_groups
+
     content {
       category_group = enabled_log.value
     }
   }
   dynamic "metric" {
     for_each = each.value.metric_categories
+
     content {
       category = metric.value
     }
