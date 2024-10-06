@@ -4,7 +4,7 @@ output "dapr_components" {
 }
 
 output "id" {
-  description = "The ID of the resource."
+  description = "The ID of the container app management environment resource."
   value       = azapi_resource.this_environment.id
 }
 
@@ -43,6 +43,11 @@ output "resource" {
     infrastructure_resource_group          = try(azapi_resource.this_environment.output.properties.infrastructureResourceGroup, null)
     mtls_enabled                           = try(azapi_resource.this_environment.output.properties.peerAuthentication.mtls.enabled, false)
   }
+}
+
+output "resource_id" {
+  description = "The ID of the container app management environment resource."
+  value       = azapi_resource.this_environment.id
 }
 
 output "storages" {
