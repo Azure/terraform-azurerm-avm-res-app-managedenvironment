@@ -2,6 +2,13 @@ data "azurerm_resource_group" "parent" {
   name = var.resource_group_name
 }
 
+data "azapi_resource_action" "shared_keys" {
+  type                   = "Microsoft.OperationalInsights/workspaces@2020-08-01"
+  action                 = "sharedKeys"
+  resource_id            = var.log_analytics_workspace_resource_id
+  response_export_values = ["primarySharedKey"]
+}
+
 resource "azapi_resource" "this_environment" {
   type = "Microsoft.App/managedEnvironments@2023-05-01"
   body = {
@@ -9,8 +16,8 @@ resource "azapi_resource" "this_environment" {
       appLogsConfiguration = {
         "destination" = var.log_analytics_workspace_destination
         logAnalyticsConfiguration = var.log_analytics_workspace_destination == "log-analytics" ? {
-          "customerId" = var.log_analytics_workspace_customer_id
-          "sharedKey"  = var.log_analytics_workspace_primary_shared_key
+          "customerId" = var.log_analytics_workspace_resource_id
+          "sharedKey"  = jsondecode(data.azapi_resource_action.shared_keys.output).primarySharedKey
         } : null
       }
       customDomainConfiguration = {
@@ -56,6 +63,7 @@ resource "azapi_resource" "this_environment" {
 
   dynamic "timeouts" {
     for_each = var.timeouts == null ? [] : [var.timeouts]
+
     content {
       create = timeouts.value.create
       delete = timeouts.value.delete
@@ -100,18 +108,21 @@ resource "azurerm_monitor_diagnostic_setting" "this" {
 
   dynamic "enabled_log" {
     for_each = each.value.log_categories
+
     content {
       category = enabled_log.value
     }
   }
   dynamic "enabled_log" {
     for_each = each.value.log_groups
+
     content {
       category_group = enabled_log.value
     }
   }
   dynamic "metric" {
     for_each = each.value.metric_categories
+
     content {
       category = metric.value
     }
