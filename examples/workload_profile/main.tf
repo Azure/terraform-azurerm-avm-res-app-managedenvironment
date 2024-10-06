@@ -65,6 +65,5 @@ module "managedenvironment" {
   }]
   zone_redundancy_enabled = true
 
-  log_analytics_workspace_customer_id        = azurerm_log_analytics_workspace.this.workspace_id
-  log_analytics_workspace_primary_shared_key = azurerm_log_analytics_workspace.this.primary_shared_key
+  log_analytics_workspace_resource_id = azurerm_log_analytics_workspace.this.id
 }
