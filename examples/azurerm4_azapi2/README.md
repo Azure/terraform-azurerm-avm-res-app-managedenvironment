@@ -7,6 +7,8 @@ This deploys the module with all the supported subcomponents using AzureRM v4 an
 terraform {
   required_version = ">= 1.8.0"
   required_providers {
+    # ignore this because we want to force the use of AzAPI v2 within the module without having it used in this example.
+    # tflint-ignore: terraform_unused_required_providers
     azapi = {
       source  = "Azure/azapi"
       version = ">= 2.0.0"

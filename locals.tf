@@ -55,22 +55,9 @@ locals {
       share_name   = sv.body.properties.azureFile.shareName
     }
   }
-  # these workload_profile_* locals are used to mimic the behaviour of the azurerm provider
+  # this is used to mimic the behaviour of the azurerm provider
   workload_profile_consumption_enabled = contains([
     for wp in var.workload_profile :
     wp.name == "Consumption" && wp.workload_profile_type == "Consumption"
   ], true)
-  workload_profile_outputs = azapi_resource.this_environment.body.properties.workloadProfiles != null ? [
-    for wp in azapi_resource.this_environment.body.properties.workloadProfiles : merge(
-      {
-        name                  = wp.name
-        workload_profile_type = wp.workloadProfileType
-      },
-      # minimumCount and maximumCount are not applicable if the workloadProfileType is "Consumption"
-      wp.workloadProfileType != "Consumption" ? {
-        minimum_count = wp.minimumCount
-        maximum_count = wp.maximumCount
-      } : {}
-    )
-  ] : null
 }

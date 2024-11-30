@@ -7,6 +7,12 @@ This deploys the module with a environment-scoped dapr component.
 terraform {
   required_version = ">= 1.3.0"
   required_providers {
+    # ignore this because we want to force the use of AzAPI v1 within the module without having it used in this example.
+    # tflint-ignore: terraform_unused_required_providers
+    azapi = {
+      source  = "Azure/azapi"
+      version = ">= 1.13, < 2.0.0"
+    }
     azurerm = {
       source  = "hashicorp/azurerm"
       version = ">= 3.7.0, < 4.0.0"
@@ -70,6 +76,8 @@ module "managedenvironment" {
 The following requirements are needed by this module:
 
 - <a name="requirement_terraform"></a> [terraform](#requirement\_terraform) (>= 1.3.0)
+
+- <a name="requirement_azapi"></a> [azapi](#requirement\_azapi) (>= 1.13, < 2.0.0)
 
 - <a name="requirement_azurerm"></a> [azurerm](#requirement\_azurerm) (>= 3.7.0, < 4.0.0)
 
