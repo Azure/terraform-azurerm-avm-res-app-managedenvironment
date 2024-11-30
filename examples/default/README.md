@@ -7,6 +7,10 @@ This deploys the module in its simplest form.
 terraform {
   required_version = ">= 1.3.0"
   required_providers {
+    azapi = {
+      source  = "Azure/azapi"
+      version = ">= 1.13, < 2.0.0"
+    }
     azurerm = {
       source  = "hashicorp/azurerm"
       version = ">= 3.7.0, < 4.0.0"
@@ -64,6 +68,8 @@ The following requirements are needed by this module:
 
 - <a name="requirement_terraform"></a> [terraform](#requirement\_terraform) (>= 1.3.0)
 
+- <a name="requirement_azapi"></a> [azapi](#requirement\_azapi) (>= 1.13, < 2.0.0)
+
 - <a name="requirement_azurerm"></a> [azurerm](#requirement\_azurerm) (>= 3.7.0, < 4.0.0)
 
 ## Resources
@@ -84,7 +90,19 @@ No optional inputs.
 
 ## Outputs
 
-No outputs.
+The following outputs are exported:
+
+### <a name="output_id"></a> [id](#output\_id)
+
+Description: The resource ID of the Container Apps Managed Environment.
+
+### <a name="output_name"></a> [name](#output\_name)
+
+Description: The name of the Container Apps Managed Environment.
+
+### <a name="output_resource_id"></a> [resource\_id](#output\_resource\_id)
+
+Description: The resource ID of the Container Apps Managed Environment.
 
 ## Modules
 

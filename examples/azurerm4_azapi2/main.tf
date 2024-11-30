@@ -1,19 +1,19 @@
 terraform {
-  required_version = ">= 1.3.0"
+  required_version = ">= 1.8.0"
   required_providers {
     azapi = {
       source  = "Azure/azapi"
-      version = ">= 1.13, < 2.0.0"
+      version = ">= 2.0.0"
     }
     azurerm = {
       source  = "hashicorp/azurerm"
-      version = ">= 3.7.0, < 4.0.0"
+      version = ">= 4.0.0"
     }
   }
 }
 
 provider "azurerm" {
-  skip_provider_registration = true
+  resource_provider_registrations = "none"
   features {
     resource_group {
       prevent_deletion_if_contains_resources = false
@@ -52,6 +52,29 @@ resource "azurerm_subnet" "this" {
   name                 = module.naming.subnet.name_unique
   resource_group_name  = azurerm_resource_group.this.name
   virtual_network_name = azurerm_virtual_network.this.name
+
+  delegation {
+    name = "Microsoft.App.environments"
+
+    service_delegation {
+      name    = "Microsoft.App/environments"
+      actions = ["Microsoft.Network/virtualNetworks/subnets/join/action"]
+    }
+  }
+}
+
+resource "azurerm_storage_account" "this" {
+  account_replication_type = "ZRS"
+  account_tier             = "Standard"
+  location                 = azurerm_resource_group.this.location
+  name                     = module.naming.storage_account.name_unique
+  resource_group_name      = azurerm_resource_group.this.name
+}
+
+resource "azurerm_storage_share" "this" {
+  name               = "sharename"
+  quota              = 5
+  storage_account_id = azurerm_storage_account.this.id
 }
 
 module "managedenvironment" {
@@ -67,8 +90,27 @@ module "managedenvironment" {
     name                  = "Consumption"
     workload_profile_type = "Consumption"
   }]
-  zone_redundancy_enabled = true
+  zone_redundancy_enabled            = true
+  internal_load_balancer_enabled     = true
+  infrastructure_resource_group_name = "rg-managed-${module.naming.container_app_environment.name_unique}"
 
   log_analytics_workspace_customer_id        = azurerm_log_analytics_workspace.this.workspace_id
   log_analytics_workspace_primary_shared_key = azurerm_log_analytics_workspace.this.primary_shared_key
+
+  dapr_components = {
+    "my-dapr-component" = {
+      component_type = "state.azure.blobstorage"
+      version        = "v1"
+    }
+  }
+
+  storages = {
+    "mycontainerappstorage" = {
+      account_name = azurerm_storage_account.this.name
+      share_name   = azurerm_storage_share.this.name
+      access_key   = azurerm_storage_account.this.primary_access_key
+      access_mode  = "ReadOnly"
+    }
+  }
+
 }

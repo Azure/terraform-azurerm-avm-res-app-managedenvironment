@@ -1,6 +1,33 @@
+output "custom_domain_verification_id" {
+  description = "The custom domain verification ID of the Container Apps Managed Environment."
+  value       = try(azapi_resource.this_environment.output.properties.customDomainConfiguration.customDomainVerificationId, null)
+}
+
+output "dapr_component_metadata_secrets" {
+  description = "The metadata secrets output of the Dapr components."
+  sensitive   = true
+  value       = local.dapr_component_metadata_secrets_output
+}
+
+output "dapr_component_secrets" {
+  description = "The secrets output of the Dapr components."
+  sensitive   = true
+  value       = local.dapr_component_secrets_output
+}
+
 output "dapr_components" {
   description = "A map of dapr components connected to this environment. The map key is the supplied input to var.storages. The map value is the azurerm-formatted version of the entire dapr_components resource."
   value       = local.dapr_component_outputs
+}
+
+output "default_domain" {
+  description = "The default domain of the Container Apps Managed Environment."
+  value       = azapi_resource.this_environment.output.properties.defaultDomain
+}
+
+output "docker_bridge_cidr" {
+  description = "The Docker bridge CIDR of the Container Apps Managed Environment."
+  value       = try(azapi_resource.this_environment.output.properties.vnetConfiguration.dockerBridgeCidr, null)
 }
 
 output "id" {
@@ -8,46 +35,45 @@ output "id" {
   value       = azapi_resource.this_environment.id
 }
 
+output "infrastructure_resource_group" {
+  description = "The infrastructure resource group of the Container Apps Managed Environment."
+  value       = try(azapi_resource.this_environment.output.properties.infrastructureResourceGroup, null)
+}
+
+output "mtls_enabled" {
+  description = "Indicates if mTLS is enabled for the Container Apps Managed Environment."
+  value       = try(azapi_resource.this_environment.output.properties.peerAuthentication.mtls.enabled, false)
+}
+
 output "name" {
   description = "The name of the resource"
   value       = azapi_resource.this_environment.name
 }
 
-output "resource" {
-  description = "The Container Apps Managed Environment resource."
-  value = {
-    id                  = azapi_resource.this_environment.id
-    name                = azapi_resource.this_environment.name
-    resource_group_name = data.azurerm_resource_group.parent.name
-    location            = azapi_resource.this_environment.location
+output "platform_reserved_cidr" {
+  description = "The platform reserved CIDR of the Container Apps Managed Environment."
+  value       = try(azapi_resource.this_environment.output.properties.vnetConfiguration.platformReservedCidr, null)
+}
 
-    # outputs provided by the AzureRM provider
-    dapr_application_insights_connection_string = try(azapi_resource.this_environment.output.properties.daprAIConnectionString, null)
-    infrastructure_subnet_id                    = try(azapi_resource.this_environment.output.properties.vnetConfiguration.infrastructureSubnetId, null)
-    internal_load_balancer_enabled              = try(azapi_resource.this_environment.output.properties.vnetConfiguration.internal, null)
-    log_analytics_workspace_id                  = try(azapi_resource.this_environment.output.properties.appLogsConfiguration.logAnalyticsConfiguration.customerId, null)
-    tags                                        = try(azapi_resource.this_environment.tags, null)
-    workload_profiles                           = local.workload_profile_outputs
-    zone_redundancy_enabled                     = try(azapi_resource.this_environment.output.properties.zoneRedundant, null)
-
-    # outputs provided by the AzureRM provider known after apply
-    default_domain                   = azapi_resource.this_environment.output.properties.defaultDomain
-    docker_bridge_cidr               = try(azapi_resource.this_environment.output.properties.vnetConfiguration.dockerBridgeCidr, null)
-    platform_reserved_cidr           = try(azapi_resource.this_environment.output.properties.vnetConfiguration.platformReservedCidr, null)
-    platform_reserved_dns_ip_address = try(azapi_resource.this_environment.output.properties.vnetConfiguration.platformReservedDnsIP, null)
-    static_ip_address                = azapi_resource.this_environment.output.properties.staticIp
-
-    # additional outputs not yet supported by the AzureRM provider
-    custom_domain_verification_id          = try(azapi_resource.this_environment.output.properties.customDomainConfiguration.customDomainVerificationId, null)
-    dapr_azure_monitor_instrumentation_key = try(azapi_resource.this_environment.output.properties.daprAIInstrumentationKey, null)
-    infrastructure_resource_group          = try(azapi_resource.this_environment.output.properties.infrastructureResourceGroup, null)
-    mtls_enabled                           = try(azapi_resource.this_environment.output.properties.peerAuthentication.mtls.enabled, false)
-  }
+output "platform_reserved_dns_ip_address" {
+  description = "The platform reserved DNS IP address of the Container Apps Managed Environment."
+  value       = try(azapi_resource.this_environment.output.properties.vnetConfiguration.platformReservedDnsIP, null)
 }
 
 output "resource_id" {
   description = "The ID of the container app management environment resource."
   value       = azapi_resource.this_environment.id
+}
+
+output "static_ip_address" {
+  description = "The static IP address of the Container Apps Managed Environment."
+  value       = azapi_resource.this_environment.output.properties.staticIp
+}
+
+output "storage_access_keys" {
+  description = "The access key outputs of the storage resources."
+  sensitive   = true
+  value       = local.storage_access_key_outputs
 }
 
 output "storages" {

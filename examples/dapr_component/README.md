@@ -91,7 +91,19 @@ No optional inputs.
 
 ## Outputs
 
-No outputs.
+The following outputs are exported:
+
+### <a name="output_dapr_component_metadata_secrets"></a> [dapr\_component\_metadata\_secrets](#output\_dapr\_component\_metadata\_secrets)
+
+Description: The metadata secrets output of the Dapr components.
+
+### <a name="output_dapr_component_secrets"></a> [dapr\_component\_secrets](#output\_dapr\_component\_secrets)
+
+Description: The secrets output of the Dapr components.
+
+### <a name="output_dapr_components"></a> [dapr\_components](#output\_dapr\_components)
+
+Description: A map of dapr components connected to this environment. The map key is the supplied input to var.storages. The map value is the azurerm-formatted version of the entire dapr\_components resource.
 
 ## Modules
 

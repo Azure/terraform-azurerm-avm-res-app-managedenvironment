@@ -12,9 +12,9 @@ The following requirements are needed by this module:
 
 - <a name="requirement_terraform"></a> [terraform](#requirement\_terraform) (>= 1.5.0)
 
-- <a name="requirement_azapi"></a> [azapi](#requirement\_azapi) (~> 1.13)
+- <a name="requirement_azapi"></a> [azapi](#requirement\_azapi) (>= 1.13, < 3)
 
-- <a name="requirement_azurerm"></a> [azurerm](#requirement\_azurerm) (~> 3.71)
+- <a name="requirement_azurerm"></a> [azurerm](#requirement\_azurerm) (>= 3.71, < 5)
 
 - <a name="requirement_modtm"></a> [modtm](#requirement\_modtm) (~> 0.3)
 
@@ -32,8 +32,8 @@ The following resources are used by this module:
 - [azurerm_role_assignment.this](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/role_assignment) (resource)
 - [modtm_telemetry.telemetry](https://registry.terraform.io/providers/Azure/modtm/latest/docs/resources/telemetry) (resource)
 - [random_uuid.telemetry](https://registry.terraform.io/providers/hashicorp/random/latest/docs/resources/uuid) (resource)
+- [azurerm_client_config.current](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/data-sources/client_config) (data source)
 - [azurerm_client_config.telemetry](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/data-sources/client_config) (data source)
-- [azurerm_resource_group.parent](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/data-sources/resource_group) (data source)
 - [modtm_module_source.telemetry](https://registry.terraform.io/providers/Azure/modtm/latest/docs/data-sources/module_source) (data source)
 
 <!-- markdownlint-disable MD013 -->
@@ -90,6 +90,7 @@ Default: `null`
 ### <a name="input_dapr_components"></a> [dapr\_components](#input\_dapr\_components)
 
 Description: - `component_type` - (Required) The Dapr Component Type. For example `state.azure.blobstorage`. Changing this forces a new resource to be created.
+
 - `ignore_errors` - (Optional) Should the Dapr sidecar to continue initialisation if the component fails to load. Defaults to `false`
 - `init_timeout` - (Optional) The timeout for component initialisation as a `ISO8601` formatted string. e.g. `5s`, `2h`, `1m`. Defaults to `5s`.
 - `secret_store_component` - (Optional) Name of a Dapr component to retrieve component secrets from.
@@ -98,17 +99,20 @@ Description: - `component_type` - (Required) The Dapr Component Type. For exampl
 
 ---
 `metadata` block supports the following:
+
 - `name` - (Required) The name of the Metadata configuration item.
 - `secret_name` - (Optional) The name of a secret specified in the `secrets` block that contains the value for this metadata configuration item.
 - `value` - (Optional) The value for this metadata configuration item.
 
 ---
 `secret` block supports the following:
+
 - `name` - (Required) The Secret name.
 - `value` - (Required) The value for this secret.
 
 ---
 `timeouts` block supports the following:
+
 - `create` - (Defaults to 30 minutes) Used when creating the Container App Environment Dapr Component.
 - `delete` - (Defaults to 30 minutes) Used when deleting the Container App Environment Dapr Component.
 - `read` - (Defaults to 5 minutes) Used when retrieving the Container App Environment Dapr Component.
@@ -189,7 +193,7 @@ Default: `true`
 
 ### <a name="input_infrastructure_resource_group_name"></a> [infrastructure\_resource\_group\_name](#input\_infrastructure\_resource\_group\_name)
 
-Description: Name of the platform-managed resource group created for the Managed Environment to host infrastructure resources.   
+Description: Name of the platform-managed resource group created for the Managed Environment to host infrastructure resources.
 If a subnet ID is provided, this resource group will be created in the same subscription as the subnet.  
 If not specified, then one will be generated automatically, in the form `ME_<app_managed_environment_name>_<resource_group>_<location>`.
 
@@ -241,7 +245,7 @@ Default: `null`
 
 ### <a name="input_log_analytics_workspace_destination"></a> [log\_analytics\_workspace\_destination](#input\_log\_analytics\_workspace\_destination)
 
-Description: Destination for Log Analytics (options: 'log-analytics', 'azuremonitor', 'none').
+Description: Destination for Log Analytics (options: 'log-analytics', 'azure-monitor', 'none').
 
 Type: `string`
 
@@ -298,12 +302,14 @@ Default: `{}`
 ### <a name="input_storages"></a> [storages](#input\_storages)
 
 Description: - `access_key` - (Required) The Storage Account Access Key.
+
 - `access_mode` - (Required) The access mode to connect this storage to the Container App. Possible values include `ReadOnly` and `ReadWrite`. Changing this forces a new resource to be created.
 - `account_name` - (Required) The Azure Storage Account in which the Share to be used is located. Changing this forces a new resource to be created.
 - `share_name` - (Required) The name of the Azure Storage Share to use. Changing this forces a new resource to be created.
 
 ---
 `timeouts` block supports the following:
+
 - `create` - (Defaults to 30 minutes) Used when creating the Container App Environment Storage.
 - `delete` - (Defaults to 30 minutes) Used when deleting the Container App Environment Storage.
 - `read` - (Defaults to 5 minutes) Used when retrieving the Container App Environment Storage.
@@ -338,6 +344,7 @@ Default: `null`
 ### <a name="input_timeouts"></a> [timeouts](#input\_timeouts)
 
 Description: - `create` - (Defaults to 30 minutes) Used when creating the Container App Environment.
+
 - `delete` - (Defaults to 30 minutes) Used when deleting the Container App Environment.
 - `read` - (Defaults to 5 minutes) Used when retrieving the Container App Environment.
 - `update` - (Defaults to 30 minutes) Used when updating the Container App Environment.
@@ -356,14 +363,14 @@ Default: `null`
 
 ### <a name="input_workload_profile"></a> [workload\_profile](#input\_workload\_profile)
 
-Description:   
+Description:
 This lists the workload profiles that will be configured for the Managed Environment.  
 This is in addition to the default Consumpion Plan workload profile.
 
- - `maximum_count` - (Optional) The maximum number of instances of workload profile that can be deployed in the Container App Environment.
- - `minimum_count` - (Optional) The minimum number of instances of workload profile that can be deployed in the Container App Environment.
- - `name` - (Required) The name of the workload profile.
- - `workload_profile_type` - (Required) Workload profile type for the workloads to run on. Possible values include `D4`, `D8`, `D16`, `D32`, `E4`, `E8`, `E16` and `E32`.
+- `maximum_count` - (Optional) The maximum number of instances of workload profile that can be deployed in the Container App Environment.
+- `minimum_count` - (Optional) The minimum number of instances of workload profile that can be deployed in the Container App Environment.
+- `name` - (Required) The name of the workload profile.
+- `workload_profile_type` - (Required) Workload profile type for the workloads to run on. Possible values include `D4`, `D8`, `D16`, `D32`, `E4`, `E8`, `E16` and `E32`.
 
 Type:
 
@@ -390,25 +397,65 @@ Default: `true`
 
 The following outputs are exported:
 
+### <a name="output_custom_domain_verification_id"></a> [custom\_domain\_verification\_id](#output\_custom\_domain\_verification\_id)
+
+Description: The custom domain verification ID of the Container Apps Managed Environment.
+
+### <a name="output_dapr_component_metadata_secrets"></a> [dapr\_component\_metadata\_secrets](#output\_dapr\_component\_metadata\_secrets)
+
+Description: The metadata secrets output of the Dapr components.
+
+### <a name="output_dapr_component_secrets"></a> [dapr\_component\_secrets](#output\_dapr\_component\_secrets)
+
+Description: The secrets output of the Dapr components.
+
 ### <a name="output_dapr_components"></a> [dapr\_components](#output\_dapr\_components)
 
 Description: A map of dapr components connected to this environment. The map key is the supplied input to var.storages. The map value is the azurerm-formatted version of the entire dapr\_components resource.
+
+### <a name="output_default_domain"></a> [default\_domain](#output\_default\_domain)
+
+Description: The default domain of the Container Apps Managed Environment.
+
+### <a name="output_docker_bridge_cidr"></a> [docker\_bridge\_cidr](#output\_docker\_bridge\_cidr)
+
+Description: The Docker bridge CIDR of the Container Apps Managed Environment.
 
 ### <a name="output_id"></a> [id](#output\_id)
 
 Description: The ID of the container app management environment resource.
 
+### <a name="output_infrastructure_resource_group"></a> [infrastructure\_resource\_group](#output\_infrastructure\_resource\_group)
+
+Description: The infrastructure resource group of the Container Apps Managed Environment.
+
+### <a name="output_mtls_enabled"></a> [mtls\_enabled](#output\_mtls\_enabled)
+
+Description: Indicates if mTLS is enabled for the Container Apps Managed Environment.
+
 ### <a name="output_name"></a> [name](#output\_name)
 
 Description: The name of the resource
 
-### <a name="output_resource"></a> [resource](#output\_resource)
+### <a name="output_platform_reserved_cidr"></a> [platform\_reserved\_cidr](#output\_platform\_reserved\_cidr)
 
-Description: The Container Apps Managed Environment resource.
+Description: The platform reserved CIDR of the Container Apps Managed Environment.
+
+### <a name="output_platform_reserved_dns_ip_address"></a> [platform\_reserved\_dns\_ip\_address](#output\_platform\_reserved\_dns\_ip\_address)
+
+Description: The platform reserved DNS IP address of the Container Apps Managed Environment.
 
 ### <a name="output_resource_id"></a> [resource\_id](#output\_resource\_id)
 
 Description: The ID of the container app management environment resource.
+
+### <a name="output_static_ip_address"></a> [static\_ip\_address](#output\_static\_ip\_address)
+
+Description: The static IP address of the Container Apps Managed Environment.
+
+### <a name="output_storage_access_keys"></a> [storage\_access\_keys](#output\_storage\_access\_keys)
+
+Description: The access key outputs of the storage resources.
 
 ### <a name="output_storages"></a> [storages](#output\_storages)
 
