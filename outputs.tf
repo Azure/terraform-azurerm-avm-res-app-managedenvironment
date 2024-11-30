@@ -16,7 +16,7 @@ output "dapr_component_secrets" {
 }
 
 output "dapr_components" {
-  description = "A map of dapr components connected to this environment. The map key is the supplied input to var.storages. The map value is the azurerm-formatted version of the entire dapr_components resource."
+  description = "A map of dapr components connected to this environment. The map key is the supplied input to var.dapr_components. The map value is the azurerm-formatted version of the entire dapr_components resource."
   value       = local.dapr_component_outputs
 }
 

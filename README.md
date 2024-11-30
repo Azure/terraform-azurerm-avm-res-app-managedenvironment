@@ -404,7 +404,7 @@ Description: The secrets output of the Dapr components.
 
 ### <a name="output_dapr_components"></a> [dapr\_components](#output\_dapr\_components)
 
-Description: A map of dapr components connected to this environment. The map key is the supplied input to var.storages. The map value is the azurerm-formatted version of the entire dapr\_components resource.
+Description: A map of dapr components connected to this environment. The map key is the supplied input to var.dapr\_components. The map value is the azurerm-formatted version of the entire dapr\_components resource.
 
 ### <a name="output_default_domain"></a> [default\_domain](#output\_default\_domain)
 
