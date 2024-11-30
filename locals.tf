@@ -1,4 +1,12 @@
 locals {
+  dapr_component_metadata_secrets_output = {
+    for dk, dv in azapi_resource.dapr_components :
+    dk => dv.body.properties.metadata != null ? [
+      for item in dv.body.properties.metadata : {
+        value = item.value
+      }
+    ] : null
+  }
   dapr_component_outputs = {
     for dk, dv in azapi_resource.dapr_components :
     dk => {
@@ -13,26 +21,36 @@ locals {
         for item in dv.body.properties.metadata : {
           name        = item.name
           secret_name = item.secretRef
-          value       = item.value
         }
       ] : null
       secret = dv.body.properties.secrets != null ? [
         for item in dv.body.properties.secrets : {
           name                = item.name
-          value               = item.value
           identity            = item.identity
           key_vault_secret_id = item.keyVaultUrl
         }
       ] : null
     }
   }
+  dapr_component_secrets_output = {
+    for dk, dv in azapi_resource.dapr_components :
+    dk => dv.body.properties.secrets != null ? [
+      for item in dv.body.properties.secrets : {
+        value = item.value
+      }
+    ] : null
+  }
   role_definition_resource_substring = "/providers/Microsoft.Authorization/roleDefinitions"
+  # access keys are kept separate because they need to be marked as sensitive
+  storage_access_key_outputs = {
+    for sk, sv in azapi_resource.storages :
+    sk => sv.body.properties.azureFile.accountKey
+  }
   storages_outputs = {
     for sk, sv in azapi_resource.storages :
     sk => {
       id           = sv.id
       access_mode  = sv.body.properties.azureFile.accessMode
-      access_key   = sv.body.properties.azureFile.accountKey
       account_name = sv.body.properties.azureFile.accountName
       share_name   = sv.body.properties.azureFile.shareName
     }

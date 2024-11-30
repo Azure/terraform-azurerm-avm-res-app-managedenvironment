@@ -140,7 +140,7 @@ variable "log_analytics_workspace_customer_id" {
 variable "log_analytics_workspace_destination" {
   type        = string
   default     = "log-analytics"
-  description = "Destination for Log Analytics (options: 'log-analytics', 'azuremonitor', 'none')."
+  description = "Destination for Log Analytics (options: 'log-analytics', 'azure-monitor', 'none')."
 
   validation {
     condition     = contains(["log-analytics", "azure-monitor", "none"], var.log_analytics_workspace_destination)

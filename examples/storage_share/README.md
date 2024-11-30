@@ -7,6 +7,10 @@ This deploys the module with Container App Environment storage.
 terraform {
   required_version = ">= 1.3.0"
   required_providers {
+    azapi = {
+      source  = "Azure/azapi"
+      version = ">= 1.13, < 2.0.0"
+    }
     azurerm = {
       source  = "hashicorp/azurerm"
       version = ">= 3.7.0, < 4.0.0"
@@ -87,13 +91,9 @@ The following requirements are needed by this module:
 
 - <a name="requirement_terraform"></a> [terraform](#requirement\_terraform) (>= 1.3.0)
 
+- <a name="requirement_azapi"></a> [azapi](#requirement\_azapi) (>= 1.13, < 2.0.0)
+
 - <a name="requirement_azurerm"></a> [azurerm](#requirement\_azurerm) (>= 3.7.0, < 4.0.0)
-
-## Providers
-
-The following providers are used by this module:
-
-- <a name="provider_azurerm"></a> [azurerm](#provider\_azurerm) (>= 3.7.0, < 4.0.0)
 
 ## Resources
 
@@ -115,7 +115,15 @@ No optional inputs.
 
 ## Outputs
 
-No outputs.
+The following outputs are exported:
+
+### <a name="output_storages"></a> [storages](#output\_storages)
+
+Description: The storage of the Container Apps Managed Environment.
+
+### <a name="output_storages_access_keys"></a> [storages\_access\_keys](#output\_storages\_access\_keys)
+
+Description: The storage access keys for storage resources attached to the Container Apps Managed Environment.
 
 ## Modules
 
