@@ -7,6 +7,8 @@ This deploys the module in its simplest form.
 terraform {
   required_version = ">= 1.3.0"
   required_providers {
+    # ignore this because we want to force the use of AzAPI v1 within the module without having it used in this example.
+    # tflint-ignore: terraform_unused_required_providers
     azapi = {
       source  = "Azure/azapi"
       version = ">= 1.13, < 2.0.0"

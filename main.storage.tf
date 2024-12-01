@@ -1,28 +1,14 @@
-resource "azapi_resource" "storages" {
+module "storage" {
+  source   = "./modules/storage"
   for_each = var.storages
 
-  type = "Microsoft.App/managedEnvironments/storages@2023-05-01"
-  body = {
-    properties = {
-      azureFile = {
-        accessMode  = each.value.access_mode
-        accountKey  = each.value.access_key
-        accountName = each.value.account_name
-        shareName   = each.value.share_name
-      }
-    }
-  }
-  name                      = each.key
-  parent_id                 = azapi_resource.this_environment.id
-  schema_validation_enabled = true
+  name                = each.key
+  managed_environment = { resource_id = azapi_resource.this_environment.id }
 
-  dynamic "timeouts" {
-    for_each = each.value.timeouts == null ? [] : [each.value.timeouts]
+  access_key   = each.value.access_key
+  account_name = each.value.account_name
+  share_name   = each.value.share_name
+  access_mode  = each.value.access_mode
 
-    content {
-      create = timeouts.value.create
-      delete = timeouts.value.delete
-      read   = timeouts.value.read
-    }
-  }
+  timeouts = each.value.timeouts
 }

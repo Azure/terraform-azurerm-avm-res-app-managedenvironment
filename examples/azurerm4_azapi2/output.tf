@@ -48,30 +48,12 @@ output "mtls_enabled" {
   value       = module.managedenvironment.mtls_enabled
 }
 
-output "dapr_components" {
-  description = "A map of dapr components connected to this environment. The map key is the supplied input to var.storages. The map value is the azurerm-formatted version of the entire dapr_components resource."
-  value       = module.managedenvironment.dapr_components
+output "dapr_component_resource_ids" {
+  description = "A map of dapr component resource IDs."
+  value       = module.managedenvironment.dapr_component_resource_ids
 }
 
-output "dapr_component_metadata_secrets" {
-  description = "The metadata secrets output of the Dapr components."
-  value       = module.managedenvironment.dapr_component_metadata_secrets
-  sensitive   = true
-}
-
-output "dapr_component_secrets" {
-  description = "The secrets output of the Dapr components."
-  value       = module.managedenvironment.dapr_component_secrets
-  sensitive   = true
-}
-
-output "storages" {
-  description = "The storage of the Container Apps Managed Environment."
-  value       = module.managedenvironment.storages
-}
-
-output "storages_access_keys" {
-  description = "The storage access keys for storage resources attached to the Container Apps Managed Environment."
-  value       = module.managedenvironment.storage_access_keys
-  sensitive   = true
+output "storage_resource_ids" {
+  description = "A map of dapr component resource IDs."
+  value       = module.managedenvironment.storage_resource_ids
 }

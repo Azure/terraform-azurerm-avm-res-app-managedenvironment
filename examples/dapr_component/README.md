@@ -7,6 +7,12 @@ This deploys the module with a environment-scoped dapr component.
 terraform {
   required_version = ">= 1.3.0"
   required_providers {
+    # ignore this because we want to force the use of AzAPI v1 within the module without having it used in this example.
+    # tflint-ignore: terraform_unused_required_providers
+    azapi = {
+      source  = "Azure/azapi"
+      version = ">= 1.13, < 2.0.0"
+    }
     azurerm = {
       source  = "hashicorp/azurerm"
       version = ">= 3.7.0, < 4.0.0"
@@ -62,6 +68,11 @@ module "managedenvironment" {
   # zone redundancy must be disabled unless we supply a subnet for vnet integration.
   zone_redundancy_enabled = false
 }
+
+moved {
+  to   = module.managedenvironment.module.dapr_component["my-dapr-component"].azapi_resource.this
+  from = module.managedenvironment.azapi_resource.dapr_components["my-dapr-component"]
+}
 ```
 
 <!-- markdownlint-disable MD033 -->
@@ -70,6 +81,8 @@ module "managedenvironment" {
 The following requirements are needed by this module:
 
 - <a name="requirement_terraform"></a> [terraform](#requirement\_terraform) (>= 1.3.0)
+
+- <a name="requirement_azapi"></a> [azapi](#requirement\_azapi) (>= 1.13, < 2.0.0)
 
 - <a name="requirement_azurerm"></a> [azurerm](#requirement\_azurerm) (>= 3.7.0, < 4.0.0)
 
@@ -93,17 +106,9 @@ No optional inputs.
 
 The following outputs are exported:
 
-### <a name="output_dapr_component_metadata_secrets"></a> [dapr\_component\_metadata\_secrets](#output\_dapr\_component\_metadata\_secrets)
+### <a name="output_dapr_component_resource_ids"></a> [dapr\_component\_resource\_ids](#output\_dapr\_component\_resource\_ids)
 
-Description: The metadata secrets output of the Dapr components.
-
-### <a name="output_dapr_component_secrets"></a> [dapr\_component\_secrets](#output\_dapr\_component\_secrets)
-
-Description: The secrets output of the Dapr components.
-
-### <a name="output_dapr_components"></a> [dapr\_components](#output\_dapr\_components)
-
-Description: A map of dapr components connected to this environment. The map key is the supplied input to var.storages. The map value is the azurerm-formatted version of the entire dapr\_components resource.
+Description: A map of dapr component resource IDs.
 
 ## Modules
 
