@@ -122,7 +122,11 @@ No optional inputs.
 
 ## Outputs
 
-No outputs.
+The following outputs are exported:
+
+### <a name="output_storage_resource_ids"></a> [storage\_resource\_ids](#output\_storage\_resource\_ids)
+
+Description: A map of dapr component resource IDs.
 
 ## Modules
 
