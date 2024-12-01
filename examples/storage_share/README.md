@@ -84,6 +84,11 @@ module "managedenvironment" {
   # zone redundancy must be disabled unless we supply a subnet for vnet integration.
   zone_redundancy_enabled = false
 }
+
+moved {
+  from = module.managedenvironment.azapi_resource.storages["mycontainerappstorage"]
+  to   = module.managedenvironment.module.storage["mycontainerappstorage"].azapi_resource.this
+}
 ```
 
 <!-- markdownlint-disable MD033 -->
@@ -117,15 +122,7 @@ No optional inputs.
 
 ## Outputs
 
-The following outputs are exported:
-
-### <a name="output_storages"></a> [storages](#output\_storages)
-
-Description: The storage of the Container Apps Managed Environment.
-
-### <a name="output_storages_access_keys"></a> [storages\_access\_keys](#output\_storages\_access\_keys)
-
-Description: The storage access keys for storage resources attached to the Container Apps Managed Environment.
+No outputs.
 
 ## Modules
 

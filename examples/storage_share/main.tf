@@ -78,3 +78,8 @@ module "managedenvironment" {
   # zone redundancy must be disabled unless we supply a subnet for vnet integration.
   zone_redundancy_enabled = false
 }
+
+moved {
+  from = module.managedenvironment.azapi_resource.storages["mycontainerappstorage"]
+  to   = module.managedenvironment.module.storage["mycontainerappstorage"].azapi_resource.this
+}

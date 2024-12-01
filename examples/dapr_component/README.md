@@ -68,6 +68,11 @@ module "managedenvironment" {
   # zone redundancy must be disabled unless we supply a subnet for vnet integration.
   zone_redundancy_enabled = false
 }
+
+moved {
+  to   = module.managedenvironment.module.dapr_component["my-dapr-component"].azapi_resource.this
+  from = module.managedenvironment.azapi_resource.dapr_components["my-dapr-component"]
+}
 ```
 
 <!-- markdownlint-disable MD033 -->
@@ -101,17 +106,9 @@ No optional inputs.
 
 The following outputs are exported:
 
-### <a name="output_dapr_component_metadata_secrets"></a> [dapr\_component\_metadata\_secrets](#output\_dapr\_component\_metadata\_secrets)
+### <a name="output_dapr_component_resource_ids"></a> [dapr\_component\_resource\_ids](#output\_dapr\_component\_resource\_ids)
 
-Description: The metadata secrets output of the Dapr components.
-
-### <a name="output_dapr_component_secrets"></a> [dapr\_component\_secrets](#output\_dapr\_component\_secrets)
-
-Description: The secrets output of the Dapr components.
-
-### <a name="output_dapr_components"></a> [dapr\_components](#output\_dapr\_components)
-
-Description: A map of dapr components connected to this environment. The map key is the supplied input to var.storages. The map value is the azurerm-formatted version of the entire dapr\_components resource.
+Description: A map of dapr component resource IDs.
 
 ## Modules
 

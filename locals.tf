@@ -1,58 +1,15 @@
 locals {
-  dapr_component_metadata_secrets_output = {
-    for dk, dv in azapi_resource.dapr_components :
-    dk => dv.body.properties.metadata != null ? [
-      for item in dv.body.properties.metadata : {
-        value = item.value
-      }
-    ] : null
-  }
-  dapr_component_outputs = {
-    for dk, dv in azapi_resource.dapr_components :
+  dapr_component_resource_ids = {
+    for dk, dv in module.dapr_component :
     dk => {
-      id                     = dv.id
-      component_type         = dv.body.properties.componentType
-      ignore_errors          = dv.body.properties.ignoreErrors
-      init_timeout           = dv.body.properties.initTimeout
-      secret_store_component = dv.body.properties.secretStoreComponent
-      scopes                 = dv.body.properties.scopes
-      version                = dv.body.properties.version
-      metadata = dv.body.properties.metadata != null ? [
-        for item in dv.body.properties.metadata : {
-          name        = item.name
-          secret_name = item.secretRef
-        }
-      ] : null
-      secret = dv.body.properties.secrets != null ? [
-        for item in dv.body.properties.secrets : {
-          name                = item.name
-          identity            = item.identity
-          key_vault_secret_id = item.keyVaultUrl
-        }
-      ] : null
+      id = dv.resource_id
     }
   }
-  dapr_component_secrets_output = {
-    for dk, dv in azapi_resource.dapr_components :
-    dk => dv.body.properties.secrets != null ? [
-      for item in dv.body.properties.secrets : {
-        value = item.value
-      }
-    ] : null
-  }
   role_definition_resource_substring = "/providers/Microsoft.Authorization/roleDefinitions"
-  # access keys are kept separate because they need to be marked as sensitive
-  storage_access_key_outputs = {
-    for sk, sv in azapi_resource.storages :
-    sk => sv.body.properties.azureFile.accountKey
-  }
-  storages_outputs = {
-    for sk, sv in azapi_resource.storages :
+  storage_resource_ids = {
+    for sk, sv in module.storage :
     sk => {
-      id           = sv.id
-      access_mode  = sv.body.properties.azureFile.accessMode
-      account_name = sv.body.properties.azureFile.accountName
-      share_name   = sv.body.properties.azureFile.shareName
+      id = sv.resource_id
     }
   }
   # this is used to mimic the behaviour of the azurerm provider

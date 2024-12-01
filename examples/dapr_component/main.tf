@@ -62,3 +62,8 @@ module "managedenvironment" {
   # zone redundancy must be disabled unless we supply a subnet for vnet integration.
   zone_redundancy_enabled = false
 }
+
+moved {
+  to   = module.managedenvironment.module.dapr_component["my-dapr-component"].azapi_resource.this
+  from = module.managedenvironment.azapi_resource.dapr_components["my-dapr-component"]
+}

@@ -24,8 +24,6 @@ The following requirements are needed by this module:
 
 The following resources are used by this module:
 
-- [azapi_resource.dapr_components](https://registry.terraform.io/providers/Azure/azapi/latest/docs/resources/resource) (resource)
-- [azapi_resource.storages](https://registry.terraform.io/providers/Azure/azapi/latest/docs/resources/resource) (resource)
 - [azapi_resource.this_environment](https://registry.terraform.io/providers/Azure/azapi/latest/docs/resources/resource) (resource)
 - [azurerm_management_lock.this](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/management_lock) (resource)
 - [azurerm_monitor_diagnostic_setting.this](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/monitor_diagnostic_setting) (resource)
@@ -394,15 +392,7 @@ The following outputs are exported:
 
 Description: The custom domain verification ID of the Container Apps Managed Environment.
 
-### <a name="output_dapr_component_metadata_secrets"></a> [dapr\_component\_metadata\_secrets](#output\_dapr\_component\_metadata\_secrets)
-
-Description: The metadata secrets output of the Dapr components.
-
-### <a name="output_dapr_component_secrets"></a> [dapr\_component\_secrets](#output\_dapr\_component\_secrets)
-
-Description: The secrets output of the Dapr components.
-
-### <a name="output_dapr_components"></a> [dapr\_components](#output\_dapr\_components)
+### <a name="output_dapr_component_resource_ids"></a> [dapr\_component\_resource\_ids](#output\_dapr\_component\_resource\_ids)
 
 Description: A map of dapr components connected to this environment. The map key is the supplied input to var.dapr\_components. The map value is the azurerm-formatted version of the entire dapr\_components resource.
 
@@ -446,17 +436,25 @@ Description: The ID of the container app management environment resource.
 
 Description: The static IP address of the Container Apps Managed Environment.
 
-### <a name="output_storage_access_keys"></a> [storage\_access\_keys](#output\_storage\_access\_keys)
-
-Description: The access key outputs of the storage resources.
-
-### <a name="output_storages"></a> [storages](#output\_storages)
+### <a name="output_storage_resource_ids"></a> [storage\_resource\_ids](#output\_storage\_resource\_ids)
 
 Description: A map of storage shares connected to this environment. The map key is the supplied input to var.storages. The map value is the azurerm-formatted version of the entire storage shares resource.
 
 ## Modules
 
-No modules.
+The following Modules are called:
+
+### <a name="module_dapr_component"></a> [dapr\_component](#module\_dapr\_component)
+
+Source: ./modules/dapr_component
+
+Version:
+
+### <a name="module_storage"></a> [storage](#module\_storage)
+
+Source: ./modules/storage
+
+Version:
 
 <!-- markdownlint-disable-next-line MD041 -->
 ## Data Collection
