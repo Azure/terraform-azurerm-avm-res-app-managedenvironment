@@ -3,21 +3,9 @@ output "custom_domain_verification_id" {
   value       = try(azapi_resource.this_environment.output.properties.customDomainConfiguration.customDomainVerificationId, null)
 }
 
-output "dapr_component_metadata_secrets" {
-  description = "The metadata secrets output of the Dapr components."
-  sensitive   = true
-  value       = local.dapr_component_metadata_secrets_output
-}
-
-output "dapr_component_secrets" {
-  description = "The secrets output of the Dapr components."
-  sensitive   = true
-  value       = local.dapr_component_secrets_output
-}
-
-output "dapr_components" {
-  description = "A map of dapr components connected to this environment. The map key is the supplied input to var.storages. The map value is the azurerm-formatted version of the entire dapr_components resource."
-  value       = local.dapr_component_outputs
+output "dapr_component_resource_ids" {
+  description = "A map of dapr components connected to this environment. The map key is the supplied input to var.dapr_components. The map value is the azurerm-formatted version of the entire dapr_components resource."
+  value       = local.dapr_component_resource_ids
 }
 
 output "default_domain" {
@@ -70,13 +58,7 @@ output "static_ip_address" {
   value       = azapi_resource.this_environment.output.properties.staticIp
 }
 
-output "storage_access_keys" {
-  description = "The access key outputs of the storage resources."
-  sensitive   = true
-  value       = local.storage_access_key_outputs
-}
-
-output "storages" {
+output "storage_resource_ids" {
   description = "A map of storage shares connected to this environment. The map key is the supplied input to var.storages. The map value is the azurerm-formatted version of the entire storage shares resource."
-  value       = local.storages_outputs
+  value       = local.storage_resource_ids
 }

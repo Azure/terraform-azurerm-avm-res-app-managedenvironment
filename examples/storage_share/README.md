@@ -7,6 +7,8 @@ This deploys the module with Container App Environment storage.
 terraform {
   required_version = ">= 1.3.0"
   required_providers {
+    # ignore this because we want to force the use of AzAPI v1 within the module without having it used in this example.
+    # tflint-ignore: terraform_unused_required_providers
     azapi = {
       source  = "Azure/azapi"
       version = ">= 1.13, < 2.0.0"
@@ -82,6 +84,11 @@ module "managedenvironment" {
   # zone redundancy must be disabled unless we supply a subnet for vnet integration.
   zone_redundancy_enabled = false
 }
+
+moved {
+  from = module.managedenvironment.azapi_resource.storages["mycontainerappstorage"]
+  to   = module.managedenvironment.module.storage["mycontainerappstorage"].azapi_resource.this
+}
 ```
 
 <!-- markdownlint-disable MD033 -->
@@ -117,13 +124,9 @@ No optional inputs.
 
 The following outputs are exported:
 
-### <a name="output_storages"></a> [storages](#output\_storages)
+### <a name="output_storage_resource_ids"></a> [storage\_resource\_ids](#output\_storage\_resource\_ids)
 
-Description: The storage of the Container Apps Managed Environment.
-
-### <a name="output_storages_access_keys"></a> [storages\_access\_keys](#output\_storages\_access\_keys)
-
-Description: The storage access keys for storage resources attached to the Container Apps Managed Environment.
+Description: A map of dapr component resource IDs.
 
 ## Modules
 

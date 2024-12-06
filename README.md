@@ -24,8 +24,6 @@ The following requirements are needed by this module:
 
 The following resources are used by this module:
 
-- [azapi_resource.dapr_components](https://registry.terraform.io/providers/Azure/azapi/latest/docs/resources/resource) (resource)
-- [azapi_resource.storages](https://registry.terraform.io/providers/Azure/azapi/latest/docs/resources/resource) (resource)
 - [azapi_resource.this_environment](https://registry.terraform.io/providers/Azure/azapi/latest/docs/resources/resource) (resource)
 - [azurerm_management_lock.this](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/management_lock) (resource)
 - [azurerm_monitor_diagnostic_setting.this](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/monitor_diagnostic_setting) (resource)
@@ -90,7 +88,6 @@ Default: `null`
 ### <a name="input_dapr_components"></a> [dapr\_components](#input\_dapr\_components)
 
 Description: - `component_type` - (Required) The Dapr Component Type. For example `state.azure.blobstorage`. Changing this forces a new resource to be created.
-
 - `ignore_errors` - (Optional) Should the Dapr sidecar to continue initialisation if the component fails to load. Defaults to `false`
 - `init_timeout` - (Optional) The timeout for component initialisation as a `ISO8601` formatted string. e.g. `5s`, `2h`, `1m`. Defaults to `5s`.
 - `secret_store_component` - (Optional) Name of a Dapr component to retrieve component secrets from.
@@ -99,20 +96,17 @@ Description: - `component_type` - (Required) The Dapr Component Type. For exampl
 
 ---
 `metadata` block supports the following:
-
 - `name` - (Required) The name of the Metadata configuration item.
 - `secret_name` - (Optional) The name of a secret specified in the `secrets` block that contains the value for this metadata configuration item.
 - `value` - (Optional) The value for this metadata configuration item.
 
 ---
 `secret` block supports the following:
-
 - `name` - (Required) The Secret name.
 - `value` - (Required) The value for this secret.
 
 ---
 `timeouts` block supports the following:
-
 - `create` - (Defaults to 30 minutes) Used when creating the Container App Environment Dapr Component.
 - `delete` - (Defaults to 30 minutes) Used when deleting the Container App Environment Dapr Component.
 - `read` - (Defaults to 5 minutes) Used when retrieving the Container App Environment Dapr Component.
@@ -193,7 +187,7 @@ Default: `true`
 
 ### <a name="input_infrastructure_resource_group_name"></a> [infrastructure\_resource\_group\_name](#input\_infrastructure\_resource\_group\_name)
 
-Description: Name of the platform-managed resource group created for the Managed Environment to host infrastructure resources.
+Description: Name of the platform-managed resource group created for the Managed Environment to host infrastructure resources.   
 If a subnet ID is provided, this resource group will be created in the same subscription as the subnet.  
 If not specified, then one will be generated automatically, in the form `ME_<app_managed_environment_name>_<resource_group>_<location>`.
 
@@ -302,14 +296,12 @@ Default: `{}`
 ### <a name="input_storages"></a> [storages](#input\_storages)
 
 Description: - `access_key` - (Required) The Storage Account Access Key.
-
 - `access_mode` - (Required) The access mode to connect this storage to the Container App. Possible values include `ReadOnly` and `ReadWrite`. Changing this forces a new resource to be created.
 - `account_name` - (Required) The Azure Storage Account in which the Share to be used is located. Changing this forces a new resource to be created.
 - `share_name` - (Required) The name of the Azure Storage Share to use. Changing this forces a new resource to be created.
 
 ---
 `timeouts` block supports the following:
-
 - `create` - (Defaults to 30 minutes) Used when creating the Container App Environment Storage.
 - `delete` - (Defaults to 30 minutes) Used when deleting the Container App Environment Storage.
 - `read` - (Defaults to 5 minutes) Used when retrieving the Container App Environment Storage.
@@ -344,7 +336,6 @@ Default: `null`
 ### <a name="input_timeouts"></a> [timeouts](#input\_timeouts)
 
 Description: - `create` - (Defaults to 30 minutes) Used when creating the Container App Environment.
-
 - `delete` - (Defaults to 30 minutes) Used when deleting the Container App Environment.
 - `read` - (Defaults to 5 minutes) Used when retrieving the Container App Environment.
 - `update` - (Defaults to 30 minutes) Used when updating the Container App Environment.
@@ -363,14 +354,14 @@ Default: `null`
 
 ### <a name="input_workload_profile"></a> [workload\_profile](#input\_workload\_profile)
 
-Description:
+Description:   
 This lists the workload profiles that will be configured for the Managed Environment.  
 This is in addition to the default Consumpion Plan workload profile.
 
-- `maximum_count` - (Optional) The maximum number of instances of workload profile that can be deployed in the Container App Environment.
-- `minimum_count` - (Optional) The minimum number of instances of workload profile that can be deployed in the Container App Environment.
-- `name` - (Required) The name of the workload profile.
-- `workload_profile_type` - (Required) Workload profile type for the workloads to run on. Possible values include `D4`, `D8`, `D16`, `D32`, `E4`, `E8`, `E16` and `E32`.
+ - `maximum_count` - (Optional) The maximum number of instances of workload profile that can be deployed in the Container App Environment.
+ - `minimum_count` - (Optional) The minimum number of instances of workload profile that can be deployed in the Container App Environment.
+ - `name` - (Required) The name of the workload profile.
+ - `workload_profile_type` - (Required) Workload profile type for the workloads to run on. Possible values include `D4`, `D8`, `D16`, `D32`, `E4`, `E8`, `E16` and `E32`.
 
 Type:
 
@@ -401,17 +392,9 @@ The following outputs are exported:
 
 Description: The custom domain verification ID of the Container Apps Managed Environment.
 
-### <a name="output_dapr_component_metadata_secrets"></a> [dapr\_component\_metadata\_secrets](#output\_dapr\_component\_metadata\_secrets)
+### <a name="output_dapr_component_resource_ids"></a> [dapr\_component\_resource\_ids](#output\_dapr\_component\_resource\_ids)
 
-Description: The metadata secrets output of the Dapr components.
-
-### <a name="output_dapr_component_secrets"></a> [dapr\_component\_secrets](#output\_dapr\_component\_secrets)
-
-Description: The secrets output of the Dapr components.
-
-### <a name="output_dapr_components"></a> [dapr\_components](#output\_dapr\_components)
-
-Description: A map of dapr components connected to this environment. The map key is the supplied input to var.storages. The map value is the azurerm-formatted version of the entire dapr\_components resource.
+Description: A map of dapr components connected to this environment. The map key is the supplied input to var.dapr\_components. The map value is the azurerm-formatted version of the entire dapr\_components resource.
 
 ### <a name="output_default_domain"></a> [default\_domain](#output\_default\_domain)
 
@@ -453,17 +436,25 @@ Description: The ID of the container app management environment resource.
 
 Description: The static IP address of the Container Apps Managed Environment.
 
-### <a name="output_storage_access_keys"></a> [storage\_access\_keys](#output\_storage\_access\_keys)
-
-Description: The access key outputs of the storage resources.
-
-### <a name="output_storages"></a> [storages](#output\_storages)
+### <a name="output_storage_resource_ids"></a> [storage\_resource\_ids](#output\_storage\_resource\_ids)
 
 Description: A map of storage shares connected to this environment. The map key is the supplied input to var.storages. The map value is the azurerm-formatted version of the entire storage shares resource.
 
 ## Modules
 
-No modules.
+The following Modules are called:
+
+### <a name="module_dapr_component"></a> [dapr\_component](#module\_dapr\_component)
+
+Source: ./modules/dapr_component
+
+Version:
+
+### <a name="module_storage"></a> [storage](#module\_storage)
+
+Source: ./modules/storage
+
+Version:
 
 <!-- markdownlint-disable-next-line MD041 -->
 ## Data Collection
