@@ -1,6 +1,12 @@
 terraform {
   required_version = ">= 1.3.0"
   required_providers {
+    # ignore this because we want to force the use of AzAPI v1 within the module without having it used in this example.
+    # tflint-ignore: terraform_unused_required_providers
+    azapi = {
+      source  = "Azure/azapi"
+      version = ">= 1.13, < 2.0.0"
+    }
     azurerm = {
       source  = "hashicorp/azurerm"
       version = ">= 3.7.0, < 4.0.0"
@@ -55,4 +61,9 @@ module "managedenvironment" {
 
   # zone redundancy must be disabled unless we supply a subnet for vnet integration.
   zone_redundancy_enabled = false
+}
+
+moved {
+  to   = module.managedenvironment.module.dapr_component["my-dapr-component"].azapi_resource.this
+  from = module.managedenvironment.azapi_resource.dapr_components["my-dapr-component"]
 }
