@@ -7,6 +7,12 @@ This deploys a Container Apps Managed Environment using the consumption-based wo
 terraform {
   required_version = ">= 1.3.0"
   required_providers {
+    # ignore this because we want to force the use of AzAPI v1 within the module without having it used in this example.
+    # tflint-ignore: terraform_unused_required_providers
+    azapi = {
+      source  = "Azure/azapi"
+      version = ">= 1.13, < 2.0.0"
+    }
     azurerm = {
       source  = "hashicorp/azurerm"
       version = ">= 3.7.0, < 4.0.0"
@@ -54,6 +60,15 @@ resource "azurerm_subnet" "this" {
   name                 = module.naming.subnet.name_unique
   resource_group_name  = azurerm_resource_group.this.name
   virtual_network_name = azurerm_virtual_network.this.name
+
+  delegation {
+    name = "Microsoft.App.environments"
+
+    service_delegation {
+      name    = "Microsoft.App/environments"
+      actions = ["Microsoft.Network/virtualNetworks/subnets/join/action"]
+    }
+  }
 }
 
 module "managedenvironment" {
@@ -85,6 +100,8 @@ The following requirements are needed by this module:
 
 - <a name="requirement_terraform"></a> [terraform](#requirement\_terraform) (>= 1.3.0)
 
+- <a name="requirement_azapi"></a> [azapi](#requirement\_azapi) (>= 1.13, < 2.0.0)
+
 - <a name="requirement_azurerm"></a> [azurerm](#requirement\_azurerm) (>= 3.7.0, < 4.0.0)
 
 ## Resources
@@ -109,9 +126,33 @@ No optional inputs.
 
 The following outputs are exported:
 
-### <a name="output_app_environment"></a> [app\_environment](#output\_app\_environment)
+### <a name="output_default_domain"></a> [default\_domain](#output\_default\_domain)
 
-Description: The outputs for the managed environment, this allows outputs to be inspected in the CI run.
+Description: The default domain of the Container Apps Managed Environment.
+
+### <a name="output_docker_bridge_cidr"></a> [docker\_bridge\_cidr](#output\_docker\_bridge\_cidr)
+
+Description: The Docker bridge CIDR of the Container Apps Managed Environment.
+
+### <a name="output_infrastructure_resource_group"></a> [infrastructure\_resource\_group](#output\_infrastructure\_resource\_group)
+
+Description: The infrastructure resource group of the Container Apps Managed Environment.
+
+### <a name="output_mtls_enabled"></a> [mtls\_enabled](#output\_mtls\_enabled)
+
+Description: Indicates if mTLS is enabled for the Container Apps Managed Environment.
+
+### <a name="output_platform_reserved_cidr"></a> [platform\_reserved\_cidr](#output\_platform\_reserved\_cidr)
+
+Description: The platform reserved CIDR of the Container Apps Managed Environment.
+
+### <a name="output_platform_reserved_dns_ip_address"></a> [platform\_reserved\_dns\_ip\_address](#output\_platform\_reserved\_dns\_ip\_address)
+
+Description: The platform reserved DNS IP address of the Container Apps Managed Environment.
+
+### <a name="output_static_ip_address"></a> [static\_ip\_address](#output\_static\_ip\_address)
+
+Description: The static IP address of the Container Apps Managed Environment.
 
 ## Modules
 

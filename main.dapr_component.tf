@@ -1,45 +1,19 @@
-resource "azapi_resource" "dapr_components" {
+module "dapr_component" {
+  source   = "./modules/dapr_component"
   for_each = var.dapr_components
 
-  type = "Microsoft.App/managedEnvironments/daprComponents@2023-05-01"
-  body = {
-    properties = {
-      componentType        = each.value.component_type
-      ignoreErrors         = each.value.ignore_errors
-      initTimeout          = each.value.init_timeout
-      secretStoreComponent = each.value.secret_store_component
-      scopes               = each.value.scopes
-      version              = each.value.version
+  name                = each.key
+  managed_environment = { resource_id = azapi_resource.this_environment.id }
 
-      metadata = each.value.metadata != null ? [
-        for m in each.value.metadata : {
-          name      = m.name
-          secretRef = m.secret_name
-          value     = m.value
-        }
-      ] : null
+  component_type         = each.value.component_type
+  ignore_errors          = each.value.ignore_errors
+  init_timeout           = each.value.init_timeout
+  secret_store_component = each.value.secret_store_component
+  scopes                 = each.value.scopes
+  dapr_component_version = each.value.version
 
-      secrets = each.value.secret != null ? [
-        for s in each.value.secret : {
-          identity    = s.identity
-          keyVaultUrl = s.key_vault_secret_id
-          name        = s.name
-          value       = s.value
-        }
-      ] : null
-    }
-  }
-  name                      = each.key
-  parent_id                 = azapi_resource.this_environment.id
-  schema_validation_enabled = true
+  metadata = try(each.value.metadata, null)
+  secret   = try(each.value.secret, null)
 
-  dynamic "timeouts" {
-    for_each = each.value.timeouts == null ? [] : [each.value.timeouts]
-
-    content {
-      create = timeouts.value.create
-      delete = timeouts.value.delete
-      read   = timeouts.value.read
-    }
-  }
+  timeouts = each.value.timeouts
 }

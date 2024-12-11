@@ -1,3 +1,18 @@
+output "id" {
+  description = "The resource ID of the Container Apps Managed Environment."
+  value       = module.managedenvironment.id
+}
+
+output "resource_id" {
+  description = "The resource ID of the Container Apps Managed Environment."
+  value       = module.managedenvironment.resource_id
+}
+
+output "name" {
+  description = "The name of the Container Apps Managed Environment."
+  value       = module.managedenvironment.name
+}
+
 output "default_domain" {
   description = "The default domain of the Container Apps Managed Environment."
   value       = module.managedenvironment.default_domain
@@ -31,4 +46,14 @@ output "infrastructure_resource_group" {
 output "mtls_enabled" {
   description = "Indicates if mTLS is enabled for the Container Apps Managed Environment."
   value       = module.managedenvironment.mtls_enabled
+}
+
+output "dapr_component_resource_ids" {
+  description = "A map of dapr component resource IDs."
+  value       = module.managedenvironment.dapr_component_resource_ids
+}
+
+output "storage_resource_ids" {
+  description = "A map of dapr component resource IDs."
+  value       = module.managedenvironment.storage_resource_ids
 }
