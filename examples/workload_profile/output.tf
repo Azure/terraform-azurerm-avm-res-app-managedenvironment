@@ -30,6 +30,6 @@ output "infrastructure_resource_group" {
 
 output "custom_domain_verification_id" {
   description = "The custom domain verification ID of the Container Apps Managed Environment."
-  value       = try(azapi_resource.this_environment.output.properties.customDomainConfiguration.customDomainVerificationId, null)
+  value       = try(module.managedenvironment.custom_domain_verification_id, null)
   sensitive   = true
 }
