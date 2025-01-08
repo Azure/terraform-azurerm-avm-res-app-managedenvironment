@@ -87,30 +87,30 @@ Default: `null`
 
 ### <a name="input_dapr_components"></a> [dapr\_components](#input\_dapr\_components)
 
-Description: - `component_type` - (Required) The Dapr Component Type. For example `state.azure.blobstorage`. Changing this forces a new resource to be created.
-- `ignore_errors` - (Optional) Should the Dapr sidecar to continue initialisation if the component fails to load. Defaults to `false`
-- `init_timeout` - (Optional) The timeout for component initialisation as a `ISO8601` formatted string. e.g. `5s`, `2h`, `1m`. Defaults to `5s`.
-- `secret_store_component` - (Optional) Name of a Dapr component to retrieve component secrets from.
-- `scopes` - (Optional) A list of scopes to which this component applies.
-- `version` - (Required) The version of the component.
+Description:  - `component_type` - (Required) The Dapr Component Type. For example `state.azure.blobstorage`. Changing this forces a new resource to be created.
+ - `ignore_errors` - (Optional) Should the Dapr sidecar to continue initialisation if the component fails to load. Defaults to `false`
+ - `init_timeout` - (Optional) The timeout for component initialisation as a `ISO8601` formatted string. e.g. `5s`, `2h`, `1m`. Defaults to `5s`.
+ - `secret_store_component` - (Optional) Name of a Dapr component to retrieve component secrets from.
+ - `scopes` - (Optional) A list of scopes to which this component applies.
+ - `version` - (Required) The version of the component.
 
----
-`metadata` block supports the following:
-- `name` - (Required) The name of the Metadata configuration item.
-- `secret_name` - (Optional) The name of a secret specified in the `secrets` block that contains the value for this metadata configuration item.
-- `value` - (Optional) The value for this metadata configuration item.
+ ---
+ `metadata` block supports the following:
+ - `name` - (Required) The name of the Metadata configuration item.
+ - `secret_name` - (Optional) The name of a secret specified in the `secrets` block that contains the value for this metadata configuration item.
+ - `value` - (Optional) The value for this metadata configuration item.
 
----
-`secret` block supports the following:
-- `name` - (Required) The Secret name.
-- `value` - (Required) The value for this secret.
+ ---
+ `secret` block supports the following:
+ - `name` - (Required) The Secret name.
+ - `value` - (Required) The value for this secret.
 
----
-`timeouts` block supports the following:
-- `create` - (Defaults to 30 minutes) Used when creating the Container App Environment Dapr Component.
-- `delete` - (Defaults to 30 minutes) Used when deleting the Container App Environment Dapr Component.
-- `read` - (Defaults to 5 minutes) Used when retrieving the Container App Environment Dapr Component.
-- `update` - (Defaults to 30 minutes) Used when updating the Container App Environment Dapr Component.
+ ---
+ `timeouts` block supports the following:
+ - `create` - (Defaults to 30 minutes) Used when creating the Container App Environment Dapr Component.
+ - `delete` - (Defaults to 30 minutes) Used when deleting the Container App Environment Dapr Component.
+ - `read` - (Defaults to 5 minutes) Used when retrieving the Container App Environment Dapr Component.
+ - `update` - (Defaults to 30 minutes) Used when updating the Container App Environment Dapr Component.
 
 Type:
 
@@ -295,17 +295,17 @@ Default: `{}`
 
 ### <a name="input_storages"></a> [storages](#input\_storages)
 
-Description: - `access_key` - (Required) The Storage Account Access Key.
-- `access_mode` - (Required) The access mode to connect this storage to the Container App. Possible values include `ReadOnly` and `ReadWrite`. Changing this forces a new resource to be created.
-- `account_name` - (Required) The Azure Storage Account in which the Share to be used is located. Changing this forces a new resource to be created.
-- `share_name` - (Required) The name of the Azure Storage Share to use. Changing this forces a new resource to be created.
+Description:  - `access_key` - (Required) The Storage Account Access Key.
+ - `access_mode` - (Required) The access mode to connect this storage to the Container App. Possible values include `ReadOnly` and `ReadWrite`. Changing this forces a new resource to be created.
+ - `account_name` - (Required) The Azure Storage Account in which the Share to be used is located. Changing this forces a new resource to be created.
+ - `share_name` - (Required) The name of the Azure Storage Share to use. Changing this forces a new resource to be created.
 
----
-`timeouts` block supports the following:
-- `create` - (Defaults to 30 minutes) Used when creating the Container App Environment Storage.
-- `delete` - (Defaults to 30 minutes) Used when deleting the Container App Environment Storage.
-- `read` - (Defaults to 5 minutes) Used when retrieving the Container App Environment Storage.
-- `update` - (Defaults to 30 minutes) Used when updating the Container App Environment Storage.
+ ---
+ `timeouts` block supports the following:
+ - `create` - (Defaults to 30 minutes) Used when creating the Container App Environment Storage.
+ - `delete` - (Defaults to 30 minutes) Used when deleting the Container App Environment Storage.
+ - `read` - (Defaults to 5 minutes) Used when retrieving the Container App Environment Storage.
+ - `update` - (Defaults to 30 minutes) Used when updating the Container App Environment Storage.
 
 Type:
 
@@ -335,10 +335,10 @@ Default: `null`
 
 ### <a name="input_timeouts"></a> [timeouts](#input\_timeouts)
 
-Description: - `create` - (Defaults to 30 minutes) Used when creating the Container App Environment.
-- `delete` - (Defaults to 30 minutes) Used when deleting the Container App Environment.
-- `read` - (Defaults to 5 minutes) Used when retrieving the Container App Environment.
-- `update` - (Defaults to 30 minutes) Used when updating the Container App Environment.
+Description:  - `create` - (Defaults to 30 minutes) Used when creating the Container App Environment.
+ - `delete` - (Defaults to 30 minutes) Used when deleting the Container App Environment.
+ - `read` - (Defaults to 5 minutes) Used when retrieving the Container App Environment.
+ - `update` - (Defaults to 30 minutes) Used when updating the Container App Environment.
 
 Type:
 
@@ -347,6 +347,7 @@ object({
     create = optional(string)
     delete = optional(string)
     read   = optional(string)
+    update = optional(string)
   })
 ```
 
@@ -411,10 +412,6 @@ Description: The ID of the container app management environment resource.
 ### <a name="output_infrastructure_resource_group"></a> [infrastructure\_resource\_group](#output\_infrastructure\_resource\_group)
 
 Description: The infrastructure resource group of the Container Apps Managed Environment.
-
-### <a name="output_mtls_enabled"></a> [mtls\_enabled](#output\_mtls\_enabled)
-
-Description: Indicates if mTLS is enabled for the Container Apps Managed Environment.
 
 ### <a name="output_name"></a> [name](#output\_name)
 

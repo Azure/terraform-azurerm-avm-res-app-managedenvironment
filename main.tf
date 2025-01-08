@@ -3,7 +3,7 @@ data "azurerm_client_config" "current" {}
 resource "azapi_resource" "this_environment" {
   type = "Microsoft.App/managedEnvironments@2024-03-01"
   body = {
-    properties = {
+    properties = merge({
       appLogsConfiguration = {
         "destination" = var.log_analytics_workspace_destination
         logAnalyticsConfiguration = var.log_analytics_workspace_destination == "log-analytics" ? {
@@ -21,7 +21,6 @@ resource "azapi_resource" "this_environment" {
           "enabled" = var.peer_authentication_enabled
         }
       }
-      infrastructureResourceGroup = var.infrastructure_resource_group_name
       vnetConfiguration = var.infrastructure_subnet_id != null ? {
         "internal"               = var.internal_load_balancer_enabled
         "infrastructureSubnetId" = var.infrastructure_subnet_id
@@ -41,7 +40,19 @@ resource "azapi_resource" "this_environment" {
         ]
       ) : null
       zoneRedundant = var.zone_redundancy_enabled
-    }
+      },
+      # Only include the infrastructureResourceGroup property if it is set
+      #
+      # Background: When using workload profiles, Azure will create a managed resource group for the container app environment.
+      # If you want to specify a name for this resource group, you use the infrastructure_resource_group_name variable.
+      # If you do not specify a name, Azure will create a name like "ME_myEnvironmentName_myResourceGroup_myRegion".
+      #
+      # The problem: if you do not specify a name, the next time a deployment runs, Terraform will see that the infrastructure_resource_group_name
+      # has changed from null to the managed name, and will try to update the resource. This fails the idempotency check "no changes to plan after apply".
+      var.infrastructure_resource_group_name != null ? {
+        infrastructureResourceGroup = var.infrastructure_resource_group_name
+      } : {}
+    )
   }
   location  = var.location
   name      = var.name
@@ -51,10 +62,10 @@ resource "azapi_resource" "this_environment" {
     "properties.daprAIInstrumentationKey",
     "properties.defaultDomain",
     "properties.infrastructureResourceGroup",
-    "properties.peerAuthentication",
+    "properties.dockerBridgeCidr",
+    "properties.platformReservedCidr",
+    "properties.platformReservedDnsIP",
     "properties.staticIp",
-    "properties.vnetConfiguration",
-    "properties.workloadProfiles",
   ]
   schema_validation_enabled = true
   tags                      = var.tags
@@ -66,6 +77,7 @@ resource "azapi_resource" "this_environment" {
       create = timeouts.value.create
       delete = timeouts.value.delete
       read   = timeouts.value.read
+      update = timeouts.value.update
     }
   }
 }

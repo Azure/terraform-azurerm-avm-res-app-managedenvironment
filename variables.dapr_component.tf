@@ -22,7 +22,7 @@ variable "dapr_components" {
     }))
   }))
   default     = {}
-  description = <<-EOT
+  description = <<DESCRIPTION
  - `component_type` - (Required) The Dapr Component Type. For example `state.azure.blobstorage`. Changing this forces a new resource to be created.
  - `ignore_errors` - (Optional) Should the Dapr sidecar to continue initialisation if the component fails to load. Defaults to `false`
  - `init_timeout` - (Optional) The timeout for component initialisation as a `ISO8601` formatted string. e.g. `5s`, `2h`, `1m`. Defaults to `5s`.
@@ -47,6 +47,6 @@ variable "dapr_components" {
  - `delete` - (Defaults to 30 minutes) Used when deleting the Container App Environment Dapr Component.
  - `read` - (Defaults to 5 minutes) Used when retrieving the Container App Environment Dapr Component.
  - `update` - (Defaults to 30 minutes) Used when updating the Container App Environment Dapr Component.
-EOT
+DESCRIPTION
   nullable    = false
 }
