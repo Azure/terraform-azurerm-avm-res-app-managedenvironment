@@ -138,10 +138,6 @@ Description: The Docker bridge CIDR of the Container Apps Managed Environment.
 
 Description: The infrastructure resource group of the Container Apps Managed Environment.
 
-### <a name="output_mtls_enabled"></a> [mtls\_enabled](#output\_mtls\_enabled)
-
-Description: Indicates if mTLS is enabled for the Container Apps Managed Environment.
-
 ### <a name="output_platform_reserved_cidr"></a> [platform\_reserved\_cidr](#output\_platform\_reserved\_cidr)
 
 Description: The platform reserved CIDR of the Container Apps Managed Environment.

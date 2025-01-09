@@ -27,8 +27,3 @@ output "infrastructure_resource_group" {
   description = "The infrastructure resource group of the Container Apps Managed Environment."
   value       = module.managedenvironment.infrastructure_resource_group
 }
-
-output "mtls_enabled" {
-  description = "Indicates if mTLS is enabled for the Container Apps Managed Environment."
-  value       = module.managedenvironment.mtls_enabled
-}

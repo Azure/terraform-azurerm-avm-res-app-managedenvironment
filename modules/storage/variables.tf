@@ -15,7 +15,7 @@ variable "managed_environment" {
   type = object({
     resource_id = string
   })
-  description = "The Dapr component resource."
+  description = "The storage component resource."
 }
 
 variable "name" {
@@ -43,10 +43,16 @@ variable "access_mode" {
 
 variable "timeouts" {
   type = object({
-    create = string
-    delete = string
-    read   = string
+    create = optional(string)
+    delete = optional(string)
+    read   = optional(string)
+    update = optional(string)
   })
   default     = null
-  description = "The timeouts for creating, reading, and deleting the storage resource."
+  description = <<DESCRIPTION
+ - `create` - (Defaults to 30 minutes) Used when creating the storage component.
+ - `delete` - (Defaults to 30 minutes) Used when deleting the storage component.
+ - `read` - (Defaults to 5 minutes) Used when retrieving the storage component.
+ - `update` - (Defaults to 30 minutes) Used when updating the storage component.
+DESCRIPTION
 }

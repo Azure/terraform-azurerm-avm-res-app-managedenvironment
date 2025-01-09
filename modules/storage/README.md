@@ -60,7 +60,7 @@ Type: `string`
 
 ### <a name="input_managed_environment"></a> [managed\_environment](#input\_managed\_environment)
 
-Description: The Dapr component resource.
+Description: The storage component resource.
 
 Type:
 
@@ -96,15 +96,19 @@ Default: `"ReadOnly"`
 
 ### <a name="input_timeouts"></a> [timeouts](#input\_timeouts)
 
-Description: The timeouts for creating, reading, and deleting the storage resource.
+Description:  - `create` - (Defaults to 30 minutes) Used when creating the storage component.
+ - `delete` - (Defaults to 30 minutes) Used when deleting the storage component.
+ - `read` - (Defaults to 5 minutes) Used when retrieving the storage component.
+ - `update` - (Defaults to 30 minutes) Used when updating the storage component.
 
 Type:
 
 ```hcl
 object({
-    create = string
-    delete = string
-    read   = string
+    create = optional(string)
+    delete = optional(string)
+    read   = optional(string)
+    update = optional(string)
   })
 ```
 
