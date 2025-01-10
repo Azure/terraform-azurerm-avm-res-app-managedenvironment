@@ -179,10 +179,6 @@ Description: The resource ID of the Container Apps Managed Environment.
 
 Description: The infrastructure resource group of the Container Apps Managed Environment.
 
-### <a name="output_mtls_enabled"></a> [mtls\_enabled](#output\_mtls\_enabled)
-
-Description: Indicates if mTLS is enabled for the Container Apps Managed Environment.
-
 ### <a name="output_name"></a> [name](#output\_name)
 
 Description: The name of the Container Apps Managed Environment.

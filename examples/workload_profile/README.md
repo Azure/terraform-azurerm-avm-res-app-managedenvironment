@@ -126,7 +126,35 @@ No optional inputs.
 
 ## Outputs
 
-No outputs.
+The following outputs are exported:
+
+### <a name="output_custom_domain_verification_id"></a> [custom\_domain\_verification\_id](#output\_custom\_domain\_verification\_id)
+
+Description: The custom domain verification ID of the Container Apps Managed Environment.
+
+### <a name="output_default_domain"></a> [default\_domain](#output\_default\_domain)
+
+Description: The default domain of the Container Apps Managed Environment.
+
+### <a name="output_docker_bridge_cidr"></a> [docker\_bridge\_cidr](#output\_docker\_bridge\_cidr)
+
+Description: The Docker bridge CIDR of the Container Apps Managed Environment.
+
+### <a name="output_infrastructure_resource_group"></a> [infrastructure\_resource\_group](#output\_infrastructure\_resource\_group)
+
+Description: The infrastructure resource group of the Container Apps Managed Environment.
+
+### <a name="output_platform_reserved_cidr"></a> [platform\_reserved\_cidr](#output\_platform\_reserved\_cidr)
+
+Description: The platform reserved CIDR of the Container Apps Managed Environment.
+
+### <a name="output_platform_reserved_dns_ip_address"></a> [platform\_reserved\_dns\_ip\_address](#output\_platform\_reserved\_dns\_ip\_address)
+
+Description: The platform reserved DNS IP address of the Container Apps Managed Environment.
+
+### <a name="output_static_ip_address"></a> [static\_ip\_address](#output\_static\_ip\_address)
+
+Description: The static IP address of the Container Apps Managed Environment.
 
 ## Modules
 

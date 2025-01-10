@@ -69,10 +69,16 @@ variable "secret_store_component" {
 
 variable "timeouts" {
   type = object({
-    create = string
-    delete = string
-    read   = string
+    create = optional(string)
+    delete = optional(string)
+    read   = optional(string)
+    update = optional(string)
   })
   default     = null
-  description = "The timeouts for creating, reading, and deleting the Dapr component."
+  description = <<DESCRIPTION
+ - `create` - (Defaults to 30 minutes) Used when creating the Dapr component.
+ - `delete` - (Defaults to 30 minutes) Used when deleting the Dapr component.
+ - `read` - (Defaults to 5 minutes) Used when retrieving the Dapr component.
+ - `update` - (Defaults to 30 minutes) Used when updating the Dapr component.
+DESCRIPTION
 }

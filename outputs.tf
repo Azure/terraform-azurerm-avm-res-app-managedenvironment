@@ -1,5 +1,6 @@
 output "custom_domain_verification_id" {
   description = "The custom domain verification ID of the Container Apps Managed Environment."
+  sensitive   = true
   value       = try(azapi_resource.this_environment.output.properties.customDomainConfiguration.customDomainVerificationId, null)
 }
 
@@ -26,11 +27,6 @@ output "id" {
 output "infrastructure_resource_group" {
   description = "The infrastructure resource group of the Container Apps Managed Environment."
   value       = try(azapi_resource.this_environment.output.properties.infrastructureResourceGroup, null)
-}
-
-output "mtls_enabled" {
-  description = "Indicates if mTLS is enabled for the Container Apps Managed Environment."
-  value       = try(azapi_resource.this_environment.output.properties.peerAuthentication.mtls.enabled, false)
 }
 
 output "name" {
