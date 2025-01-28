@@ -17,4 +17,22 @@ locals {
     for wp in var.workload_profile :
     wp.name == "Consumption" && wp.workload_profile_type == "Consumption"
   ], true)
+  workload_profiles = distinct(concat(
+    [
+      for wp in var.workload_profile : {
+        name                = wp.name
+        workloadProfileType = wp.workload_profile_type
+        minimumCount        = wp.minimum_count
+        maximumCount        = wp.maximum_count
+      }
+    ],
+    [
+      {
+        name                = "Consumption"
+        workloadProfileType = "Consumption"
+        minimumCount        = null
+        maximumCount        = null
+      }
+    ],
+  ))
 }

@@ -94,7 +94,7 @@ variable "infrastructure_resource_group_name" {
   type        = string
   default     = null
   description = <<DESCRIPTION
-Name of the platform-managed resource group created for the Managed Environment to host infrastructure resources. 
+Name of the platform-managed resource group created for the Managed Environment to host infrastructure resources.
 If a subnet ID is provided, this resource group will be created in the same subscription as the subnet.
 If not specified, then one will be generated automatically, in the form ``ME_<app_managed_environment_name>_<resource_group>_<location>``.
 DESCRIPTION
@@ -222,7 +222,7 @@ variable "workload_profile" {
   description = <<DESCRIPTION
 
 This lists the workload profiles that will be configured for the Managed Environment.
-This is in addition to the default Consumpion Plan workload profile.
+This is in addition to the default Consumption Plan workload profile.
 
  - `maximum_count` - (Optional) The maximum number of instances of workload profile that can be deployed in the Container App Environment.
  - `minimum_count` - (Optional) The minimum number of instances of workload profile that can be deployed in the Container App Environment.
