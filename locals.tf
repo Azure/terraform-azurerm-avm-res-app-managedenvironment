@@ -12,7 +12,7 @@ locals {
       id = sv.resource_id
     }
   }
-  workload_profiles = distinct(concat(
+  workload_profiles = toset(concat(
     [
       for wp in var.workload_profile : {
         name                = wp.name
