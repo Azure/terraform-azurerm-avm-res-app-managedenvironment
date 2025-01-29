@@ -25,21 +25,8 @@ resource "azapi_resource" "this_environment" {
         "internal"               = var.internal_load_balancer_enabled
         "infrastructureSubnetId" = var.infrastructure_subnet_id
       } : null
-      workloadProfiles = local.workload_profile_consumption_enabled ? setunion([
-        {
-          name                = "Consumption"
-          workloadProfileType = "Consumption"
-        }],
-        [for wp in var.workload_profile :
-          {
-            name                = wp.name
-            workloadProfileType = wp.workload_profile_type
-            minimumCount        = wp.minimum_count
-            maximumCount        = wp.maximum_count
-          } if wp.workload_profile_type != "Consumption"
-        ]
-      ) : null
-      zoneRedundant = var.zone_redundancy_enabled
+      workloadProfiles = local.workload_profiles
+      zoneRedundant    = var.zone_redundancy_enabled
       },
       # Only include the infrastructureResourceGroup property if it is set
       #

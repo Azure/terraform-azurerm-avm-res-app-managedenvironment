@@ -12,9 +12,22 @@ locals {
       id = sv.resource_id
     }
   }
-  # this is used to mimic the behaviour of the azurerm provider
-  workload_profile_consumption_enabled = contains([
-    for wp in var.workload_profile :
-    wp.name == "Consumption" && wp.workload_profile_type == "Consumption"
-  ], true)
+  workload_profiles = toset(concat(
+    [
+      for wp in var.workload_profile : {
+        name                = wp.name
+        workloadProfileType = wp.workload_profile_type
+        minimumCount        = wp.minimum_count
+        maximumCount        = wp.maximum_count
+      }
+    ],
+    [
+      {
+        name                = "Consumption"
+        workloadProfileType = "Consumption"
+        minimumCount        = null
+        maximumCount        = null
+      }
+    ],
+  ))
 }
