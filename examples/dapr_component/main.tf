@@ -5,11 +5,11 @@ terraform {
     # tflint-ignore: terraform_unused_required_providers
     azapi = {
       source  = "Azure/azapi"
-      version = ">= 1.13, < 2.0.0"
+      version = "~> 2.0"
     }
     azurerm = {
       source  = "hashicorp/azurerm"
-      version = ">= 3.7.0, < 4.0.0"
+      version = "~> 4.0"
     }
   }
 }
@@ -64,6 +64,6 @@ module "managedenvironment" {
 }
 
 moved {
-  to   = module.managedenvironment.module.dapr_component["my-dapr-component"].azapi_resource.this
   from = module.managedenvironment.azapi_resource.dapr_components["my-dapr-component"]
+  to   = module.managedenvironment.module.dapr_component["my-dapr-component"].azapi_resource.this
 }

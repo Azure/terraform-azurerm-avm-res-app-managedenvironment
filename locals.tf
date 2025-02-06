@@ -12,6 +12,10 @@ locals {
       id = sv.resource_id
     }
   }
+  workload_profile_consumption_enabled = contains([
+    for wp in var.workload_profile :
+    wp.name == "Consumption" && wp.workload_profile_type == "Consumption"
+  ], true)
   workload_profiles = toset(concat(
     [
       for wp in var.workload_profile : {
@@ -21,13 +25,13 @@ locals {
         maximumCount        = wp.maximum_count
       }
     ],
-    [
+    local.workload_profile_consumption_enabled ? [
       {
         name                = "Consumption"
         workloadProfileType = "Consumption"
         minimumCount        = null
         maximumCount        = null
       }
-    ],
+    ] : [],
   ))
 }
