@@ -1,21 +1,21 @@
 <!-- BEGIN_TF_DOCS -->
-# Example to test AzureRM v4 and AzAPI v2
+# Consumption workload profile with integrated vnet
 
-This deploys the module with all the supported subcomponents using AzureRM v4 and AzAPI v2.
+This deploys a Container Apps Managed Environment using a workload profile with dedicated compute, using vnet integration and an internal load balancer.
 
 ```hcl
 terraform {
-  required_version = ">= 1.8.0"
+  required_version = ">= 1.3.0"
   required_providers {
-    # ignore this because we want to force the use of AzAPI v2 within the module without having it used in this example.
+    # ignore this because we want to force the use of AzAPI v1 within the module without having it used in this example.
     # tflint-ignore: terraform_unused_required_providers
     azapi = {
       source  = "Azure/azapi"
-      version = ">= 2.0.0"
+      version = "~> 2.0"
     }
     azurerm = {
       source  = "hashicorp/azurerm"
-      version = ">= 4.0.0"
+      version = "~> 4.0"
     }
   }
 }
@@ -71,20 +71,6 @@ resource "azurerm_subnet" "this" {
   }
 }
 
-resource "azurerm_storage_account" "this" {
-  account_replication_type = "ZRS"
-  account_tier             = "Standard"
-  location                 = azurerm_resource_group.this.location
-  name                     = module.naming.storage_account.name_unique
-  resource_group_name      = azurerm_resource_group.this.name
-}
-
-resource "azurerm_storage_share" "this" {
-  name               = "sharename"
-  quota              = 5
-  storage_account_id = azurerm_storage_account.this.id
-}
-
 module "managedenvironment" {
   source = "../../"
   # source = "Azure/avm-res-app-managedenvironment/azurerm"
@@ -95,8 +81,10 @@ module "managedenvironment" {
 
   infrastructure_subnet_id = azurerm_subnet.this.id
   workload_profile = [{
-    name                  = "Consumption"
-    workload_profile_type = "Consumption"
+    name                  = "Dedicated"
+    workload_profile_type = "D4"
+    maximum_count         = 3
+    minimum_count         = 1
   }]
   zone_redundancy_enabled            = true
   internal_load_balancer_enabled     = true
@@ -104,23 +92,6 @@ module "managedenvironment" {
 
   log_analytics_workspace_customer_id        = azurerm_log_analytics_workspace.this.workspace_id
   log_analytics_workspace_primary_shared_key = azurerm_log_analytics_workspace.this.primary_shared_key
-
-  dapr_components = {
-    "my-dapr-component" = {
-      component_type = "state.azure.blobstorage"
-      version        = "v1"
-    }
-  }
-
-  storages = {
-    "mycontainerappstorage" = {
-      account_name = azurerm_storage_account.this.name
-      share_name   = azurerm_storage_share.this.name
-      access_key   = azurerm_storage_account.this.primary_access_key
-      access_mode  = "ReadOnly"
-    }
-  }
-
 }
 ```
 
@@ -129,11 +100,11 @@ module "managedenvironment" {
 
 The following requirements are needed by this module:
 
-- <a name="requirement_terraform"></a> [terraform](#requirement\_terraform) (>= 1.8.0)
+- <a name="requirement_terraform"></a> [terraform](#requirement\_terraform) (>= 1.3.0)
 
-- <a name="requirement_azapi"></a> [azapi](#requirement\_azapi) (>= 2.0.0)
+- <a name="requirement_azapi"></a> [azapi](#requirement\_azapi) (~> 2.0)
 
-- <a name="requirement_azurerm"></a> [azurerm](#requirement\_azurerm) (>= 4.0.0)
+- <a name="requirement_azurerm"></a> [azurerm](#requirement\_azurerm) (~> 4.0)
 
 ## Resources
 
@@ -141,8 +112,6 @@ The following resources are used by this module:
 
 - [azurerm_log_analytics_workspace.this](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/log_analytics_workspace) (resource)
 - [azurerm_resource_group.this](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/resource_group) (resource)
-- [azurerm_storage_account.this](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/storage_account) (resource)
-- [azurerm_storage_share.this](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/storage_share) (resource)
 - [azurerm_subnet.this](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/subnet) (resource)
 - [azurerm_virtual_network.this](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/virtual_network) (resource)
 
@@ -159,10 +128,6 @@ No optional inputs.
 
 The following outputs are exported:
 
-### <a name="output_dapr_component_resource_ids"></a> [dapr\_component\_resource\_ids](#output\_dapr\_component\_resource\_ids)
-
-Description: A map of dapr component resource IDs.
-
 ### <a name="output_default_domain"></a> [default\_domain](#output\_default\_domain)
 
 Description: The default domain of the Container Apps Managed Environment.
@@ -171,17 +136,9 @@ Description: The default domain of the Container Apps Managed Environment.
 
 Description: The Docker bridge CIDR of the Container Apps Managed Environment.
 
-### <a name="output_id"></a> [id](#output\_id)
-
-Description: The resource ID of the Container Apps Managed Environment.
-
 ### <a name="output_infrastructure_resource_group"></a> [infrastructure\_resource\_group](#output\_infrastructure\_resource\_group)
 
 Description: The infrastructure resource group of the Container Apps Managed Environment.
-
-### <a name="output_name"></a> [name](#output\_name)
-
-Description: The name of the Container Apps Managed Environment.
 
 ### <a name="output_platform_reserved_cidr"></a> [platform\_reserved\_cidr](#output\_platform\_reserved\_cidr)
 
@@ -191,17 +148,9 @@ Description: The platform reserved CIDR of the Container Apps Managed Environmen
 
 Description: The platform reserved DNS IP address of the Container Apps Managed Environment.
 
-### <a name="output_resource_id"></a> [resource\_id](#output\_resource\_id)
-
-Description: The resource ID of the Container Apps Managed Environment.
-
 ### <a name="output_static_ip_address"></a> [static\_ip\_address](#output\_static\_ip\_address)
 
 Description: The static IP address of the Container Apps Managed Environment.
-
-### <a name="output_storage_resource_ids"></a> [storage\_resource\_ids](#output\_storage\_resource\_ids)
-
-Description: A map of dapr component resource IDs.
 
 ## Modules
 

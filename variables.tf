@@ -224,10 +224,31 @@ variable "workload_profile" {
 This lists the workload profiles that will be configured for the Managed Environment.
 This is in addition to the default Consumption Plan workload profile.
 
- - `maximum_count` - (Optional) The maximum number of instances of workload profile that can be deployed in the Container App Environment.
- - `minimum_count` - (Optional) The minimum number of instances of workload profile that can be deployed in the Container App Environment.
+ - `maximum_count` - (Optional) The maximum number of instances of workload profile that can be deployed in the Container App Environment.  Required for Dedicated profile types.
+ - `minimum_count` - (Optional) The minimum number of instances of workload profile that can be deployed in the Container App Environment.  Required for Dedicated profile types.
  - `name` - (Required) The name of the workload profile.
  - `workload_profile_type` - (Required) Workload profile type for the workloads to run on. Possible values include `D4`, `D8`, `D16`, `D32`, `E4`, `E8`, `E16` and `E32`.
+
+Examples:
+
+```hcl
+  # this creates a Consumption workload profile:
+  workload_profile = [{
+    name                  = "Consumption"
+    workload_profile_type = "Consumption"
+  }]
+
+  # this creates a Dedicated workload profile, in this scenario a consumption profile is automatically created by the Container Apps service (or can be specified).
+  workload_profile = [{
+    name                  = "Dedicated"
+    workload_profile_type = "D4"
+    maximum_count         = 3
+    minimum_count         = 1
+  }]
+
+  # workload profiles can also be not specified, in which case a Consumption Only plan is created, without workload profiles.
+```
+
 DESCRIPTION
   nullable    = false
 
