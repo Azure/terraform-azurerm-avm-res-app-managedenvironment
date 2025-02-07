@@ -25,7 +25,7 @@ resource "azapi_resource" "this_environment" {
         "internal"               = var.internal_load_balancer_enabled
         "infrastructureSubnetId" = var.infrastructure_subnet_id
       } : null
-      workloadProfiles = length(local.workload_profiles) > 0 ? local.workload_profiles : null
+      workloadProfiles = local.workload_profiles
       zoneRedundant    = var.zone_redundancy_enabled
       },
       # Only include the infrastructureResourceGroup property if it is set

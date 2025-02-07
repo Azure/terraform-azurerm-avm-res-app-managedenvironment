@@ -12,11 +12,8 @@ locals {
       id = sv.resource_id
     }
   }
-  workload_profile_consumption_enabled = contains([
-    for wp in var.workload_profile :
-    wp.name == "Consumption" && wp.workload_profile_type == "Consumption"
-  ], true)
-  workload_profiles = toset(concat(
+  # workload profiles can be null, in this case a Consumption Only plan is created.
+  workload_profiles = length(var.workload_profile) > 0 ? toset(concat(
     [
       for wp in var.workload_profile : {
         name                = wp.name
@@ -24,14 +21,19 @@ locals {
         minimumCount        = wp.minimum_count
         maximumCount        = wp.maximum_count
       }
+      if wp.workload_profile_type != "Consumption"
     ],
-    local.workload_profile_consumption_enabled ? [
+    # if you specify a dedicated workload profile, then a consumption profile is also created automatically.
+    # we add this block to avoid idempotency issues on subsequent runs.
+    # the consumption profile is a special case that does not need a minimum or maximum count
+    # there can be at most one consumption profile.
+    [
       {
         name                = "Consumption"
         workloadProfileType = "Consumption"
         minimumCount        = null
         maximumCount        = null
       }
-    ] : [],
-  ))
+    ]
+  )) : null
 }
