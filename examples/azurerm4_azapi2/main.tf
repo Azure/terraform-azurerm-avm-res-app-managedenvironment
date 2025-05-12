@@ -81,31 +81,21 @@ resource "azurerm_storage_share" "this" {
 
 module "managedenvironment" {
   source = "../../"
-  # source = "Azure/avm-res-app-managedenvironment/azurerm"
 
+  location          = azurerm_resource_group.this.location
   name              = module.naming.container_app_environment.name_unique
   resource_group_id = azurerm_resource_group.this.id
-  location          = azurerm_resource_group.this.location
-
-  infrastructure_subnet_id = azurerm_subnet.this.id
-  workload_profile = [{
-    name                  = "Consumption"
-    workload_profile_type = "Consumption"
-  }]
-  zone_redundancy_enabled            = true
-  internal_load_balancer_enabled     = true
-  infrastructure_resource_group_name = "rg-managed-${module.naming.container_app_environment.name_unique}"
-
-  log_analytics_workspace_customer_id        = azurerm_log_analytics_workspace.this.workspace_id
-  log_analytics_workspace_primary_shared_key = azurerm_log_analytics_workspace.this.primary_shared_key
-
   dapr_components = {
     "my-dapr-component" = {
       component_type = "state.azure.blobstorage"
       version        = "v1"
     }
   }
-
+  infrastructure_resource_group_name         = "rg-managed-${module.naming.container_app_environment.name_unique}"
+  infrastructure_subnet_id                   = azurerm_subnet.this.id
+  internal_load_balancer_enabled             = true
+  log_analytics_workspace_customer_id        = azurerm_log_analytics_workspace.this.workspace_id
+  log_analytics_workspace_primary_shared_key = azurerm_log_analytics_workspace.this.primary_shared_key
   storages = {
     "mycontainerappstorage" = {
       account_name = azurerm_storage_account.this.name
@@ -114,5 +104,9 @@ module "managedenvironment" {
       access_mode  = "ReadOnly"
     }
   }
-
+  workload_profile = [{
+    name                  = "Consumption"
+    workload_profile_type = "Consumption"
+  }]
+  zone_redundancy_enabled = true
 }

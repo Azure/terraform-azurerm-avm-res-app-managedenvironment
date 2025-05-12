@@ -49,15 +49,12 @@ resource "azurerm_log_analytics_workspace" "this" {
 
 module "managedenvironment" {
   source = "../../"
-  # source = "Azure/avm-res-app-managedenvironment/azurerm"
 
-  name              = module.naming.container_app_environment.name_unique
-  resource_group_id = azurerm_resource_group.this.id
-  location          = azurerm_resource_group.this.location
-
+  location                                   = azurerm_resource_group.this.location
+  name                                       = module.naming.container_app_environment.name_unique
+  resource_group_id                          = azurerm_resource_group.this.id
   log_analytics_workspace_customer_id        = azurerm_log_analytics_workspace.this.workspace_id
   log_analytics_workspace_primary_shared_key = azurerm_log_analytics_workspace.this.primary_shared_key
-
   # zone redundancy must be disabled unless we supply a subnet for vnet integration.
   zone_redundancy_enabled = false
 }
