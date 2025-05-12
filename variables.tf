@@ -10,9 +10,9 @@ variable "name" {
   nullable    = false
 }
 
-variable "resource_group_name" {
+variable "resource_group_id" {
   type        = string
-  description = "(Required) The name of the resource group in which the Container App Environment is to be created. Changing this forces a new resource to be created."
+  description = "(Required) The ID of the resource group in which the Container App Environment is to be created. Changing this forces a new resource to be created."
   nullable    = false
 }
 
@@ -185,6 +185,36 @@ A map of role assignments to create on the container app environment. The map ke
 - `principal_type` - (Optional) The type of the `principal_id`. Possible values are `User`, `Group` and `ServicePrincipal`. It is necessary to explicitly set this attribute when creating role assignments if the principal creating the assignment is constrained by ABAC rules that filters on the PrincipalType attribute.
 
 > Note: only set `skip_service_principal_aad_check` to true if you are assigning a role to a service principal.
+DESCRIPTION
+  nullable    = false
+}
+
+variable "storages" {
+  type = map(object({
+    access_key   = string
+    access_mode  = string
+    account_name = string
+    share_name   = string
+    timeouts = optional(object({
+      create = optional(string)
+      delete = optional(string)
+      read   = optional(string)
+    }))
+  }))
+  default     = {}
+  description = <<DESCRIPTION
+ - `access_key` - (Required) The Storage Account Access Key.
+ - `access_mode` - (Required) The access mode to connect this storage to the Container App. Possible values include `ReadOnly` and `ReadWrite`. Changing this forces a new resource to be created.
+ - `account_name` - (Required) The Azure Storage Account in which the Share to be used is located. Changing this forces a new resource to be created.
+ - `share_name` - (Required) The name of the Azure Storage Share to use. Changing this forces a new resource to be created.
+
+ ---
+ `timeouts` block supports the following:
+ - `create` - (Defaults to 30 minutes) Used when creating the Container App Environment Storage.
+ - `delete` - (Defaults to 30 minutes) Used when deleting the Container App Environment Storage.
+ - `read` - (Defaults to 5 minutes) Used when retrieving the Container App Environment Storage.
+ - `update` - (Defaults to 30 minutes) Used when updating the Container App Environment Storage.
+
 DESCRIPTION
   nullable    = false
 }

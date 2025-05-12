@@ -5,6 +5,7 @@ locals {
       id = dv.resource_id
     }
   }
+  resource_group_id                  = var.resource_group_id
   role_definition_resource_substring = "/providers/Microsoft.Authorization/roleDefinitions"
   storage_resource_ids = {
     for sk, sv in module.storage :
