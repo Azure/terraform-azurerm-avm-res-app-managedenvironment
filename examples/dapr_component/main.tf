@@ -5,11 +5,11 @@ terraform {
     # tflint-ignore: terraform_unused_required_providers
     azapi = {
       source  = "Azure/azapi"
-      version = ">= 1.13, < 2.0.0"
+      version = "~> 2.0"
     }
     azurerm = {
       source  = "hashicorp/azurerm"
-      version = ">= 3.7.0, < 4.0.0"
+      version = "~> 4.0"
     }
   }
 }
@@ -45,9 +45,10 @@ module "managedenvironment" {
   source = "../../"
   # source = "Azure/avm-res-app-managedenvironment/azurerm"
 
-  name                = module.naming.container_app_environment.name_unique
-  resource_group_name = azurerm_resource_group.this.name
-  location            = azurerm_resource_group.this.location
+  name              = module.naming.container_app_environment.name_unique
+  resource_group_id = azurerm_resource_group.this.id
+
+  location = azurerm_resource_group.this.location
 
   log_analytics_workspace_customer_id        = azurerm_log_analytics_workspace.this.workspace_id
   log_analytics_workspace_primary_shared_key = azurerm_log_analytics_workspace.this.primary_shared_key
@@ -64,6 +65,6 @@ module "managedenvironment" {
 }
 
 moved {
-  to   = module.managedenvironment.module.dapr_component["my-dapr-component"].azapi_resource.this
   from = module.managedenvironment.azapi_resource.dapr_components["my-dapr-component"]
+  to   = module.managedenvironment.module.dapr_component["my-dapr-component"].azapi_resource.this
 }

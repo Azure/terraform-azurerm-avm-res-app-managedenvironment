@@ -89,9 +89,9 @@ module "managedenvironment" {
   source = "../../"
   # source = "Azure/avm-res-app-managedenvironment/azurerm"
 
-  name                = module.naming.container_app_environment.name_unique
-  resource_group_name = azurerm_resource_group.this.name
-  location            = azurerm_resource_group.this.location
+  name              = module.naming.container_app_environment.name_unique
+  resource_group_id = azurerm_resource_group.this.id
+  location          = azurerm_resource_group.this.location
 
   infrastructure_subnet_id = azurerm_subnet.this.id
   workload_profile = [{

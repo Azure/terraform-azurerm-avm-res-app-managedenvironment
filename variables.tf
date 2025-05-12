@@ -10,9 +10,9 @@ variable "name" {
   nullable    = false
 }
 
-variable "resource_group_name" {
+variable "resource_group_id" {
   type        = string
-  description = "(Required) The name of the resource group in which the Container App Environment is to be created. Changing this forces a new resource to be created."
+  description = "(Required) The ID of the resource group in which the Container App Environment is to be created. Changing this forces a new resource to be created."
   nullable    = false
 }
 
