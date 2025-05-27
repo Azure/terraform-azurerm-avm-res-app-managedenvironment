@@ -1,7 +1,7 @@
 data "azurerm_client_config" "current" {}
 
 resource "azapi_resource" "this_environment" {
-  type = "Microsoft.App/managedEnvironments@2024-03-01"
+  type = "Microsoft.App/managedEnvironments@2025-01-01"
   body = {
     properties = merge({
       appLogsConfiguration = {
@@ -45,6 +45,7 @@ resource "azapi_resource" "this_environment" {
   name      = var.name
   parent_id = "/subscriptions/${data.azurerm_client_config.current.subscription_id}/resourceGroups/${var.resource_group_name}"
   response_export_values = [
+    "identity",
     "properties.customDomainConfiguration",
     "properties.daprAIInstrumentationKey",
     "properties.defaultDomain",
@@ -56,6 +57,15 @@ resource "azapi_resource" "this_environment" {
   ]
   schema_validation_enabled = true
   tags                      = var.tags
+
+  dynamic "identity" {
+    for_each = local.managed_identities.system_assigned_user_assigned
+
+    content {
+      type         = identity.value.type
+      identity_ids = identity.value.user_assigned_resource_ids
+    }
+  }
 
   dynamic "timeouts" {
     for_each = var.timeouts == null ? [] : [var.timeouts]
