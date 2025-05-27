@@ -79,6 +79,12 @@ resource "azurerm_storage_share" "this" {
   storage_account_id = azurerm_storage_account.this.id
 }
 
+resource "azurerm_user_assigned_identity" "this" {
+  location            = azurerm_resource_group.this.location
+  name                = module.naming.user_assigned_identity.name_unique
+  resource_group_name = azurerm_resource_group.this.name
+}
+
 module "managedenvironment" {
   source = "../../"
   # source = "Azure/avm-res-app-managedenvironment/azurerm"
@@ -104,6 +110,11 @@ module "managedenvironment" {
       component_type = "state.azure.blobstorage"
       version        = "v1"
     }
+  }
+
+  managed_identities = {
+    system_assigned            = true
+    user_assigned_resource_ids = [azurerm_user_assigned_identity.this.id]
   }
 
   storages = {
