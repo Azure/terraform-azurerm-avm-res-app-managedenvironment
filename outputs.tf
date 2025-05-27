@@ -24,6 +24,11 @@ output "id" {
   value       = azapi_resource.this_environment.id
 }
 
+output "identity" {
+  description = "The managed identities assigned to the Container Apps Managed Environment."
+  value       = azapi_resource.this_environment.output.identity
+}
+
 output "infrastructure_resource_group" {
   description = "The infrastructure resource group of the Container Apps Managed Environment."
   value       = try(azapi_resource.this_environment.output.properties.infrastructureResourceGroup, null)
@@ -57,9 +62,4 @@ output "static_ip_address" {
 output "storage_resource_ids" {
   description = "A map of storage shares connected to this environment. The map key is the supplied input to var.storages. The map value is the azurerm-formatted version of the entire storage shares resource."
   value       = local.storage_resource_ids
-}
-
-output "identity" {
-  description = "The managed identities assigned to the Container Apps Managed Environment."
-  value       = azapi_resource.this_environment.output.identity
 }

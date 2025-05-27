@@ -57,15 +57,12 @@ resource "azurerm_storage_share" "this" {
 
 module "managedenvironment" {
   source = "../../"
-  # source = "Azure/avm-res-app-managedenvironment/azurerm"
 
-  name                = module.naming.container_app_environment.name_unique
-  resource_group_name = azurerm_resource_group.this.name
-  location            = azurerm_resource_group.this.location
-
+  location                                   = azurerm_resource_group.this.location
+  name                                       = module.naming.container_app_environment.name_unique
+  resource_group_name                        = azurerm_resource_group.this.name
   log_analytics_workspace_customer_id        = azurerm_log_analytics_workspace.this.workspace_id
   log_analytics_workspace_primary_shared_key = azurerm_log_analytics_workspace.this.primary_shared_key
-
   storages = {
     "mycontainerappstorage" = {
       account_name = azurerm_storage_account.this.name
@@ -74,7 +71,6 @@ module "managedenvironment" {
       access_mode  = "ReadOnly"
     }
   }
-
   # zone redundancy must be disabled unless we supply a subnet for vnet integration.
   zone_redundancy_enabled = false
 }

@@ -12,7 +12,7 @@ The following requirements are needed by this module:
 
 - <a name="requirement_terraform"></a> [terraform](#requirement\_terraform) (>= 1.5.0)
 
-- <a name="requirement_azapi"></a> [azapi](#requirement\_azapi) (>= 1.13, < 3)
+- <a name="requirement_azapi"></a> [azapi](#requirement\_azapi) (~> 2.4)
 
 - <a name="requirement_azurerm"></a> [azurerm](#requirement\_azurerm) (>= 3.71, < 5)
 
@@ -253,6 +253,24 @@ Type: `string`
 
 Default: `null`
 
+### <a name="input_managed_identities"></a> [managed\_identities](#input\_managed\_identities)
+
+Description:   Controls the Managed Identity configuration on this resource. The following properties can be specified:
+
+  - `system_assigned` - (Optional) Specifies if the System Assigned Managed Identity should be enabled.
+  - `user_assigned_resource_ids` - (Optional) Specifies a list of User Assigned Managed Identity resource IDs to be assigned to this resource.
+
+Type:
+
+```hcl
+object({
+    system_assigned            = optional(bool, false)
+    user_assigned_resource_ids = optional(set(string), [])
+  })
+```
+
+Default: `{}`
+
 ### <a name="input_peer_authentication_enabled"></a> [peer\_authentication\_enabled](#input\_peer\_authentication\_enabled)
 
 Description: Enable peer authentication (Mutual TLS).
@@ -408,6 +426,10 @@ Description: The Docker bridge CIDR of the Container Apps Managed Environment.
 ### <a name="output_id"></a> [id](#output\_id)
 
 Description: The ID of the container app management environment resource.
+
+### <a name="output_identity"></a> [identity](#output\_identity)
+
+Description: The managed identities assigned to the Container Apps Managed Environment.
 
 ### <a name="output_infrastructure_resource_group"></a> [infrastructure\_resource\_group](#output\_infrastructure\_resource\_group)
 
