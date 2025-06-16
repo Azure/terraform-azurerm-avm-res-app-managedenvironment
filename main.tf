@@ -1,4 +1,3 @@
-data "azurerm_client_config" "current" {}
 
 resource "azapi_resource" "this_environment" {
   type = "Microsoft.App/managedEnvironments@2024-03-01"
@@ -43,7 +42,7 @@ resource "azapi_resource" "this_environment" {
   }
   location  = var.location
   name      = var.name
-  parent_id = "/subscriptions/${data.azurerm_client_config.current.subscription_id}/resourceGroups/${var.resource_group_name}"
+  parent_id = local.resource_group_id
   response_export_values = [
     "properties.customDomainConfiguration",
     "properties.daprAIInstrumentationKey",

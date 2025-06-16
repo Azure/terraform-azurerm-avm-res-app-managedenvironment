@@ -1,3 +1,5 @@
+data "azapi_client_config" "current" {}
+
 locals {
   dapr_component_resource_ids = {
     for dk, dv in module.dapr_component :
@@ -5,6 +7,7 @@ locals {
       id = dv.resource_id
     }
   }
+  resource_group_id                  = "/subscriptions/${data.azurerm_client_config.current.subscription_id}/resourceGroups/${var.resource_group_name}"
   role_definition_resource_substring = "/providers/Microsoft.Authorization/roleDefinitions"
   storage_resource_ids = {
     for sk, sv in module.storage :
