@@ -25,7 +25,7 @@ output "infrastructure_resource_group" {
 
 output "managed_identities" {
   description = "The managed identities assigned to the Container Apps Managed Environment."
-  value       = module.managedenvironment.identity
+  value       = module.managedenvironment.managed_identities
 }
 
 output "name" {
