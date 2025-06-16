@@ -18,6 +18,11 @@ output "id" {
   value       = module.managedenvironment.id
 }
 
+output "identity" {
+  description = "The managed identities assigned to the Container Apps Managed Environment."
+  value       = module.managedenvironment.identity
+}
+
 output "infrastructure_resource_group" {
   description = "The infrastructure resource group of the Container Apps Managed Environment."
   value       = module.managedenvironment.infrastructure_resource_group

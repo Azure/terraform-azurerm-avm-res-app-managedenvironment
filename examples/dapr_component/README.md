@@ -50,9 +50,9 @@ resource "azurerm_log_analytics_workspace" "this" {
 module "managedenvironment" {
   source = "../../"
 
-  location          = azurerm_resource_group.this.location
-  name              = module.naming.container_app_environment.name_unique
-  resource_group_id = azurerm_resource_group.this.id
+  location            = azurerm_resource_group.this.location
+  name                = module.naming.container_app_environment.name_unique
+  resource_group_name = azurerm_resource_group.this.name
   dapr_components = {
     "my-dapr-component" = {
       component_type = "state.azure.blobstorage"

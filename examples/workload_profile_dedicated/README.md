@@ -71,12 +71,32 @@ resource "azurerm_subnet" "this" {
   }
 }
 
+resource "azurerm_storage_account" "this" {
+  account_replication_type = "ZRS"
+  account_tier             = "Standard"
+  location                 = azurerm_resource_group.this.location
+  name                     = module.naming.storage_account.name_unique
+  resource_group_name      = azurerm_resource_group.this.name
+}
+
+resource "azurerm_storage_share" "this" {
+  name               = "sharename"
+  quota              = 5
+  storage_account_id = azurerm_storage_account.this.id
+}
+
+resource "azurerm_user_assigned_identity" "this" {
+  location            = azurerm_resource_group.this.location
+  name                = module.naming.user_assigned_identity.name_unique
+  resource_group_name = azurerm_resource_group.this.name
+}
+
 module "managedenvironment" {
   source = "../../"
 
-  location          = azurerm_resource_group.this.location
-  name              = module.naming.container_app_environment.name_unique
-  resource_group_id = azurerm_resource_group.this.id
+  location            = azurerm_resource_group.this.location
+  name                = module.naming.container_app_environment.name_unique
+  resource_group_name = azurerm_resource_group.this.name
   dapr_components = {
     "my-dapr-component" = {
       component_type = "state.azure.blobstorage"
@@ -88,6 +108,10 @@ module "managedenvironment" {
   internal_load_balancer_enabled             = true
   log_analytics_workspace_customer_id        = azurerm_log_analytics_workspace.this.workspace_id
   log_analytics_workspace_primary_shared_key = azurerm_log_analytics_workspace.this.primary_shared_key
+  managed_identities = {
+    system_assigned            = true
+    user_assigned_resource_ids = [azurerm_user_assigned_identity.this.id]
+  }
   storages = {
     "mycontainerappstorage" = {
       account_name = azurerm_storage_account.this.name
@@ -122,6 +146,7 @@ The following resources are used by this module:
 - [azurerm_log_analytics_workspace.this](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/log_analytics_workspace) (resource)
 - [azurerm_resource_group.this](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/resource_group) (resource)
 - [azurerm_subnet.this](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/subnet) (resource)
+- [azurerm_user_assigned_identity.this](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/user_assigned_identity) (resource)
 - [azurerm_virtual_network.this](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/virtual_network) (resource)
 
 <!-- markdownlint-disable MD013 -->
@@ -144,6 +169,14 @@ Description: The default domain of the Container Apps Managed Environment.
 ### <a name="output_docker_bridge_cidr"></a> [docker\_bridge\_cidr](#output\_docker\_bridge\_cidr)
 
 Description: The Docker bridge CIDR of the Container Apps Managed Environment.
+
+### <a name="output_id"></a> [id](#output\_id)
+
+Description: The resource ID of the Container Apps Managed Environment.
+
+### <a name="output_identity"></a> [identity](#output\_identity)
+
+Description: The managed identities assigned to the Container Apps Managed Environment.
 
 ### <a name="output_infrastructure_resource_group"></a> [infrastructure\_resource\_group](#output\_infrastructure\_resource\_group)
 
