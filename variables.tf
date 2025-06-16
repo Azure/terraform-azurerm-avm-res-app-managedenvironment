@@ -35,6 +35,13 @@ variable "dapr_application_insights_connection_string" {
   sensitive   = true
 }
 
+variable "dapr_application_insights_instrumentation_key" {
+  type        = string
+  default     = null
+  description = "Azure Monitor instrumentation key used by Dapr to export Service to Service communication telemetry."
+  sensitive   = true
+}
+
 variable "diagnostic_settings" {
   type = map(object({
     name                                     = optional(string, null)

@@ -85,6 +85,14 @@ Type: `string`
 
 Default: `null`
 
+### <a name="input_dapr_application_insights_instrumentation_key"></a> [dapr\_application\_insights\_instrumentation\_key](#input\_dapr\_application\_insights\_instrumentation\_key)
+
+Description: Azure Monitor instrumentation key used by Dapr to export Service to Service communication telemetry.
+
+Type: `string`
+
+Default: `null`
+
 ### <a name="input_dapr_components"></a> [dapr\_components](#input\_dapr\_components)
 
 Description:  - `component_type` - (Required) The Dapr Component Type. For example `state.azure.blobstorage`. Changing this forces a new resource to be created.

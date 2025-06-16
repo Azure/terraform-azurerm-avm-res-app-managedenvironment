@@ -3,7 +3,7 @@ data "azapi_client_config" "current" {}
 locals {
   container_app_environment_properties = merge({
     appLogsConfiguration = {
-      "destination" = var.log_analytics_workspace_destination
+      "destination" = var.log_analytics_workspace_destination == "none" ? "" : var.log_analytics_workspace_destination
       logAnalyticsConfiguration = var.log_analytics_workspace_destination == "log-analytics" ? {
         "customerId" = var.log_analytics_workspace_customer_id
         "sharedKey"  = var.log_analytics_workspace_primary_shared_key
@@ -13,7 +13,8 @@ locals {
       "certificatePassword" = var.custom_domain_certificate_password
       "dnsSuffix"           = var.custom_domain_dns_suffix
     }
-    daprAIInstrumentationKey = var.dapr_application_insights_connection_string
+    daprAIConnectionString   = var.dapr_application_insights_connection_string
+    daprAIInstrumentationKey = var.dapr_application_insights_instrumentation_key
     peerAuthentication = {
       "mtls" : {
         "enabled" = var.peer_authentication_enabled
