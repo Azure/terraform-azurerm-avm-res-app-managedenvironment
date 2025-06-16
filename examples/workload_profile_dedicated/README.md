@@ -145,6 +145,8 @@ The following resources are used by this module:
 
 - [azurerm_log_analytics_workspace.this](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/log_analytics_workspace) (resource)
 - [azurerm_resource_group.this](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/resource_group) (resource)
+- [azurerm_storage_account.this](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/storage_account) (resource)
+- [azurerm_storage_share.this](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/storage_share) (resource)
 - [azurerm_subnet.this](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/subnet) (resource)
 - [azurerm_user_assigned_identity.this](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/user_assigned_identity) (resource)
 - [azurerm_virtual_network.this](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/virtual_network) (resource)
@@ -162,6 +164,10 @@ No optional inputs.
 
 The following outputs are exported:
 
+### <a name="output_dapr_component_resource_ids"></a> [dapr\_component\_resource\_ids](#output\_dapr\_component\_resource\_ids)
+
+Description: A map of dapr component resource IDs.
+
 ### <a name="output_default_domain"></a> [default\_domain](#output\_default\_domain)
 
 Description: The default domain of the Container Apps Managed Environment.
@@ -174,13 +180,17 @@ Description: The Docker bridge CIDR of the Container Apps Managed Environment.
 
 Description: The resource ID of the Container Apps Managed Environment.
 
-### <a name="output_identity"></a> [identity](#output\_identity)
-
-Description: The managed identities assigned to the Container Apps Managed Environment.
-
 ### <a name="output_infrastructure_resource_group"></a> [infrastructure\_resource\_group](#output\_infrastructure\_resource\_group)
 
 Description: The infrastructure resource group of the Container Apps Managed Environment.
+
+### <a name="output_managed_identities"></a> [managed\_identities](#output\_managed\_identities)
+
+Description: The managed identities assigned to the Container Apps Managed Environment.
+
+### <a name="output_name"></a> [name](#output\_name)
+
+Description: The name of the Container Apps Managed Environment.
 
 ### <a name="output_platform_reserved_cidr"></a> [platform\_reserved\_cidr](#output\_platform\_reserved\_cidr)
 
@@ -190,9 +200,17 @@ Description: The platform reserved CIDR of the Container Apps Managed Environmen
 
 Description: The platform reserved DNS IP address of the Container Apps Managed Environment.
 
+### <a name="output_resource_id"></a> [resource\_id](#output\_resource\_id)
+
+Description: The resource ID of the Container Apps Managed Environment.
+
 ### <a name="output_static_ip_address"></a> [static\_ip\_address](#output\_static\_ip\_address)
 
 Description: The static IP address of the Container Apps Managed Environment.
+
+### <a name="output_storage_resource_ids"></a> [storage\_resource\_ids](#output\_storage\_resource\_ids)
+
+Description: A map of dapr component resource IDs.
 
 ## Modules
 

@@ -1,5 +1,7 @@
 resource "azapi_resource" "this" {
-  type = "Microsoft.App/managedEnvironments/daprComponents@2024-03-01"
+  name      = var.name
+  parent_id = var.managed_environment.resource_id
+  type      = "Microsoft.App/managedEnvironments/daprComponents@2024-03-01"
   body = {
     properties = {
       componentType        = var.component_type
@@ -27,8 +29,6 @@ resource "azapi_resource" "this" {
       ] : null
     }
   }
-  name      = var.name
-  parent_id = var.managed_environment.resource_id
 
   dynamic "timeouts" {
     for_each = var.timeouts == null ? [] : [var.timeouts]
