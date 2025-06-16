@@ -50,9 +50,9 @@ resource "azurerm_storage_account" "this" {
 }
 
 resource "azurerm_storage_share" "this" {
-  name                 = "sharename"
-  quota                = 5
-  storage_account_name = azurerm_storage_account.this.name
+  name               = "sharename"
+  quota              = 5
+  storage_account_id = azurerm_storage_account.this.id
 }
 
 module "managedenvironment" {
