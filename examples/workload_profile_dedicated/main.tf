@@ -97,11 +97,10 @@ module "managedenvironment" {
       version        = "v1"
     }
   }
-  infrastructure_resource_group_name         = "rg-managed-${module.naming.container_app_environment.name_unique}"
-  infrastructure_subnet_id                   = azurerm_subnet.this.id
-  internal_load_balancer_enabled             = true
-  log_analytics_workspace_customer_id        = azurerm_log_analytics_workspace.this.workspace_id
-  log_analytics_workspace_primary_shared_key = azurerm_log_analytics_workspace.this.primary_shared_key
+  infrastructure_resource_group_name = "rg-managed-${module.naming.container_app_environment.name_unique}"
+  infrastructure_subnet_id           = azurerm_subnet.this.id
+  internal_load_balancer_enabled     = true
+  log_analytics_workspace            = { resource_id = azurerm_log_analytics_workspace.this.id }
   managed_identities = {
     system_assigned            = true
     user_assigned_resource_ids = [azurerm_user_assigned_identity.this.id]

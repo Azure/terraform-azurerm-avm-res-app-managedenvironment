@@ -17,8 +17,12 @@ resource "azapi_resource" "this_environment" {
     "properties.platformReservedDnsIP",
     "properties.staticIp",
   ]
+  # does not work with conditional on container_app_environment_sensitive_properties
   schema_validation_enabled = true
-  tags                      = var.tags
+  sensitive_body = {
+    properties = local.container_app_environment_sensitive_properties
+  }
+  tags = var.tags
 
   dynamic "identity" {
     for_each = local.managed_identities.system_assigned_user_assigned

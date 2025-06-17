@@ -15,7 +15,7 @@ This module is composite and includes sub modules that can be used independently
 
 The following requirements are needed by this module:
 
-- <a name="requirement_terraform"></a> [terraform](#requirement\_terraform) (>= 1.9, < 2.0)
+- <a name="requirement_terraform"></a> [terraform](#requirement\_terraform) (>= 1.10, < 2.0)
 
 - <a name="requirement_azapi"></a> [azapi](#requirement\_azapi) (~> 2.4)
 
@@ -36,6 +36,7 @@ The following resources are used by this module:
 - [modtm_telemetry.telemetry](https://registry.terraform.io/providers/Azure/modtm/latest/docs/resources/telemetry) (resource)
 - [random_uuid.telemetry](https://registry.terraform.io/providers/hashicorp/random/latest/docs/resources/uuid) (resource)
 - [azapi_client_config.current](https://registry.terraform.io/providers/Azure/azapi/latest/docs/data-sources/client_config) (data source)
+- [azapi_resource.customer_id](https://registry.terraform.io/providers/Azure/azapi/latest/docs/data-sources/resource) (data source)
 - [azurerm_client_config.telemetry](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/data-sources/client_config) (data source)
 - [modtm_module_source.telemetry](https://registry.terraform.io/providers/Azure/modtm/latest/docs/data-sources/module_source) (data source)
 
@@ -85,14 +86,6 @@ Default: `null`
 ### <a name="input_dapr_application_insights_connection_string"></a> [dapr\_application\_insights\_connection\_string](#input\_dapr\_application\_insights\_connection\_string)
 
 Description: Application Insights connection string used by Dapr to export Service to Service communication telemetry.
-
-Type: `string`
-
-Default: `null`
-
-### <a name="input_dapr_application_insights_instrumentation_key"></a> [dapr\_application\_insights\_instrumentation\_key](#input\_dapr\_application\_insights\_instrumentation\_key)
-
-Description: Azure Monitor instrumentation key used by Dapr to export Service to Service communication telemetry.
 
 Type: `string`
 
@@ -242,9 +235,36 @@ object({
 
 Default: `null`
 
+### <a name="input_log_analytics_workspace"></a> [log\_analytics\_workspace](#input\_log\_analytics\_workspace)
+
+Description:   The resource ID of the Log Analytics Workspace to link this Container Apps Managed Environment to.
+
+  This is the suggested mechanism to link a Log Analytics Workspace to a Container Apps Managed Environment, as it  
+  avoids having to pass the primary shared key directly.
+
+  This requires at least `Microsoft.OperationalInsights/workspaces/sharedkeys/read` over the Log Analytics Workspace resource,  
+  as the key is fetched by the module (i.e. this mirrors the behaviour of the AzureRM provider).
+
+  An alternative mechanism is to supply `log_analytics_workspace_primary_shared_key` directly.
+
+Type:
+
+```hcl
+object({
+    resource_id = string
+  })
+```
+
+Default: `null`
+
 ### <a name="input_log_analytics_workspace_customer_id"></a> [log\_analytics\_workspace\_customer\_id](#input\_log\_analytics\_workspace\_customer\_id)
 
-Description: The ID for the Log Analytics Workspace to link this Container Apps Managed Environment to.
+Description:   The Customer ID for the Log Analytics Workspace to link this Container Apps Managed Environment to.  
+  If specifying this, you must also specify `log_analytics_workspace_primary_shared_key`.
+
+  This scenario is useful where you do not have permissions to directly look up the shared key.
+
+  The preferred mechanism is to specify the `log_analytics_workspace.resource_id`, in which case this variable can be left as `null`.
 
 Type: `string`
 
@@ -260,7 +280,10 @@ Default: `"log-analytics"`
 
 ### <a name="input_log_analytics_workspace_primary_shared_key"></a> [log\_analytics\_workspace\_primary\_shared\_key](#input\_log\_analytics\_workspace\_primary\_shared\_key)
 
-Description: Primary shared key for Log Analytics.
+Description:   Optional direct mechanism to supply the primary shared key for Log Analytics.
+
+  The alternative method is to use the `log_analytics_workspace.resource_id`, and the module will make a POST request to  
+  fetch the key, in which case this variable can be left as `null`.
 
 Type: `string`
 

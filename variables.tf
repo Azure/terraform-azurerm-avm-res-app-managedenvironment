@@ -35,13 +35,6 @@ variable "dapr_application_insights_connection_string" {
   sensitive   = true
 }
 
-variable "dapr_application_insights_instrumentation_key" {
-  type        = string
-  default     = null
-  description = "Azure Monitor instrumentation key used by Dapr to export Service to Service communication telemetry."
-  sensitive   = true
-}
-
 variable "diagnostic_settings" {
   type = map(object({
     name                                     = optional(string, null)
@@ -138,10 +131,37 @@ DESCRIPTION
   }
 }
 
+variable "log_analytics_workspace" {
+  # wrapped as an object because: https://azure.github.io/Azure-Verified-Modules/spec/TFNFR11/
+  type = object({
+    resource_id = string
+  })
+  default     = null
+  description = <<DESCRIPTION
+  The resource ID of the Log Analytics Workspace to link this Container Apps Managed Environment to.
+
+  This is the suggested mechanism to link a Log Analytics Workspace to a Container Apps Managed Environment, as it
+  avoids having to pass the primary shared key directly.
+
+  This requires at least `Microsoft.OperationalInsights/workspaces/sharedkeys/read` over the Log Analytics Workspace resource,
+  as the key is fetched by the module (i.e. this mirrors the behaviour of the AzureRM provider).
+
+  An alternative mechanism is to supply `log_analytics_workspace_primary_shared_key` directly.
+
+DESCRIPTION
+}
+
 variable "log_analytics_workspace_customer_id" {
   type        = string
   default     = null
-  description = "The ID for the Log Analytics Workspace to link this Container Apps Managed Environment to."
+  description = <<DESCRIPTION
+  The Customer ID for the Log Analytics Workspace to link this Container Apps Managed Environment to.
+  If specifying this, you must also specify `log_analytics_workspace_primary_shared_key`.
+
+  This scenario is useful where you do not have permissions to directly look up the shared key.
+
+  The preferred mechanism is to specify the `log_analytics_workspace.resource_id`, in which case this variable can be left as `null`.
+DESCRIPTION
 }
 
 variable "log_analytics_workspace_destination" {
@@ -158,7 +178,13 @@ variable "log_analytics_workspace_destination" {
 variable "log_analytics_workspace_primary_shared_key" {
   type        = string
   default     = null
-  description = "Primary shared key for Log Analytics."
+  description = <<DESCRIPTION
+  Optional direct mechanism to supply the primary shared key for Log Analytics.
+
+  The alternative method is to use the `log_analytics_workspace.resource_id`, and the module will make a POST request to
+  fetch the key, in which case this variable can be left as `null`.
+DESCRIPTION
+  sensitive   = true
 }
 
 variable "managed_identities" {

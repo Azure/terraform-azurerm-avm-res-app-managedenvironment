@@ -1,20 +1,39 @@
 data "azapi_client_config" "current" {}
 
+# this will attempt to get the primary shared key from the Log Analytics Workspace, mirroring the behaviour of AzureRM provider.
+# optionally, log_analytics_workspace_primary_shared_key can be set to a value, in which case this will not be used.
+ephemeral "azapi_resource_action" "shared_keys" {
+  count = var.log_analytics_workspace != null ? 1 : 0
+
+  action                 = "sharedKeys"
+  method                 = "POST"
+  resource_id            = var.log_analytics_workspace.resource_id
+  type                   = "Microsoft.OperationalInsights/workspaces@2020-08-01"
+  response_export_values = ["primarySharedKey"]
+}
+
+# if the resource ID is specified, fetch the customer ID.
+data "azapi_resource" "customer_id" {
+  count = var.log_analytics_workspace != null ? 1 : 0
+
+  resource_id            = var.log_analytics_workspace.resource_id
+  type                   = "Microsoft.OperationalInsights/workspaces@2020-08-01"
+  response_export_values = ["properties.customerId"]
+}
+
 locals {
   container_app_environment_properties = merge({
     appLogsConfiguration = {
       "destination" = var.log_analytics_workspace_destination == "none" ? "" : var.log_analytics_workspace_destination
       logAnalyticsConfiguration = var.log_analytics_workspace_destination == "log-analytics" ? {
-        "customerId" = var.log_analytics_workspace_customer_id
-        "sharedKey"  = var.log_analytics_workspace_primary_shared_key
+        "customerId" = coalesce(var.log_analytics_workspace_customer_id, try(data.azapi_resource.customer_id[0].output.properties.customerId, null))
       } : null
     }
     customDomainConfiguration = {
       "certificatePassword" = var.custom_domain_certificate_password
       "dnsSuffix"           = var.custom_domain_dns_suffix
     }
-    daprAIConnectionString   = var.dapr_application_insights_connection_string
-    daprAIInstrumentationKey = var.dapr_application_insights_instrumentation_key
+    daprAIConnectionString = var.dapr_application_insights_connection_string
     peerAuthentication = {
       "mtls" : {
         "enabled" = var.peer_authentication_enabled
@@ -39,12 +58,33 @@ locals {
       infrastructureResourceGroup = var.infrastructure_resource_group_name
     } : {}
   )
+  # container_app_environment_sensitive_properties = merge(
+  #   var.log_analytics_workspace_destination == "log-analytics" ? {
+  #     appLogsConfiguration = {
+  #       logAnalyticsConfiguration = {
+  #         sharedKey = local.log_analytics_key
+  #       }
+  #     }
+  #   } : {}
+  # )
+  container_app_environment_sensitive_properties = {
+    appLogsConfiguration = {
+      logAnalyticsConfiguration = {
+        sharedKey = local.log_analytics_key
+      }
+    }
+  }
   dapr_component_resource_ids = {
     for dk, dv in module.dapr_component :
     dk => {
       id = dv.resource_id
     }
   }
+  # get the key via the workspace resource ID if this is set.
+  log_analytics_key = (var.log_analytics_workspace_destination != "log-analytics" ? null :
+    length(ephemeral.azapi_resource_action.shared_keys) > 0 ?
+    ephemeral.azapi_resource_action.shared_keys[0].output.primarySharedKey : var.log_analytics_workspace_primary_shared_key
+  )
   resource_group_id                  = "/subscriptions/${data.azapi_client_config.current.subscription_id}/resourceGroups/${var.resource_group_name}"
   role_definition_resource_substring = "/providers/Microsoft.Authorization/roleDefinitions"
   storage_resource_ids = {

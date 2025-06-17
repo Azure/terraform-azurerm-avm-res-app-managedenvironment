@@ -41,32 +41,15 @@ resource "azurerm_log_analytics_workspace" "this" {
   resource_group_name = azurerm_resource_group.this.name
 }
 
-resource "azurerm_application_insights" "this" {
-  application_type    = "web"
-  location            = azurerm_resource_group.this.location
-  name                = module.naming.application_insights.name_unique
-  resource_group_name = azurerm_resource_group.this.name
-}
+
 
 module "managedenvironment" {
   source = "../../"
 
-  location                                    = azurerm_resource_group.this.location
-  name                                        = module.naming.container_app_environment.name_unique
-  resource_group_name                         = azurerm_resource_group.this.name
-  dapr_application_insights_connection_string = azurerm_application_insights.this.connection_string
-  dapr_components = {
-    "my-dapr-component" = {
-      component_type = "state.azure.blobstorage"
-      version        = "v1"
-    }
-  }
-  log_analytics_workspace = { resource_id = azurerm_log_analytics_workspace.this.id }
+  location                            = azurerm_resource_group.this.location
+  name                                = module.naming.container_app_environment.name_unique
+  resource_group_name                 = azurerm_resource_group.this.name
+  log_analytics_workspace_destination = "none"
   # zone redundancy must be disabled unless we supply a subnet for vnet integration.
   zone_redundancy_enabled = false
-}
-
-moved {
-  from = module.managedenvironment.azapi_resource.dapr_components["my-dapr-component"]
-  to   = module.managedenvironment.module.dapr_component["my-dapr-component"].azapi_resource.this
 }
