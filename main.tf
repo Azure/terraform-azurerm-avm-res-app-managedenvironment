@@ -17,8 +17,9 @@ resource "azapi_resource" "this_environment" {
     "properties.platformReservedDnsIP",
     "properties.staticIp",
   ]
-  # does not work with conditional on container_app_environment_sensitive_properties
-  schema_validation_enabled = true
+  # schema validation does not work with conditional on container_app_environment_sensitive_properties
+  # https://github.com/Azure/terraform-provider-azapi/issues/901
+  schema_validation_enabled = false
   sensitive_body = {
     properties = local.container_app_environment_sensitive_properties
   }
