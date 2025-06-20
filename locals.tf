@@ -69,9 +69,9 @@ locals {
   # )
   container_app_environment_sensitive_properties = {
     appLogsConfiguration = {
-      logAnalyticsConfiguration = {
+      logAnalyticsConfiguration = var.log_analytics_workspace_destination == "log-analytics" ? {
         sharedKey = local.log_analytics_key
-      }
+      } : null
     }
   }
   dapr_component_resource_ids = {
