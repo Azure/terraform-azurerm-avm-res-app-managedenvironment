@@ -1,21 +1,21 @@
 terraform {
-  required_version = ">= 1.3.0"
+  required_version = ">= 1.9, < 2.0"
   required_providers {
     # ignore this because we want to force the use of AzAPI v1 within the module without having it used in this example.
     # tflint-ignore: terraform_unused_required_providers
     azapi = {
       source  = "Azure/azapi"
-      version = ">= 1.13, < 2.0.0"
+      version = "~> 2.0"
     }
     azurerm = {
       source  = "hashicorp/azurerm"
-      version = ">= 3.7.0, < 4.0.0"
+      version = "~> 4.0"
     }
   }
 }
 
 provider "azurerm" {
-  skip_provider_registration = true
+  resource_provider_registrations = "none"
   features {
     resource_group {
       prevent_deletion_if_contains_resources = false
@@ -50,22 +50,19 @@ resource "azurerm_storage_account" "this" {
 }
 
 resource "azurerm_storage_share" "this" {
-  name                 = "sharename"
-  quota                = 5
-  storage_account_name = azurerm_storage_account.this.name
+  name               = "sharename"
+  quota              = 5
+  storage_account_id = azurerm_storage_account.this.id
 }
 
 module "managedenvironment" {
   source = "../../"
-  # source = "Azure/avm-res-app-managedenvironment/azurerm"
 
-  name                = module.naming.container_app_environment.name_unique
-  resource_group_name = azurerm_resource_group.this.name
-  location            = azurerm_resource_group.this.location
-
+  location                                   = azurerm_resource_group.this.location
+  name                                       = module.naming.container_app_environment.name_unique
+  resource_group_name                        = azurerm_resource_group.this.name
   log_analytics_workspace_customer_id        = azurerm_log_analytics_workspace.this.workspace_id
   log_analytics_workspace_primary_shared_key = azurerm_log_analytics_workspace.this.primary_shared_key
-
   storages = {
     "mycontainerappstorage" = {
       account_name = azurerm_storage_account.this.name
@@ -74,7 +71,6 @@ module "managedenvironment" {
       access_mode  = "ReadOnly"
     }
   }
-
   # zone redundancy must be disabled unless we supply a subnet for vnet integration.
   zone_redundancy_enabled = false
 }

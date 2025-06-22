@@ -1,21 +1,21 @@
 terraform {
-  required_version = ">= 1.3.0"
+  required_version = ">= 1.9, < 2.0"
   required_providers {
     # ignore this because we want to force the use of AzAPI v1 within the module without having it used in this example.
     # tflint-ignore: terraform_unused_required_providers
     azapi = {
       source  = "Azure/azapi"
-      version = ">= 1.13, < 2.0.0"
+      version = "~> 2.0"
     }
     azurerm = {
       source  = "hashicorp/azurerm"
-      version = ">= 3.7.0, < 4.0.0"
+      version = "~> 4.0"
     }
   }
 }
 
 provider "azurerm" {
-  skip_provider_registration = true
+  resource_provider_registrations = "none"
   features {
     resource_group {
       prevent_deletion_if_contains_resources = false
@@ -67,21 +67,17 @@ resource "azurerm_subnet" "this" {
 
 module "managedenvironment" {
   source = "../../"
-  # source = "Azure/avm-res-app-managedenvironment/azurerm"
 
-  name                = module.naming.container_app_environment.name_unique
-  resource_group_name = azurerm_resource_group.this.name
-  location            = azurerm_resource_group.this.location
-
-  infrastructure_subnet_id = azurerm_subnet.this.id
+  location                           = azurerm_resource_group.this.location
+  name                               = module.naming.container_app_environment.name_unique
+  resource_group_name                = azurerm_resource_group.this.name
+  infrastructure_resource_group_name = "rg-managed-${module.naming.container_app_environment.name_unique}"
+  infrastructure_subnet_id           = azurerm_subnet.this.id
+  internal_load_balancer_enabled     = true
+  log_analytics_workspace            = { resource_id = azurerm_log_analytics_workspace.this.id }
   workload_profile = [{
     name                  = "Consumption"
     workload_profile_type = "Consumption"
   }]
-  zone_redundancy_enabled            = true
-  internal_load_balancer_enabled     = true
-  infrastructure_resource_group_name = "rg-managed-${module.naming.container_app_environment.name_unique}"
-
-  log_analytics_workspace_customer_id        = azurerm_log_analytics_workspace.this.workspace_id
-  log_analytics_workspace_primary_shared_key = azurerm_log_analytics_workspace.this.primary_shared_key
+  zone_redundancy_enabled = true
 }

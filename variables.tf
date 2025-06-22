@@ -131,10 +131,37 @@ DESCRIPTION
   }
 }
 
+variable "log_analytics_workspace" {
+  # wrapped as an object because: https://azure.github.io/Azure-Verified-Modules/spec/TFNFR11/
+  type = object({
+    resource_id = string
+  })
+  default     = null
+  description = <<DESCRIPTION
+  The resource ID of the Log Analytics Workspace to link this Container Apps Managed Environment to.
+
+  This is the suggested mechanism to link a Log Analytics Workspace to a Container Apps Managed Environment, as it
+  avoids having to pass the primary shared key directly.
+
+  This requires at least `Microsoft.OperationalInsights/workspaces/sharedkeys/read` over the Log Analytics Workspace resource,
+  as the key is fetched by the module (i.e. this mirrors the behaviour of the AzureRM provider).
+
+  An alternative mechanism is to supply `log_analytics_workspace_primary_shared_key` directly.
+
+DESCRIPTION
+}
+
 variable "log_analytics_workspace_customer_id" {
   type        = string
   default     = null
-  description = "The ID for the Log Analytics Workspace to link this Container Apps Managed Environment to."
+  description = <<DESCRIPTION
+  The Customer ID for the Log Analytics Workspace to link this Container Apps Managed Environment to.
+  If specifying this, you must also specify `log_analytics_workspace_primary_shared_key`.
+
+  This scenario is useful where you do not have permissions to directly look up the shared key.
+
+  The preferred mechanism is to specify the `log_analytics_workspace.resource_id`, in which case this variable can be left as `null`.
+DESCRIPTION
 }
 
 variable "log_analytics_workspace_destination" {
@@ -151,7 +178,28 @@ variable "log_analytics_workspace_destination" {
 variable "log_analytics_workspace_primary_shared_key" {
   type        = string
   default     = null
-  description = "Primary shared key for Log Analytics."
+  description = <<DESCRIPTION
+  Optional direct mechanism to supply the primary shared key for Log Analytics.
+
+  The alternative method is to use the `log_analytics_workspace.resource_id`, and the module will make a POST request to
+  fetch the key, in which case this variable can be left as `null`.
+DESCRIPTION
+  sensitive   = true
+}
+
+variable "managed_identities" {
+  type = object({
+    system_assigned            = optional(bool, false)
+    user_assigned_resource_ids = optional(set(string), [])
+  })
+  default     = {}
+  description = <<DESCRIPTION
+  Controls the Managed Identity configuration on this resource. The following properties can be specified:
+
+  - `system_assigned` - (Optional) Specifies if the System Assigned Managed Identity should be enabled.
+  - `user_assigned_resource_ids` - (Optional) Specifies a list of User Assigned Managed Identity resource IDs to be assigned to this resource.
+  DESCRIPTION
+  nullable    = false
 }
 
 variable "peer_authentication_enabled" {
@@ -185,6 +233,36 @@ A map of role assignments to create on the container app environment. The map ke
 - `principal_type` - (Optional) The type of the `principal_id`. Possible values are `User`, `Group` and `ServicePrincipal`. It is necessary to explicitly set this attribute when creating role assignments if the principal creating the assignment is constrained by ABAC rules that filters on the PrincipalType attribute.
 
 > Note: only set `skip_service_principal_aad_check` to true if you are assigning a role to a service principal.
+DESCRIPTION
+  nullable    = false
+}
+
+variable "storages" {
+  type = map(object({
+    access_key   = string
+    access_mode  = string
+    account_name = string
+    share_name   = string
+    timeouts = optional(object({
+      create = optional(string)
+      delete = optional(string)
+      read   = optional(string)
+    }))
+  }))
+  default     = {}
+  description = <<DESCRIPTION
+ - `access_key` - (Required) The Storage Account Access Key.
+ - `access_mode` - (Required) The access mode to connect this storage to the Container App. Possible values include `ReadOnly` and `ReadWrite`. Changing this forces a new resource to be created.
+ - `account_name` - (Required) The Azure Storage Account in which the Share to be used is located. Changing this forces a new resource to be created.
+ - `share_name` - (Required) The name of the Azure Storage Share to use. Changing this forces a new resource to be created.
+
+ ---
+ `timeouts` block supports the following:
+ - `create` - (Defaults to 30 minutes) Used when creating the Container App Environment Storage.
+ - `delete` - (Defaults to 30 minutes) Used when deleting the Container App Environment Storage.
+ - `read` - (Defaults to 5 minutes) Used when retrieving the Container App Environment Storage.
+ - `update` - (Defaults to 30 minutes) Used when updating the Container App Environment Storage.
+
 DESCRIPTION
   nullable    = false
 }
@@ -224,10 +302,31 @@ variable "workload_profile" {
 This lists the workload profiles that will be configured for the Managed Environment.
 This is in addition to the default Consumption Plan workload profile.
 
- - `maximum_count` - (Optional) The maximum number of instances of workload profile that can be deployed in the Container App Environment.
- - `minimum_count` - (Optional) The minimum number of instances of workload profile that can be deployed in the Container App Environment.
+ - `maximum_count` - (Optional) The maximum number of instances of workload profile that can be deployed in the Container App Environment.  Required for Dedicated profile types.
+ - `minimum_count` - (Optional) The minimum number of instances of workload profile that can be deployed in the Container App Environment.  Required for Dedicated profile types.
  - `name` - (Required) The name of the workload profile.
  - `workload_profile_type` - (Required) Workload profile type for the workloads to run on. Possible values include `D4`, `D8`, `D16`, `D32`, `E4`, `E8`, `E16` and `E32`.
+
+Examples:
+
+```hcl
+  # this creates a Consumption workload profile:
+  workload_profile = [{
+    name                  = "Consumption"
+    workload_profile_type = "Consumption"
+  }]
+
+  # this creates a Dedicated workload profile, in this scenario a consumption profile is automatically created by the Container Apps service (or can be specified).
+  workload_profile = [{
+    name                  = "Dedicated"
+    workload_profile_type = "D4"
+    maximum_count         = 3
+    minimum_count         = 1
+  }]
+
+  # workload profiles can also be not specified, in which case a Consumption Only plan is created, without workload profiles.
+```
+
 DESCRIPTION
   nullable    = false
 

@@ -1,20 +1,25 @@
 <!-- BEGIN_TF_DOCS -->
-# terraform-azurerm-avm-res-app-managedenvironment
+# Azure Container Apps Managed Environment Module
 
-Module to deploy Container Apps Managed Environments in Azure.
+This module is used to manage Container Apps Managed Environments.
 
--> Major version Zero (0.y.z) is for initial development. Anything MAY change at any time. A module SHOULD NOT be considered stable till at least it is major version one (1.0.0) or greater. Changes will always be via new versions being published and no changes will be made to existing published versions. For more details please go to <https://semver.org/>
+This module is composite and includes sub modules that can be used independently for deploying sub resources. These are:
+
+- **dapr\_component** - creation of Dapr components.
+- **storage** - presentation of Azure Files Storage.
+
+> Major version Zero (0.y.z) is for initial development. Anything MAY change at any time. A module SHOULD NOT be considered stable till at least it is major version one (1.0.0) or greater. Changes will always be via new versions being published and no changes will be made to existing published versions. For more details please go to <https://semver.org/>
 
 <!-- markdownlint-disable MD033 -->
 ## Requirements
 
 The following requirements are needed by this module:
 
-- <a name="requirement_terraform"></a> [terraform](#requirement\_terraform) (>= 1.5.0)
+- <a name="requirement_terraform"></a> [terraform](#requirement\_terraform) (>= 1.10, < 2.0)
 
-- <a name="requirement_azapi"></a> [azapi](#requirement\_azapi) (>= 1.13, < 3)
+- <a name="requirement_azapi"></a> [azapi](#requirement\_azapi) (~> 2.4)
 
-- <a name="requirement_azurerm"></a> [azurerm](#requirement\_azurerm) (>= 3.71, < 5)
+- <a name="requirement_azurerm"></a> [azurerm](#requirement\_azurerm) (~> 4.0)
 
 - <a name="requirement_modtm"></a> [modtm](#requirement\_modtm) (~> 0.3)
 
@@ -30,7 +35,8 @@ The following resources are used by this module:
 - [azurerm_role_assignment.this](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/role_assignment) (resource)
 - [modtm_telemetry.telemetry](https://registry.terraform.io/providers/Azure/modtm/latest/docs/resources/telemetry) (resource)
 - [random_uuid.telemetry](https://registry.terraform.io/providers/hashicorp/random/latest/docs/resources/uuid) (resource)
-- [azurerm_client_config.current](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/data-sources/client_config) (data source)
+- [azapi_client_config.current](https://registry.terraform.io/providers/Azure/azapi/latest/docs/data-sources/client_config) (data source)
+- [azapi_resource.customer_id](https://registry.terraform.io/providers/Azure/azapi/latest/docs/data-sources/resource) (data source)
 - [azurerm_client_config.telemetry](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/data-sources/client_config) (data source)
 - [modtm_module_source.telemetry](https://registry.terraform.io/providers/Azure/modtm/latest/docs/data-sources/module_source) (data source)
 
@@ -229,9 +235,36 @@ object({
 
 Default: `null`
 
+### <a name="input_log_analytics_workspace"></a> [log\_analytics\_workspace](#input\_log\_analytics\_workspace)
+
+Description:   The resource ID of the Log Analytics Workspace to link this Container Apps Managed Environment to.
+
+  This is the suggested mechanism to link a Log Analytics Workspace to a Container Apps Managed Environment, as it  
+  avoids having to pass the primary shared key directly.
+
+  This requires at least `Microsoft.OperationalInsights/workspaces/sharedkeys/read` over the Log Analytics Workspace resource,  
+  as the key is fetched by the module (i.e. this mirrors the behaviour of the AzureRM provider).
+
+  An alternative mechanism is to supply `log_analytics_workspace_primary_shared_key` directly.
+
+Type:
+
+```hcl
+object({
+    resource_id = string
+  })
+```
+
+Default: `null`
+
 ### <a name="input_log_analytics_workspace_customer_id"></a> [log\_analytics\_workspace\_customer\_id](#input\_log\_analytics\_workspace\_customer\_id)
 
-Description: The ID for the Log Analytics Workspace to link this Container Apps Managed Environment to.
+Description:   The Customer ID for the Log Analytics Workspace to link this Container Apps Managed Environment to.  
+  If specifying this, you must also specify `log_analytics_workspace_primary_shared_key`.
+
+  This scenario is useful where you do not have permissions to directly look up the shared key.
+
+  The preferred mechanism is to specify the `log_analytics_workspace.resource_id`, in which case this variable can be left as `null`.
 
 Type: `string`
 
@@ -247,11 +280,32 @@ Default: `"log-analytics"`
 
 ### <a name="input_log_analytics_workspace_primary_shared_key"></a> [log\_analytics\_workspace\_primary\_shared\_key](#input\_log\_analytics\_workspace\_primary\_shared\_key)
 
-Description: Primary shared key for Log Analytics.
+Description:   Optional direct mechanism to supply the primary shared key for Log Analytics.
+
+  The alternative method is to use the `log_analytics_workspace.resource_id`, and the module will make a POST request to  
+  fetch the key, in which case this variable can be left as `null`.
 
 Type: `string`
 
 Default: `null`
+
+### <a name="input_managed_identities"></a> [managed\_identities](#input\_managed\_identities)
+
+Description:   Controls the Managed Identity configuration on this resource. The following properties can be specified:
+
+  - `system_assigned` - (Optional) Specifies if the System Assigned Managed Identity should be enabled.
+  - `user_assigned_resource_ids` - (Optional) Specifies a list of User Assigned Managed Identity resource IDs to be assigned to this resource.
+
+Type:
+
+```hcl
+object({
+    system_assigned            = optional(bool, false)
+    user_assigned_resource_ids = optional(set(string), [])
+  })
+```
+
+Default: `{}`
 
 ### <a name="input_peer_authentication_enabled"></a> [peer\_authentication\_enabled](#input\_peer\_authentication\_enabled)
 
@@ -359,10 +413,30 @@ Description:
 This lists the workload profiles that will be configured for the Managed Environment.  
 This is in addition to the default Consumption Plan workload profile.
 
- - `maximum_count` - (Optional) The maximum number of instances of workload profile that can be deployed in the Container App Environment.
- - `minimum_count` - (Optional) The minimum number of instances of workload profile that can be deployed in the Container App Environment.
+ - `maximum_count` - (Optional) The maximum number of instances of workload profile that can be deployed in the Container App Environment.  Required for Dedicated profile types.
+ - `minimum_count` - (Optional) The minimum number of instances of workload profile that can be deployed in the Container App Environment.  Required for Dedicated profile types.
  - `name` - (Required) The name of the workload profile.
  - `workload_profile_type` - (Required) Workload profile type for the workloads to run on. Possible values include `D4`, `D8`, `D16`, `D32`, `E4`, `E8`, `E16` and `E32`.
+
+Examples:
+
+```hcl
+  # this creates a Consumption workload profile:
+  workload_profile = [{
+    name                  = "Consumption"
+    workload_profile_type = "Consumption"
+  }]
+
+  # this creates a Dedicated workload profile, in this scenario a consumption profile is automatically created by the Container Apps service (or can be specified).
+  workload_profile = [{
+    name                  = "Dedicated"
+    workload_profile_type = "D4"
+    maximum_count         = 3
+    minimum_count         = 1
+  }]
+
+  # workload profiles can also be not specified, in which case a Consumption Only plan is created, without workload profiles.
+```
 
 Type:
 
@@ -412,6 +486,10 @@ Description: The ID of the container app management environment resource.
 ### <a name="output_infrastructure_resource_group"></a> [infrastructure\_resource\_group](#output\_infrastructure\_resource\_group)
 
 Description: The infrastructure resource group of the Container Apps Managed Environment.
+
+### <a name="output_managed_identities"></a> [managed\_identities](#output\_managed\_identities)
+
+Description: The managed identities assigned to the Container Apps Managed Environment.
 
 ### <a name="output_name"></a> [name](#output\_name)
 

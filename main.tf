@@ -1,50 +1,13 @@
-data "azurerm_client_config" "current" {}
-
 resource "azapi_resource" "this_environment" {
-  type = "Microsoft.App/managedEnvironments@2024-03-01"
-  body = {
-    properties = merge({
-      appLogsConfiguration = {
-        "destination" = var.log_analytics_workspace_destination
-        logAnalyticsConfiguration = var.log_analytics_workspace_destination == "log-analytics" ? {
-          "customerId" = var.log_analytics_workspace_customer_id
-          "sharedKey"  = var.log_analytics_workspace_primary_shared_key
-        } : null
-      }
-      customDomainConfiguration = {
-        "certificatePassword" = var.custom_domain_certificate_password
-        "dnsSuffix"           = var.custom_domain_dns_suffix
-      }
-      daprAIInstrumentationKey = var.dapr_application_insights_connection_string
-      peerAuthentication = {
-        "mtls" : {
-          "enabled" = var.peer_authentication_enabled
-        }
-      }
-      vnetConfiguration = var.infrastructure_subnet_id != null ? {
-        "internal"               = var.internal_load_balancer_enabled
-        "infrastructureSubnetId" = var.infrastructure_subnet_id
-      } : null
-      workloadProfiles = local.workload_profiles
-      zoneRedundant    = var.zone_redundancy_enabled
-      },
-      # Only include the infrastructureResourceGroup property if it is set
-      #
-      # Background: When using workload profiles, Azure will create a managed resource group for the container app environment.
-      # If you want to specify a name for this resource group, you use the infrastructure_resource_group_name variable.
-      # If you do not specify a name, Azure will create a name like "ME_myEnvironmentName_myResourceGroup_myRegion".
-      #
-      # The problem: if you do not specify a name, the next time a deployment runs, Terraform will see that the infrastructure_resource_group_name
-      # has changed from null to the managed name, and will try to update the resource. This fails the idempotency check "no changes to plan after apply".
-      var.infrastructure_resource_group_name != null ? {
-        infrastructureResourceGroup = var.infrastructure_resource_group_name
-      } : {}
-    )
-  }
   location  = var.location
   name      = var.name
-  parent_id = "/subscriptions/${data.azurerm_client_config.current.subscription_id}/resourceGroups/${var.resource_group_name}"
+  parent_id = local.resource_group_id
+  type      = "Microsoft.App/managedEnvironments@2025-01-01"
+  body = {
+    properties = local.container_app_environment_properties
+  }
   response_export_values = [
+    "identity",
     "properties.customDomainConfiguration",
     "properties.daprAIInstrumentationKey",
     "properties.defaultDomain",
@@ -54,9 +17,22 @@ resource "azapi_resource" "this_environment" {
     "properties.platformReservedDnsIP",
     "properties.staticIp",
   ]
-  schema_validation_enabled = true
-  tags                      = var.tags
+  # schema validation does not work with conditional on container_app_environment_sensitive_properties
+  # https://github.com/Azure/terraform-provider-azapi/issues/901
+  schema_validation_enabled = false
+  sensitive_body = {
+    properties = local.container_app_environment_sensitive_properties
+  }
+  tags = var.tags
 
+  dynamic "identity" {
+    for_each = local.managed_identities.system_assigned_user_assigned
+
+    content {
+      type         = identity.value.type
+      identity_ids = identity.value.user_assigned_resource_ids
+    }
+  }
   dynamic "timeouts" {
     for_each = var.timeouts == null ? [] : [var.timeouts]
 

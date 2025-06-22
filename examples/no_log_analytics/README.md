@@ -1,10 +1,7 @@
 <!-- BEGIN_TF_DOCS -->
-# Storage example
+# Default example without Log Analytics
 
-This deploys the module and presents storage from Azure Files using the storage submodule.
-
-This also exercises the alternative mechanism to specify the Log Analytics Workspace, via
-the customer ID and primary shared key.
+This deploys the module with log analytics not configured (`log_analytics_workspace_destination = "none"`).
 
 ```hcl
 terraform {
@@ -50,43 +47,17 @@ resource "azurerm_log_analytics_workspace" "this" {
   resource_group_name = azurerm_resource_group.this.name
 }
 
-resource "azurerm_storage_account" "this" {
-  account_replication_type = "ZRS"
-  account_tier             = "Standard"
-  location                 = azurerm_resource_group.this.location
-  name                     = module.naming.storage_account.name_unique
-  resource_group_name      = azurerm_resource_group.this.name
-}
 
-resource "azurerm_storage_share" "this" {
-  name               = "sharename"
-  quota              = 5
-  storage_account_id = azurerm_storage_account.this.id
-}
 
 module "managedenvironment" {
   source = "../../"
 
-  location                                   = azurerm_resource_group.this.location
-  name                                       = module.naming.container_app_environment.name_unique
-  resource_group_name                        = azurerm_resource_group.this.name
-  log_analytics_workspace_customer_id        = azurerm_log_analytics_workspace.this.workspace_id
-  log_analytics_workspace_primary_shared_key = azurerm_log_analytics_workspace.this.primary_shared_key
-  storages = {
-    "mycontainerappstorage" = {
-      account_name = azurerm_storage_account.this.name
-      share_name   = azurerm_storage_share.this.name
-      access_key   = azurerm_storage_account.this.primary_access_key
-      access_mode  = "ReadOnly"
-    }
-  }
+  location                            = azurerm_resource_group.this.location
+  name                                = module.naming.container_app_environment.name_unique
+  resource_group_name                 = azurerm_resource_group.this.name
+  log_analytics_workspace_destination = "none"
   # zone redundancy must be disabled unless we supply a subnet for vnet integration.
   zone_redundancy_enabled = false
-}
-
-moved {
-  from = module.managedenvironment.azapi_resource.storages["mycontainerappstorage"]
-  to   = module.managedenvironment.module.storage["mycontainerappstorage"].azapi_resource.this
 }
 ```
 
@@ -107,8 +78,6 @@ The following resources are used by this module:
 
 - [azurerm_log_analytics_workspace.this](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/log_analytics_workspace) (resource)
 - [azurerm_resource_group.this](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/resource_group) (resource)
-- [azurerm_storage_account.this](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/storage_account) (resource)
-- [azurerm_storage_share.this](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/storage_share) (resource)
 
 <!-- markdownlint-disable MD013 -->
 ## Required Inputs
@@ -123,9 +92,17 @@ No optional inputs.
 
 The following outputs are exported:
 
-### <a name="output_storage_resource_ids"></a> [storage\_resource\_ids](#output\_storage\_resource\_ids)
+### <a name="output_id"></a> [id](#output\_id)
 
-Description: A map of dapr component resource IDs.
+Description: The resource ID of the Container Apps Managed Environment.
+
+### <a name="output_name"></a> [name](#output\_name)
+
+Description: The name of the Container Apps Managed Environment.
+
+### <a name="output_resource_id"></a> [resource\_id](#output\_resource\_id)
+
+Description: The resource ID of the Container Apps Managed Environment.
 
 ## Modules
 

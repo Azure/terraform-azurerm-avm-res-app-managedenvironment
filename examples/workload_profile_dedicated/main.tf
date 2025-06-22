@@ -1,15 +1,15 @@
 terraform {
-  required_version = ">= 1.8.0"
+  required_version = ">= 1.9, < 2.0"
   required_providers {
-    # ignore this because we want to force the use of AzAPI v2 within the module without having it used in this example.
+    # ignore this because we want to force the use of AzAPI v1 within the module without having it used in this example.
     # tflint-ignore: terraform_unused_required_providers
     azapi = {
       source  = "Azure/azapi"
-      version = ">= 2.0.0"
+      version = "~> 2.0"
     }
     azurerm = {
       source  = "hashicorp/azurerm"
-      version = ">= 4.0.0"
+      version = "~> 4.0"
     }
   }
 }
@@ -79,33 +79,32 @@ resource "azurerm_storage_share" "this" {
   storage_account_id = azurerm_storage_account.this.id
 }
 
+resource "azurerm_user_assigned_identity" "this" {
+  location            = azurerm_resource_group.this.location
+  name                = module.naming.user_assigned_identity.name_unique
+  resource_group_name = azurerm_resource_group.this.name
+}
+
 module "managedenvironment" {
   source = "../../"
-  # source = "Azure/avm-res-app-managedenvironment/azurerm"
 
+  location            = azurerm_resource_group.this.location
   name                = module.naming.container_app_environment.name_unique
   resource_group_name = azurerm_resource_group.this.name
-  location            = azurerm_resource_group.this.location
-
-  infrastructure_subnet_id = azurerm_subnet.this.id
-  workload_profile = [{
-    name                  = "Consumption"
-    workload_profile_type = "Consumption"
-  }]
-  zone_redundancy_enabled            = true
-  internal_load_balancer_enabled     = true
-  infrastructure_resource_group_name = "rg-managed-${module.naming.container_app_environment.name_unique}"
-
-  log_analytics_workspace_customer_id        = azurerm_log_analytics_workspace.this.workspace_id
-  log_analytics_workspace_primary_shared_key = azurerm_log_analytics_workspace.this.primary_shared_key
-
   dapr_components = {
     "my-dapr-component" = {
       component_type = "state.azure.blobstorage"
       version        = "v1"
     }
   }
-
+  infrastructure_resource_group_name = "rg-managed-${module.naming.container_app_environment.name_unique}"
+  infrastructure_subnet_id           = azurerm_subnet.this.id
+  internal_load_balancer_enabled     = true
+  log_analytics_workspace            = { resource_id = azurerm_log_analytics_workspace.this.id }
+  managed_identities = {
+    system_assigned            = true
+    user_assigned_resource_ids = [azurerm_user_assigned_identity.this.id]
+  }
   storages = {
     "mycontainerappstorage" = {
       account_name = azurerm_storage_account.this.name
@@ -114,5 +113,9 @@ module "managedenvironment" {
       access_mode  = "ReadOnly"
     }
   }
-
+  workload_profile = [{
+    name                  = "Consumption"
+    workload_profile_type = "Consumption"
+  }]
+  zone_redundancy_enabled = true
 }

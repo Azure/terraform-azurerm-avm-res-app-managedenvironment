@@ -5,23 +5,23 @@ This deploys the module with a environment-scoped dapr component.
 
 ```hcl
 terraform {
-  required_version = ">= 1.3.0"
+  required_version = ">= 1.9, < 2.0"
   required_providers {
     # ignore this because we want to force the use of AzAPI v1 within the module without having it used in this example.
     # tflint-ignore: terraform_unused_required_providers
     azapi = {
       source  = "Azure/azapi"
-      version = ">= 1.13, < 2.0.0"
+      version = "~> 2.0"
     }
     azurerm = {
       source  = "hashicorp/azurerm"
-      version = ">= 3.7.0, < 4.0.0"
+      version = "~> 4.0"
     }
   }
 }
 
 provider "azurerm" {
-  skip_provider_registration = true
+  resource_provider_registrations = "none"
   features {
     resource_group {
       prevent_deletion_if_contains_resources = false
@@ -47,31 +47,34 @@ resource "azurerm_log_analytics_workspace" "this" {
   resource_group_name = azurerm_resource_group.this.name
 }
 
+resource "azurerm_application_insights" "this" {
+  application_type    = "web"
+  location            = azurerm_resource_group.this.location
+  name                = module.naming.application_insights.name_unique
+  resource_group_name = azurerm_resource_group.this.name
+}
+
 module "managedenvironment" {
   source = "../../"
-  # source = "Azure/avm-res-app-managedenvironment/azurerm"
 
-  name                = module.naming.container_app_environment.name_unique
-  resource_group_name = azurerm_resource_group.this.name
-  location            = azurerm_resource_group.this.location
-
-  log_analytics_workspace_customer_id        = azurerm_log_analytics_workspace.this.workspace_id
-  log_analytics_workspace_primary_shared_key = azurerm_log_analytics_workspace.this.primary_shared_key
-
+  location                                    = azurerm_resource_group.this.location
+  name                                        = module.naming.container_app_environment.name_unique
+  resource_group_name                         = azurerm_resource_group.this.name
+  dapr_application_insights_connection_string = azurerm_application_insights.this.connection_string
   dapr_components = {
     "my-dapr-component" = {
       component_type = "state.azure.blobstorage"
       version        = "v1"
     }
   }
-
+  log_analytics_workspace = { resource_id = azurerm_log_analytics_workspace.this.id }
   # zone redundancy must be disabled unless we supply a subnet for vnet integration.
   zone_redundancy_enabled = false
 }
 
 moved {
-  to   = module.managedenvironment.module.dapr_component["my-dapr-component"].azapi_resource.this
   from = module.managedenvironment.azapi_resource.dapr_components["my-dapr-component"]
+  to   = module.managedenvironment.module.dapr_component["my-dapr-component"].azapi_resource.this
 }
 ```
 
@@ -80,16 +83,17 @@ moved {
 
 The following requirements are needed by this module:
 
-- <a name="requirement_terraform"></a> [terraform](#requirement\_terraform) (>= 1.3.0)
+- <a name="requirement_terraform"></a> [terraform](#requirement\_terraform) (>= 1.9, < 2.0)
 
-- <a name="requirement_azapi"></a> [azapi](#requirement\_azapi) (>= 1.13, < 2.0.0)
+- <a name="requirement_azapi"></a> [azapi](#requirement\_azapi) (~> 2.0)
 
-- <a name="requirement_azurerm"></a> [azurerm](#requirement\_azurerm) (>= 3.7.0, < 4.0.0)
+- <a name="requirement_azurerm"></a> [azurerm](#requirement\_azurerm) (~> 4.0)
 
 ## Resources
 
 The following resources are used by this module:
 
+- [azurerm_application_insights.this](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/application_insights) (resource)
 - [azurerm_log_analytics_workspace.this](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/log_analytics_workspace) (resource)
 - [azurerm_resource_group.this](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/resource_group) (resource)
 

@@ -1,5 +1,7 @@
 resource "azapi_resource" "this" {
-  type = "Microsoft.App/managedEnvironments/storages@2024-03-01"
+  name      = var.name
+  parent_id = var.managed_environment.resource_id
+  type      = "Microsoft.App/managedEnvironments/storages@2024-03-01"
   body = {
     properties = {
       azureFile = {
@@ -10,8 +12,6 @@ resource "azapi_resource" "this" {
       }
     }
   }
-  name                      = var.name
-  parent_id                 = var.managed_environment.resource_id
   schema_validation_enabled = true
 
   dynamic "timeouts" {

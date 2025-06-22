@@ -29,6 +29,11 @@ output "infrastructure_resource_group" {
   value       = try(azapi_resource.this_environment.output.properties.infrastructureResourceGroup, null)
 }
 
+output "managed_identities" {
+  description = "The managed identities assigned to the Container Apps Managed Environment."
+  value       = try(azapi_resource.this_environment.output.identity, {})
+}
+
 output "name" {
   description = "The name of the resource"
   value       = azapi_resource.this_environment.name
