@@ -6,6 +6,7 @@ This deploys a Container Apps Managed Environment using a workload profile with 
 ```hcl
 terraform {
   required_version = ">= 1.9, < 2.0"
+
   required_providers {
     # ignore this because we want to force the use of AzAPI v1 within the module without having it used in this example.
     # tflint-ignore: terraform_unused_required_providers
@@ -49,10 +50,10 @@ resource "azurerm_log_analytics_workspace" "this" {
 
 # Create the vnet to use with vnet integration
 resource "azurerm_virtual_network" "this" {
-  address_space       = ["192.168.0.0/23"]
   location            = azurerm_resource_group.this.location
   name                = module.naming.virtual_network.name_unique
   resource_group_name = azurerm_resource_group.this.name
+  address_space       = ["192.168.0.0/23"]
 }
 
 resource "azurerm_subnet" "this" {
