@@ -40,4 +40,12 @@ resource "azapi_resource" "this" {
       update = timeouts.value.update
     }
   }
+
+  retry = {
+    error_message_regex  = ["ContainerAppEnvironmentDisabled"]
+    interval_seconds     = 10
+    max_interval_seconds = 300
+    multiplier          = 2.0
+    randomization_factor = 0.3
+  }
 }
