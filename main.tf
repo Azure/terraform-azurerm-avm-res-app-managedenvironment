@@ -6,6 +6,9 @@ resource "azapi_resource" "this_environment" {
   body = {
     properties = local.container_app_environment_properties
   }
+  create_headers = var.enable_telemetry ? { "User-Agent" : local.avm_azapi_header } : null
+  delete_headers = var.enable_telemetry ? { "User-Agent" : local.avm_azapi_header } : null
+  read_headers   = var.enable_telemetry ? { "User-Agent" : local.avm_azapi_header } : null
   response_export_values = [
     "identity",
     "properties.customDomainConfiguration",
@@ -23,7 +26,8 @@ resource "azapi_resource" "this_environment" {
   sensitive_body = {
     properties = local.container_app_environment_sensitive_properties
   }
-  tags = var.tags
+  tags           = var.tags
+  update_headers = var.enable_telemetry ? { "User-Agent" : local.avm_azapi_header } : null
 
   dynamic "identity" {
     for_each = local.managed_identities.system_assigned_user_assigned
