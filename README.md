@@ -308,6 +308,14 @@ object({
 
 Default: `{}`
 
+### <a name="input_parent_id"></a> [parent\_id](#input\_parent\_id)
+
+Description: The parent resource ID for this resource. When provided, takes precedence over resource\_group\_name.
+
+Type: `string`
+
+Default: `null`
+
 ### <a name="input_peer_authentication_enabled"></a> [peer\_authentication\_enabled](#input\_peer\_authentication\_enabled)
 
 Description: Enable peer authentication (Mutual TLS).

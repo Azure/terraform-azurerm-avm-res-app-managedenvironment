@@ -85,7 +85,11 @@ locals {
     length(ephemeral.azapi_resource_action.shared_keys) > 0 ?
     ephemeral.azapi_resource_action.shared_keys[0].output.primarySharedKey : var.log_analytics_workspace_primary_shared_key
   )
-  resource_group_id                  = "/subscriptions/${data.azapi_client_config.current.subscription_id}/resourceGroups/${var.resource_group_name}"
+  parent_id = var.parent_id != null ? var.parent_id : (
+    var.resource_group_name != null ?
+    "/subscriptions/${data.azapi_client_config.current.subscription_id}/resourceGroups/${var.resource_group_name}" :
+    null
+  )
   role_definition_resource_substring = "/providers/Microsoft.Authorization/roleDefinitions"
   storage_resource_ids = {
     for sk, sv in module.storage :

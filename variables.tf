@@ -203,6 +203,12 @@ variable "managed_identities" {
   nullable    = false
 }
 
+variable "parent_id" {
+  type        = string
+  default     = null
+  description = "The parent resource ID for this resource. When provided, takes precedence over resource_group_name."
+}
+
 variable "peer_authentication_enabled" {
   type        = bool
   default     = false
