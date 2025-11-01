@@ -22,6 +22,12 @@ data "azapi_resource" "customer_id" {
 }
 
 locals {
+  certificate_resource_ids = {
+    for ck, cv in module.certificate :
+    ck => {
+      id = cv.resource_id
+    }
+  }
   container_app_environment_properties = merge({
     appLogsConfiguration = {
       "destination" = var.log_analytics_workspace_destination == "none" ? "" : var.log_analytics_workspace_destination
@@ -29,14 +35,27 @@ locals {
         "customerId" = coalesce(var.log_analytics_workspace_customer_id, try(data.azapi_resource.customer_id[0].output.properties.customerId, null))
       } : null
     }
-    customDomainConfiguration = {
-      "certificatePassword" = var.custom_domain_certificate_password
-      "dnsSuffix"           = var.custom_domain_dns_suffix
-    }
+    customDomainConfiguration = merge(
+      {
+        "certificatePassword" = var.custom_domain_certificate_password
+        "dnsSuffix"           = var.custom_domain_dns_suffix
+      },
+      var.custom_domain_certificate_key_vault_url != null ? {
+        certificateKeyVaultProperties = {
+          identity    = var.custom_domain_certificate_key_vault_identity
+          keyVaultUrl = var.custom_domain_certificate_key_vault_url
+        }
+      } : {}
+    )
     daprAIConnectionString = var.dapr_application_insights_connection_string
     peerAuthentication = {
       "mtls" : {
         "enabled" = var.peer_authentication_enabled
+      }
+    }
+    peerTrafficConfiguration = {
+      "encryption" : {
+        "enabled" = var.peer_traffic_encryption_enabled
       }
     }
     vnetConfiguration = var.infrastructure_subnet_id != null ? {
@@ -67,13 +86,20 @@ locals {
   #     }
   #   } : {}
   # )
-  container_app_environment_sensitive_properties = {
-    appLogsConfiguration = {
-      logAnalyticsConfiguration = var.log_analytics_workspace_destination == "log-analytics" ? {
-        sharedKey = local.log_analytics_key
-      } : null
-    }
-  }
+  container_app_environment_sensitive_properties = merge(
+    {
+      appLogsConfiguration = {
+        logAnalyticsConfiguration = var.log_analytics_workspace_destination == "log-analytics" ? {
+          sharedKey = local.log_analytics_key
+        } : null
+      }
+    },
+    var.custom_domain_certificate_value != null ? {
+      customDomainConfiguration = {
+        certificateValue = var.custom_domain_certificate_value
+      }
+    } : {}
+  )
   dapr_component_resource_ids = {
     for dk, dv in module.dapr_component :
     dk => {
@@ -85,6 +111,12 @@ locals {
     length(ephemeral.azapi_resource_action.shared_keys) > 0 ?
     ephemeral.azapi_resource_action.shared_keys[0].output.primarySharedKey : var.log_analytics_workspace_primary_shared_key
   )
+  managed_certificate_resource_ids = {
+    for mck, mcv in module.managed_certificate :
+    mck => {
+      id = mcv.resource_id
+    }
+  }
   resource_group_id                  = "/subscriptions/${data.azapi_client_config.current.subscription_id}/resourceGroups/${var.resource_group_name}"
   role_definition_resource_substring = "/providers/Microsoft.Authorization/roleDefinitions"
   storage_resource_ids = {
