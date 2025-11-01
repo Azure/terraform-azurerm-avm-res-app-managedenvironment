@@ -203,10 +203,34 @@ variable "managed_identities" {
   nullable    = false
 }
 
+variable "parent_id" {
+  type        = string
+  default     = null
+  description = "The parent resource ID for this resource. When provided, takes precedence over resource_group_name."
+}
+
 variable "peer_authentication_enabled" {
   type        = bool
   default     = false
-  description = "Enable peer authentication (Mutual TLS)."
+  description = <<DESCRIPTION
+Enable mutual TLS (mTLS) authentication for peer-to-peer communication between Container Apps within the environment.
+
+When enabled, Container Apps within the environment will use mTLS to mutually authenticate each other. Azure Container Apps
+automatically manages the certificates required for this authentication.
+
+This is different from `peer_traffic_encryption_enabled`:
+- `peer_authentication_enabled` (this variable) - Enables mutual TLS authentication (both parties verify each other's identity)
+- `peer_traffic_encryption_enabled` - Enables traffic encryption only (encrypts the channel but doesn't enforce mutual authentication)
+
+**Note:** Applications within a Container Apps environment are automatically authenticated when peer-to-peer encryption is enabled.
+However, the Container Apps runtime doesn't support authorization for access control between applications using the built-in
+peer-to-peer encryption. For client-to-app mTLS (client certificate authentication), configure at the individual container app level.
+
+Defaults to `false`.
+
+See: https://learn.microsoft.com/en-us/azure/container-apps/ingress-environment-configuration?tabs=azure-cli#peer-to-peer-encryption
+DESCRIPTION
+  nullable    = false
 }
 
 variable "role_assignments" {

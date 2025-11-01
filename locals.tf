@@ -117,7 +117,11 @@ locals {
       id = mcv.resource_id
     }
   }
-  resource_group_id                  = "/subscriptions/${data.azapi_client_config.current.subscription_id}/resourceGroups/${var.resource_group_name}"
+  parent_id = var.parent_id != null ? var.parent_id : (
+    var.resource_group_name != null ?
+    "/subscriptions/${data.azapi_client_config.current.subscription_id}/resourceGroups/${var.resource_group_name}" :
+    null
+  )
   role_definition_resource_substring = "/providers/Microsoft.Authorization/roleDefinitions"
   storage_resource_ids = {
     for sk, sv in module.storage :

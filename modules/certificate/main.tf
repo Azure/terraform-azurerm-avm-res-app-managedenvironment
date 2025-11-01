@@ -6,7 +6,7 @@ resource "azapi_resource" "this" {
   body = {
     properties = local.certificate_properties
   }
-  schema_validation_enabled = false
+  schema_validation_enabled = true
   sensitive_body = {
     properties = local.certificate_sensitive_properties
   }

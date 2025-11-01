@@ -1,7 +1,7 @@
 resource "azapi_resource" "this_environment" {
   location  = var.location
   name      = var.name
-  parent_id = local.resource_group_id
+  parent_id = local.parent_id
   type      = "Microsoft.App/managedEnvironments@2025-01-01"
   body = {
     properties = local.container_app_environment_properties
@@ -20,9 +20,7 @@ resource "azapi_resource" "this_environment" {
     "properties.platformReservedDnsIP",
     "properties.staticIp",
   ]
-  # schema validation does not work with conditional on container_app_environment_sensitive_properties
-  # https://github.com/Azure/terraform-provider-azapi/issues/901
-  schema_validation_enabled = false
+  schema_validation_enabled = true
   sensitive_body = {
     properties = local.container_app_environment_sensitive_properties
   }

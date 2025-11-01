@@ -1,0 +1,12 @@
+This example is excluded from CI testing because it requires:
+1. A registered domain name with DNS management access
+2. Ability to create DNS records (CNAME, TXT, or host HTTP validation files)
+3. Time for DNS propagation and certificate authority validation (can take several minutes to hours)
+4. Azure-managed certificate provisioning and renewal
+
+These dependencies cannot be automatically provisioned in the CI environment and require:
+- Domain ownership verification
+- DNS configuration access
+- Certificate authority interaction and validation time
+
+This example should be manually validated when managed certificate-related changes are made to the module.
