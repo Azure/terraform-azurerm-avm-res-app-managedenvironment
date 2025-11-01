@@ -526,7 +526,7 @@ This is useful for creating fully private environments that are not accessible f
 - The environment must have virtual network integration configured (`infrastructure_subnet_id` must be set)
 - Private endpoints can be configured after disabling public access for secure connectivity
 
-**Note:** This feature requires API version 2024-10-02-preview or later.
+**Note:** This feature requires API version 2024-10-02-preview or later. This module uses API version 2025-02-02-preview.
 
 Defaults to `true` (public access enabled).
 
@@ -750,7 +750,7 @@ The following Modules are called:
 
 ### <a name="module_avm_interfaces"></a> [avm\_interfaces](#module\_avm\_interfaces)
 
-Source: Azure/avm-utl-interfaces/azurerm
+Source: Azure/avm-utl-interfaces/azure
 
 Version: ~> 0.4.0
 

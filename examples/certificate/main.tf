@@ -66,8 +66,8 @@ resource "azurerm_user_assigned_identity" "this" {
 # Grant the managed identity permission to read certificates from Key Vault
 resource "azurerm_role_assignment" "kv_secrets_user" {
   principal_id         = azurerm_user_assigned_identity.this.principal_id
-  role_definition_name = "Key Vault Secrets User"
   scope                = azurerm_key_vault.this.id
+  role_definition_name = "Key Vault Secrets User"
 }
 
 module "managedenvironment" {
@@ -76,51 +76,13 @@ module "managedenvironment" {
   location            = azurerm_resource_group.this.location
   name                = module.naming.container_app_environment.name_unique
   resource_group_name = azurerm_resource_group.this.name
-
   log_analytics_workspace = {
     resource_id = azurerm_log_analytics_workspace.this.id
   }
-
-  # zone redundancy must be disabled unless we supply a subnet for vnet integration.
-  zone_redundancy_enabled = false
-
   # Configure managed identity for Key Vault access
   managed_identities = {
     user_assigned_resource_ids = [azurerm_user_assigned_identity.this.id]
   }
-
-  # Example 1: Direct certificate upload
-  # Uncomment and provide valid certificate file and password
-  # certificates = {
-  #   "direct-upload-cert" = {
-  #     certificate_value    = filebase64("./path/to/certificate.pfx")
-  #     certificate_password = "YourCertificatePassword"
-  #   }
-  # }
-
-  # Example 2: Key Vault reference
-  # Uncomment and provide valid Key Vault secret ID
-  # certificates = {
-  #   "keyvault-ref-cert" = {
-  #     key_vault_secret_id = "${azurerm_key_vault.this.vault_uri}secrets/my-certificate/latest"
-  #   }
-  # }
-
-  # Example 3: Mixed approach - both direct and Key Vault
-  # certificates = {
-  #   "direct-cert" = {
-  #     certificate_value    = filebase64("./direct-cert.pfx")
-  #     certificate_password = "Password123"
-  #   }
-  #   "keyvault-cert" = {
-  #     key_vault_secret_id = "${azurerm_key_vault.this.vault_uri}secrets/kv-cert/latest"
-  #   }
-  # }
-
-  # Enable peer traffic encryption (requires certificates)
-  # peer_traffic_encryption_enabled = true
-
-  # Configure custom domain with Key Vault properties
-  # custom_domain_certificate_key_vault_id       = azurerm_key_vault.this.id
-  # custom_domain_certificate_identity_client_id = azurerm_user_assigned_identity.this.client_id
+  # zone redundancy must be disabled unless we supply a subnet for vnet integration.
+  zone_redundancy_enabled = false
 }

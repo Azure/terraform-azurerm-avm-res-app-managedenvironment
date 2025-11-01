@@ -2,7 +2,7 @@ resource "azapi_resource" "this_environment" {
   location  = var.location
   name      = var.name
   parent_id = local.parent_id
-  type      = "Microsoft.App/managedEnvironments@2025-01-01"
+  type      = "Microsoft.App/managedEnvironments@2025-02-02-preview"
   body = {
     properties = local.container_app_environment_properties
   }

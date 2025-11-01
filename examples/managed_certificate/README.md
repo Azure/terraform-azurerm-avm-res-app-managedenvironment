@@ -66,56 +66,11 @@ module "managedenvironment" {
   location            = azurerm_resource_group.this.location
   name                = module.naming.container_app_environment.name_unique
   resource_group_name = azurerm_resource_group.this.name
-
   log_analytics_workspace = {
     resource_id = azurerm_log_analytics_workspace.this.id
   }
-
   # zone redundancy must be disabled unless we supply a subnet for vnet integration.
   zone_redundancy_enabled = false
-
-  # Example: Managed certificates with different validation methods
-  # Uncomment and provide your actual domain name
-
-  # Example 1: CNAME validation (recommended)
-  # managed_certificates = {
-  #   "cname-validated" = {
-  #     subject_name = "app.yourdomain.com"
-  #     domain_control_validation = "CNAME"
-  #   }
-  # }
-
-  # Example 2: HTTP validation
-  # managed_certificates = {
-  #   "http-validated" = {
-  #     subject_name = "www.yourdomain.com"
-  #     domain_control_validation = "HTTP"
-  #   }
-  # }
-
-  # Example 3: TXT validation
-  # managed_certificates = {
-  #   "txt-validated" = {
-  #     subject_name = "api.yourdomain.com"
-  #     domain_control_validation = "TXT"
-  #   }
-  # }
-
-  # Example 4: Multiple domains with different validation methods
-  # managed_certificates = {
-  #   "domain1" = {
-  #     subject_name = "app1.yourdomain.com"
-  #     domain_control_validation = "CNAME"
-  #   }
-  #   "domain2" = {
-  #     subject_name = "app2.yourdomain.com"
-  #     domain_control_validation = "HTTP"
-  #   }
-  #   "domain3" = {
-  #     subject_name = "app3.yourdomain.com"
-  #     domain_control_validation = "TXT"
-  #   }
-  # }
 }
 ```
 

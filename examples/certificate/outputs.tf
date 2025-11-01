@@ -3,14 +3,14 @@ output "certificate_resource_ids" {
   value       = module.managedenvironment.certificate_resource_ids
 }
 
-output "managed_environment_id" {
-  description = "The resource ID of the Container Apps Managed Environment"
-  value       = module.managedenvironment.resource_id
-}
-
 output "key_vault_id" {
   description = "The resource ID of the Key Vault (for certificate storage)"
   value       = azurerm_key_vault.this.id
+}
+
+output "managed_environment_id" {
+  description = "The resource ID of the Container Apps Managed Environment"
+  value       = module.managedenvironment.resource_id
 }
 
 output "managed_identity_id" {
