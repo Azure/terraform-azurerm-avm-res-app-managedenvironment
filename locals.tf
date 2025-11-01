@@ -58,6 +58,7 @@ locals {
         "enabled" = var.peer_traffic_encryption_enabled
       }
     }
+    publicNetworkAccess = var.public_network_access_enabled ? "Enabled" : "Disabled"
     vnetConfiguration = var.infrastructure_subnet_id != null ? {
       "internal"               = var.internal_load_balancer_enabled
       "infrastructureSubnetId" = var.infrastructure_subnet_id
@@ -122,7 +123,6 @@ locals {
     "/subscriptions/${data.azapi_client_config.current.subscription_id}/resourceGroups/${var.resource_group_name}" :
     null
   )
-  role_definition_resource_substring = "/providers/Microsoft.Authorization/roleDefinitions"
   storage_resource_ids = {
     for sk, sv in module.storage :
     sk => {

@@ -49,4 +49,12 @@ variable "dapr_components" {
  - `update` - (Defaults to 30 minutes) Used when updating the Container App Environment Dapr Component.
 DESCRIPTION
   nullable    = false
+
+  validation {
+    condition = alltrue([
+      for name, _ in var.dapr_components :
+      can(regex("^[a-z][a-z0-9.-]{0,58}[a-z0-9]$", name)) && !can(regex("--", name))
+    ])
+    error_message = "Dapr component names must consist of lowercase alphanumeric characters, '-' or '.', start with an alphabetic character, end with an alphanumeric character, not contain '--', and be 60 characters or less."
+  }
 }

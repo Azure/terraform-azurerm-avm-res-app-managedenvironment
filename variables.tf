@@ -209,6 +209,30 @@ variable "parent_id" {
   description = "The parent resource ID for this resource. When provided, takes precedence over resource_group_name."
 }
 
+variable "public_network_access_enabled" {
+  type        = bool
+  default     = true
+  description = <<DESCRIPTION
+THIS IS A VARIABLE USED FOR A PREVIEW SERVICE/FEATURE, MICROSOFT MAY NOT PROVIDE SUPPORT FOR THIS, PLEASE CHECK THE PRODUCT DOCS FOR CLARIFICATION.
+
+Controls whether the Container Apps environment accepts traffic from public networks.
+
+When set to `false`, the environment can only be accessed through private endpoints or virtual network integration.
+This is useful for creating fully private environments that are not accessible from the internet.
+
+**Prerequisites for disabling public access:**
+- The environment must have virtual network integration configured (`infrastructure_subnet_id` must be set)
+- Private endpoints can be configured after disabling public access for secure connectivity
+
+**Note:** This feature requires API version 2024-10-02-preview or later.
+
+Defaults to `true` (public access enabled).
+
+See: https://learn.microsoft.com/en-us/azure/container-apps/networking#public-network-access
+DESCRIPTION
+  nullable    = false
+}
+
 variable "peer_authentication_enabled" {
   type        = bool
   default     = false

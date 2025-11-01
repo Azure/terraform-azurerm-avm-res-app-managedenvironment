@@ -20,8 +20,6 @@ The following requirements are needed by this module:
 
 - <a name="requirement_azapi"></a> [azapi](#requirement\_azapi) (~> 2.6)
 
-- <a name="requirement_azurerm"></a> [azurerm](#requirement\_azurerm) (~> 4.0)
-
 - <a name="requirement_modtm"></a> [modtm](#requirement\_modtm) (~> 0.3)
 
 - <a name="requirement_random"></a> [random](#requirement\_random) (~> 3.5)
@@ -30,10 +28,10 @@ The following requirements are needed by this module:
 
 The following resources are used by this module:
 
+- [azapi_resource.diagnostic_settings](https://registry.terraform.io/providers/Azure/azapi/latest/docs/resources/resource) (resource)
+- [azapi_resource.lock](https://registry.terraform.io/providers/Azure/azapi/latest/docs/resources/resource) (resource)
+- [azapi_resource.role_assignments](https://registry.terraform.io/providers/Azure/azapi/latest/docs/resources/resource) (resource)
 - [azapi_resource.this_environment](https://registry.terraform.io/providers/Azure/azapi/latest/docs/resources/resource) (resource)
-- [azurerm_management_lock.this](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/management_lock) (resource)
-- [azurerm_monitor_diagnostic_setting.this](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/monitor_diagnostic_setting) (resource)
-- [azurerm_role_assignment.this](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/role_assignment) (resource)
 - [modtm_telemetry.telemetry](https://registry.terraform.io/providers/Azure/modtm/latest/docs/resources/telemetry) (resource)
 - [random_uuid.telemetry](https://registry.terraform.io/providers/hashicorp/random/latest/docs/resources/uuid) (resource)
 - [azapi_client_config.current](https://registry.terraform.io/providers/Azure/azapi/latest/docs/data-sources/client_config) (data source)
@@ -464,9 +462,32 @@ object({
 
 Default: `{}`
 
+### <a name="input_parent_id"></a> [parent\_id](#input\_parent\_id)
+
+Description: The parent resource ID for this resource. When provided, takes precedence over resource\_group\_name.
+
+Type: `string`
+
+Default: `null`
+
 ### <a name="input_peer_authentication_enabled"></a> [peer\_authentication\_enabled](#input\_peer\_authentication\_enabled)
 
-Description: Enable peer authentication (Mutual TLS).
+Description: Enable mutual TLS (mTLS) authentication for peer-to-peer communication between Container Apps within the environment.
+
+When enabled, Container Apps within the environment will use mTLS to mutually authenticate each other. Azure Container Apps  
+automatically manages the certificates required for this authentication.
+
+This is different from `peer_traffic_encryption_enabled`:
+- `peer_authentication_enabled` (this variable) - Enables mutual TLS authentication (both parties verify each other's identity)
+- `peer_traffic_encryption_enabled` - Enables traffic encryption only (encrypts the channel but doesn't enforce mutual authentication)
+
+**Note:** Applications within a Container Apps environment are automatically authenticated when peer-to-peer encryption is enabled.  
+However, the Container Apps runtime doesn't support authorization for access control between applications using the built-in  
+peer-to-peer encryption. For client-to-app mTLS (client certificate authentication), configure at the individual container app level.
+
+Defaults to `false`.
+
+See: https://learn.microsoft.com/en-us/azure/container-apps/ingress-environment-configuration?tabs=azure-cli#peer-to-peer-encryption
 
 Type: `bool`
 
@@ -491,6 +512,29 @@ Defaults to `false`.
 Type: `bool`
 
 Default: `false`
+
+### <a name="input_public_network_access_enabled"></a> [public\_network\_access\_enabled](#input\_public\_network\_access\_enabled)
+
+Description: THIS IS A VARIABLE USED FOR A PREVIEW SERVICE/FEATURE, MICROSOFT MAY NOT PROVIDE SUPPORT FOR THIS, PLEASE CHECK THE PRODUCT DOCS FOR CLARIFICATION.
+
+Controls whether the Container Apps environment accepts traffic from public networks.
+
+When set to `false`, the environment can only be accessed through private endpoints or virtual network integration.  
+This is useful for creating fully private environments that are not accessible from the internet.
+
+**Prerequisites for disabling public access:**
+- The environment must have virtual network integration configured (`infrastructure_subnet_id` must be set)
+- Private endpoints can be configured after disabling public access for secure connectivity
+
+**Note:** This feature requires API version 2024-10-02-preview or later.
+
+Defaults to `true` (public access enabled).
+
+See: https://learn.microsoft.com/en-us/azure/container-apps/networking#public-network-access
+
+Type: `bool`
+
+Default: `true`
 
 ### <a name="input_role_assignments"></a> [role\_assignments](#input\_role\_assignments)
 
@@ -703,6 +747,12 @@ Description: A map of storage shares connected to this environment. The map key 
 ## Modules
 
 The following Modules are called:
+
+### <a name="module_avm_interfaces"></a> [avm\_interfaces](#module\_avm\_interfaces)
+
+Source: Azure/avm-utl-interfaces/azurerm
+
+Version: ~> 0.4.0
 
 ### <a name="module_certificate"></a> [certificate](#module\_certificate)
 
