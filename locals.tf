@@ -28,6 +28,7 @@ locals {
       id = cv.resource_id
     }
   }
+  role_definition_resource_substring = "/providers/Microsoft.Authorization/roleDefinitions"
   container_app_environment_properties = merge({
     appLogsConfiguration = {
       "destination" = var.log_analytics_workspace_destination == "none" ? "" : var.log_analytics_workspace_destination
