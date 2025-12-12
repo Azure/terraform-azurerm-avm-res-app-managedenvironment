@@ -18,7 +18,7 @@ The following requirements are needed by this module:
 
 - <a name="requirement_terraform"></a> [terraform](#requirement\_terraform) (>= 1.10, < 2.0)
 
-- <a name="requirement_azapi"></a> [azapi](#requirement\_azapi) (~> 2.4)
+- <a name="requirement_azapi"></a> [azapi](#requirement\_azapi) (~> 2.6)
 
 - <a name="requirement_azurerm"></a> [azurerm](#requirement\_azurerm) (~> 4.0)
 
@@ -68,9 +68,121 @@ Type: `string`
 
 The following input variables are optional (have default values):
 
+### <a name="input_certificates"></a> [certificates](#input\_certificates)
+
+Description: A map of certificates to create on the Container Apps Managed Environment. The map key is deliberately arbitrary to avoid issues where map keys maybe unknown at plan time.
+
+Each certificate can be configured in one of two ways:
+
+**Direct Certificate Upload:**
+- `certificate_password` - (Optional) The password for the certificate (WriteOnly). Required when using direct certificate upload.
+- `certificate_value` - (Optional) The PFX or PEM blob for the certificate (WriteOnly). Required when using direct certificate upload.
+
+**Key Vault Reference:**
+- `key_vault_url` - (Optional) URL pointing to the Azure Key Vault secret that holds the certificate. Required when using Key Vault reference.
+- `key_vault_identity` - (Optional) Resource ID of a managed identity to authenticate with Azure Key Vault, or 'System' to use a system-assigned identity. Required when using Key Vault reference.
+
+---
+`timeouts` block supports the following:
+- `create` - (Defaults to 30 minutes) Used when creating the certificate.
+- `delete` - (Defaults to 30 minutes) Used when deleting the certificate.
+- `read` - (Defaults to 5 minutes) Used when retrieving the certificate.
+- `update` - (Defaults to 30 minutes) Used when updating the certificate.
+
+Examples:
+
+Direct certificate upload:
+```
+certificates = {
+  "my-cert" = {
+    certificate_password = "password123"
+    certificate_value    = file("./cert.pfx")
+  }
+}
+```
+
+Key Vault reference with system-assigned identity:
+```
+certificates = {
+  "my-kv-cert" = {
+    key_vault_url      = "https://myvault.vault.azure.net/secrets/mycert"
+    key_vault_identity = "System"
+  }
+}
+```
+
+Key Vault reference with user-assigned identity:
+```
+certificates = {
+  "my-kv-cert" = {
+    key_vault_url      = "https://myvault.vault.azure.net/secrets/mycert"
+    key_vault_identity = "/subscriptions/00000000-0000-0000-0000-000000000000/resourceGroups/rg/providers/Microsoft.ManagedIdentity/userAssignedIdentities/myidentity"
+  }
+}
+```
+
+Type:
+
+```hcl
+map(object({
+    # Direct certificate upload
+    certificate_password = optional(string)
+    certificate_value    = optional(string)
+
+    # Key Vault reference
+    key_vault_url      = optional(string)
+    key_vault_identity = optional(string) # or "System"
+
+    timeouts = optional(object({
+      create = optional(string)
+      delete = optional(string)
+      read   = optional(string)
+      update = optional(string)
+    }))
+  }))
+```
+
+Default: `{}`
+
+### <a name="input_custom_domain_certificate_key_vault_identity"></a> [custom\_domain\_certificate\_key\_vault\_identity](#input\_custom\_domain\_certificate\_key\_vault\_identity)
+
+Description: Resource ID of a managed identity to authenticate with Azure Key Vault for the custom domain certificate, or 'System' to use a system-assigned identity.
+
+This is used when configuring a custom domain for the entire environment (not individual certificates).
+
+Must be used in conjunction with `custom_domain_certificate_key_vault_url`.
+
+Type: `string`
+
+Default: `null`
+
+### <a name="input_custom_domain_certificate_key_vault_url"></a> [custom\_domain\_certificate\_key\_vault\_url](#input\_custom\_domain\_certificate\_key\_vault\_url)
+
+Description: URL pointing to the Azure Key Vault secret that holds the certificate for the custom domain.
+
+This is used when configuring a custom domain for the entire environment (not individual certificates).
+
+Must be used in conjunction with `custom_domain_certificate_key_vault_identity`.
+
+Type: `string`
+
+Default: `null`
+
 ### <a name="input_custom_domain_certificate_password"></a> [custom\_domain\_certificate\_password](#input\_custom\_domain\_certificate\_password)
 
 Description: Certificate password for custom domain.
+
+Type: `string`
+
+Default: `null`
+
+### <a name="input_custom_domain_certificate_value"></a> [custom\_domain\_certificate\_value](#input\_custom\_domain\_certificate\_value)
+
+Description: PFX or PEM blob for the custom domain certificate (WriteOnly).
+
+This is an alternative to using `custom_domain_certificate_key_vault_url` for direct certificate upload.
+
+If using Key Vault reference, leave this as null and use `custom_domain_certificate_key_vault_url` instead.
 
 Type: `string`
 
@@ -290,6 +402,50 @@ Type: `string`
 
 Default: `null`
 
+### <a name="input_managed_certificates"></a> [managed\_certificates](#input\_managed\_certificates)
+
+Description: A map of managed certificates to create on the Container Apps Managed Environment. The map key is deliberately arbitrary to avoid issues where map keys maybe unknown at plan time.
+
+Managed certificates are auto-provisioned and auto-renewed by Azure.
+
+- `subject_name` - (Required) The subject name (domain name) for the certificate.
+- `domain_control_validation` - (Optional) The domain control validation method. Possible values: 'CNAME', 'HTTP', 'TXT'. Defaults to 'HTTP'.
+
+---
+`timeouts` block supports the following:
+- `create` - (Defaults to 30 minutes) Used when creating the managed certificate.
+- `delete` - (Defaults to 30 minutes) Used when deleting the managed certificate.
+- `read` - (Defaults to 5 minutes) Used when retrieving the managed certificate.
+- `update` - (Defaults to 30 minutes) Used when updating the managed certificate.
+
+Example:
+```
+managed_certificates = {
+  "my-domain-cert" = {
+    subject_name              = "example.com"
+    domain_control_validation = "HTTP"
+  }
+}
+```
+
+Type:
+
+```hcl
+map(object({
+    subject_name              = string
+    domain_control_validation = optional(string, "HTTP")
+
+    timeouts = optional(object({
+      create = optional(string)
+      delete = optional(string)
+      read   = optional(string)
+      update = optional(string)
+    }))
+  }))
+```
+
+Default: `{}`
+
 ### <a name="input_managed_identities"></a> [managed\_identities](#input\_managed\_identities)
 
 Description:   Controls the Managed Identity configuration on this resource. The following properties can be specified:
@@ -308,13 +464,79 @@ object({
 
 Default: `{}`
 
+### <a name="input_parent_id"></a> [parent\_id](#input\_parent\_id)
+
+Description: The parent resource ID for this resource. When provided, takes precedence over resource\_group\_name.
+
+Type: `string`
+
+Default: `null`
+
 ### <a name="input_peer_authentication_enabled"></a> [peer\_authentication\_enabled](#input\_peer\_authentication\_enabled)
 
-Description: Enable peer authentication (Mutual TLS).
+Description: Enable mutual TLS (mTLS) authentication for peer-to-peer communication between Container Apps within the environment.
+
+When enabled, Container Apps within the environment will use mTLS to mutually authenticate each other. Azure Container Apps  
+automatically manages the certificates required for this authentication.
+
+This is different from `peer_traffic_encryption_enabled`:
+- `peer_authentication_enabled` (this variable) - Enables mutual TLS authentication (both parties verify each other's identity)
+- `peer_traffic_encryption_enabled` - Enables traffic encryption only (encrypts the channel but doesn't enforce mutual authentication)
+
+**Note:** Applications within a Container Apps environment are automatically authenticated when peer-to-peer encryption is enabled.  
+However, the Container Apps runtime doesn't support authorization for access control between applications using the built-in  
+peer-to-peer encryption. For client-to-app mTLS (client certificate authentication), configure at the individual container app level.
+
+Defaults to `false`.
+
+See: https://learn.microsoft.com/en-us/azure/container-apps/ingress-environment-configuration?tabs=azure-cli#peer-to-peer-encryption
 
 Type: `bool`
 
 Default: `false`
+
+### <a name="input_peer_traffic_encryption_enabled"></a> [peer\_traffic\_encryption\_enabled](#input\_peer\_traffic\_encryption\_enabled)
+
+Description: Enable peer-to-peer traffic encryption within the Container Apps environment.
+
+When enabled, all network traffic between apps within the environment is encrypted using private certificates managed by Azure.
+
+This is different from `peer_authentication_enabled` (mTLS):
+- `peer_authentication_enabled` - Enables mutual TLS authentication (who you are)
+- `peer_traffic_encryption_enabled` - Enables traffic encryption (secure channel)
+
+Both can be enabled independently or together.
+
+**Note:** Enabling peer-to-peer encryption may increase response latency and reduce maximum throughput in high-load scenarios.
+
+Defaults to `false`.
+
+Type: `bool`
+
+Default: `false`
+
+### <a name="input_public_network_access_enabled"></a> [public\_network\_access\_enabled](#input\_public\_network\_access\_enabled)
+
+Description: THIS IS A VARIABLE USED FOR A PREVIEW SERVICE/FEATURE, MICROSOFT MAY NOT PROVIDE SUPPORT FOR THIS, PLEASE CHECK THE PRODUCT DOCS FOR CLARIFICATION.
+
+Controls whether the Container Apps environment accepts traffic from public networks.
+
+When set to `false`, the environment can only be accessed through private endpoints or virtual network integration.  
+This is useful for creating fully private environments that are not accessible from the internet.
+
+**Prerequisites for disabling public access:**
+- The environment must have virtual network integration configured (`infrastructure_subnet_id` must be set)
+- Private endpoints can be configured after disabling public access for secure connectivity
+
+**Note:** This feature requires API version 2024-10-02-preview or later. This module uses API version 2025-02-02-preview.
+
+Defaults to `true` (public access enabled).
+
+See: https://learn.microsoft.com/en-us/azure/container-apps/networking#public-network-access
+
+Type: `bool`
+
+Default: `true`
 
 ### <a name="input_role_assignments"></a> [role\_assignments](#input\_role\_assignments)
 
@@ -464,6 +686,10 @@ Default: `true`
 
 The following outputs are exported:
 
+### <a name="output_certificate_resource_ids"></a> [certificate\_resource\_ids](#output\_certificate\_resource\_ids)
+
+Description: A map of certificates connected to this environment. The map key is the supplied input to var.certificates. The map value is the azurerm-formatted version of the entire certificate resource.
+
 ### <a name="output_custom_domain_verification_id"></a> [custom\_domain\_verification\_id](#output\_custom\_domain\_verification\_id)
 
 Description: The custom domain verification ID of the Container Apps Managed Environment.
@@ -487,6 +713,10 @@ Description: The ID of the container app management environment resource.
 ### <a name="output_infrastructure_resource_group"></a> [infrastructure\_resource\_group](#output\_infrastructure\_resource\_group)
 
 Description: The infrastructure resource group of the Container Apps Managed Environment.
+
+### <a name="output_managed_certificate_resource_ids"></a> [managed\_certificate\_resource\_ids](#output\_managed\_certificate\_resource\_ids)
+
+Description: A map of managed certificates connected to this environment. The map key is the supplied input to var.managed\_certificates. The map value is the azurerm-formatted version of the entire managed certificate resource.
 
 ### <a name="output_managed_identities"></a> [managed\_identities](#output\_managed\_identities)
 
@@ -520,9 +750,21 @@ Description: A map of storage shares connected to this environment. The map key 
 
 The following Modules are called:
 
+### <a name="module_certificate"></a> [certificate](#module\_certificate)
+
+Source: ./modules/certificate
+
+Version:
+
 ### <a name="module_dapr_component"></a> [dapr\_component](#module\_dapr\_component)
 
 Source: ./modules/dapr_component
+
+Version:
+
+### <a name="module_managed_certificate"></a> [managed\_certificate](#module\_managed\_certificate)
+
+Source: ./modules/managed_certificate
 
 Version:
 

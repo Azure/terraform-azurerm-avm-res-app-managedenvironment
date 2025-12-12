@@ -203,10 +203,58 @@ variable "managed_identities" {
   nullable    = false
 }
 
+variable "parent_id" {
+  type        = string
+  default     = null
+  description = "The parent resource ID for this resource. When provided, takes precedence over resource_group_name."
+}
+
 variable "peer_authentication_enabled" {
   type        = bool
   default     = false
-  description = "Enable peer authentication (Mutual TLS)."
+  description = <<DESCRIPTION
+Enable mutual TLS (mTLS) authentication for peer-to-peer communication between Container Apps within the environment.
+
+When enabled, Container Apps within the environment will use mTLS to mutually authenticate each other. Azure Container Apps
+automatically manages the certificates required for this authentication.
+
+This is different from `peer_traffic_encryption_enabled`:
+- `peer_authentication_enabled` (this variable) - Enables mutual TLS authentication (both parties verify each other's identity)
+- `peer_traffic_encryption_enabled` - Enables traffic encryption only (encrypts the channel but doesn't enforce mutual authentication)
+
+**Note:** Applications within a Container Apps environment are automatically authenticated when peer-to-peer encryption is enabled.
+However, the Container Apps runtime doesn't support authorization for access control between applications using the built-in
+peer-to-peer encryption. For client-to-app mTLS (client certificate authentication), configure at the individual container app level.
+
+Defaults to `false`.
+
+See: https://learn.microsoft.com/en-us/azure/container-apps/ingress-environment-configuration?tabs=azure-cli#peer-to-peer-encryption
+DESCRIPTION
+  nullable    = false
+}
+
+variable "public_network_access_enabled" {
+  type        = bool
+  default     = true
+  description = <<DESCRIPTION
+THIS IS A VARIABLE USED FOR A PREVIEW SERVICE/FEATURE, MICROSOFT MAY NOT PROVIDE SUPPORT FOR THIS, PLEASE CHECK THE PRODUCT DOCS FOR CLARIFICATION.
+
+Controls whether the Container Apps environment accepts traffic from public networks.
+
+When set to `false`, the environment can only be accessed through private endpoints or virtual network integration.
+This is useful for creating fully private environments that are not accessible from the internet.
+
+**Prerequisites for disabling public access:**
+- The environment must have virtual network integration configured (`infrastructure_subnet_id` must be set)
+- Private endpoints can be configured after disabling public access for secure connectivity
+
+**Note:** This feature requires API version 2024-10-02-preview or later. This module uses API version 2025-02-02-preview.
+
+Defaults to `true` (public access enabled).
+
+See: https://learn.microsoft.com/en-us/azure/container-apps/networking#public-network-access
+DESCRIPTION
+  nullable    = false
 }
 
 variable "role_assignments" {

@@ -29,6 +29,7 @@ resource "azapi_resource" "this" {
       ] : null
     }
   }
+  schema_validation_enabled = true
 
   dynamic "timeouts" {
     for_each = var.timeouts == null ? [] : [var.timeouts]

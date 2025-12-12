@@ -1,0 +1,8 @@
+This example is excluded from CI testing because it requires:
+1. A valid TLS/SSL certificate (PFX or PEM format) with a private key
+2. An Azure Key Vault with appropriate access policies
+3. Either pre-provisioned certificate data or Key Vault secret references
+
+These dependencies cannot be automatically provisioned in the CI environment and require manual setup, domain ownership verification, and certificate authority interaction.
+
+This example should be manually validated when certificate-related changes are made to the module.
