@@ -250,6 +250,9 @@ This is useful for creating fully private environments that are not accessible f
 
 **Note:** This feature requires API version 2024-10-02-preview or later. This module uses API version 2025-02-02-preview.
 
+**Important:** If `internal_load_balancer_enabled` is `true`, Azure does not allow public network access to be `Enabled`.
+In that case this module will force `publicNetworkAccess` to `Disabled`.
+
 Defaults to `true` (public access enabled).
 
 See: https://learn.microsoft.com/en-us/azure/container-apps/networking#public-network-access
