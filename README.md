@@ -753,12 +753,6 @@ Description: A map of storage shares connected to this environment. The map key 
 
 The following Modules are called:
 
-### <a name="module_avm_interfaces"></a> [avm\_interfaces](#module\_avm\_interfaces)
-
-Source: git::https://github.com/kewalaka/terraform-azure-avm-utl-interfaces-1.git
-
-Version: fix/role_assignment
-
 ### <a name="module_certificate"></a> [certificate](#module\_certificate)
 
 Source: ./modules/certificate
