@@ -58,7 +58,9 @@ locals {
         "enabled" = var.peer_traffic_encryption_enabled
       }
     }
-    publicNetworkAccess = var.public_network_access_enabled ? "Enabled" : "Disabled"
+    # Azure rejects publicNetworkAccess=Enabled when the environment is internal-only.
+    # When internal load balancer mode is enabled, force public network access to Disabled.
+    publicNetworkAccess = var.internal_load_balancer_enabled ? "Disabled" : (var.public_network_access_enabled ? "Enabled" : "Disabled")
     vnetConfiguration = var.infrastructure_subnet_id != null ? {
       "internal"               = var.internal_load_balancer_enabled
       "infrastructureSubnetId" = var.infrastructure_subnet_id
