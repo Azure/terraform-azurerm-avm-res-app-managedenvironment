@@ -1,3 +1,8 @@
+output "certificate_resource_ids" {
+  description = "A map of certificates connected to this environment. The map key is the supplied input to var.certificates. The map value is the azurerm-formatted version of the entire certificate resource."
+  value       = local.certificate_resource_ids
+}
+
 output "custom_domain_verification_id" {
   description = "The custom domain verification ID of the Container Apps Managed Environment."
   sensitive   = true
@@ -27,6 +32,11 @@ output "id" {
 output "infrastructure_resource_group" {
   description = "The infrastructure resource group of the Container Apps Managed Environment."
   value       = try(azapi_resource.this_environment.output.properties.infrastructureResourceGroup, null)
+}
+
+output "managed_certificate_resource_ids" {
+  description = "A map of managed certificates connected to this environment. The map key is the supplied input to var.managed_certificates. The map value is the azurerm-formatted version of the entire managed certificate resource."
+  value       = local.managed_certificate_resource_ids
 }
 
 output "managed_identities" {
