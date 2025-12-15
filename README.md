@@ -679,7 +679,7 @@ Default: `[]`
 
 ### <a name="input_zone_redundancy_enabled"></a> [zone\_redundancy\_enabled](#input\_zone\_redundancy\_enabled)
 
-Description: (Optional) Should the Container App Environment be created with Zone Redundancy enabled? Defaults to `false`. Changing this forces a new resource to be created.
+Description: (Optional) Should the Container App Environment be created with Zone Redundancy enabled? Defaults to `true`. Changing this forces a new resource to be created.
 
 Type: `bool`
 

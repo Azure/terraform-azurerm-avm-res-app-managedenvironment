@@ -395,5 +395,5 @@ DESCRIPTION
 variable "zone_redundancy_enabled" {
   type        = bool
   default     = true
-  description = "(Optional) Should the Container App Environment be created with Zone Redundancy enabled? Defaults to `false`. Changing this forces a new resource to be created."
+  description = "(Optional) Should the Container App Environment be created with Zone Redundancy enabled? Defaults to `true`. Changing this forces a new resource to be created."
 }
