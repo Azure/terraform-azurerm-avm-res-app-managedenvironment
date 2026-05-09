@@ -75,6 +75,13 @@ module "managedenvironment" {
   log_analytics_workspace = { resource_id = azurerm_log_analytics_workspace.this.id }
   vnet_configuration = {
     infrastructure_subnet_id = azurerm_subnet.this.id
+    internal                 = false
   }
+  workload_profiles = [
+    {
+      name                  = "Consumption"
+      workload_profile_type = "Consumption"
+    }
+  ]
   zone_redundant = true
 }

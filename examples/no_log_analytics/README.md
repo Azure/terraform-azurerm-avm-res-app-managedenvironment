@@ -94,6 +94,10 @@ No optional inputs.
 
 The following outputs are exported:
 
+### <a name="output_id"></a> [id](#output\_id)
+
+Description: DEPRECATED: Use 'resource\_id' instead. The resource ID of the Container Apps Managed Environment.
+
 ### <a name="output_name"></a> [name](#output\_name)
 
 Description: The name of the Container Apps Managed Environment.

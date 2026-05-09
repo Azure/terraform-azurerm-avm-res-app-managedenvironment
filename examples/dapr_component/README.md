@@ -59,15 +59,15 @@ resource "azurerm_application_insights" "this" {
 module "managedenvironment" {
   source = "../../"
 
-  location                  = azurerm_resource_group.this.location
-  name                      = module.naming.container_app_environment.name_unique
-  resource_group_name       = azurerm_resource_group.this.name
-  dapr_ai_connection_string = azurerm_application_insights.this.connection_string
+  location                          = azurerm_resource_group.this.location
+  name                              = module.naming.container_app_environment.name_unique
+  resource_group_name               = azurerm_resource_group.this.name
+  dapr_ai_connection_string         = azurerm_application_insights.this.connection_string
+  dapr_ai_connection_string_version = 1
   dapr_components = {
     "my-dapr-component" = {
       component_type          = "state.azure.blobstorage"
       dapr_components_version = "v1"
-      location                = azurerm_resource_group.this.location
       name                    = "my-dapr-component"
     }
   }

@@ -1,3 +1,8 @@
+output "id" {
+  description = "DEPRECATED: Use 'resource_id' instead. The resource ID of the Container Apps Managed Environment."
+  value       = module.managedenvironment.id
+}
+
 output "dapr_component_resource_ids" {
   description = "A map of dapr component resource IDs."
   value       = module.managedenvironment.dapr_component_resource_ids
