@@ -85,6 +85,12 @@ module "managedenvironment" {
     infrastructure_subnet_id = azurerm_subnet.this.id
     internal                 = true
   }
+  workload_profiles = [
+    {
+      name                  = "Consumption"
+      workload_profile_type = "Consumption"
+    }
+  ]
   zone_redundant = true
 }
 ```
