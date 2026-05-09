@@ -1,8 +1,3 @@
-output "id" {
-  description = "DEPRECATED: Use 'resource_id' instead. The resource ID of the Container Apps Managed Environment."
-  value       = module.managedenvironment.id
-}
-
 output "dapr_component_resource_ids" {
   description = "A map of dapr component resource IDs."
   value       = module.managedenvironment.dapr_component_resource_ids
@@ -16,6 +11,11 @@ output "default_domain" {
 output "docker_bridge_cidr" {
   description = "The Docker bridge CIDR of the Container Apps Managed Environment."
   value       = module.managedenvironment.docker_bridge_cidr
+}
+
+output "id" {
+  description = "DEPRECATED: Use 'resource_id' instead. The resource ID of the Container Apps Managed Environment."
+  value       = module.managedenvironment.id
 }
 
 output "infrastructure_resource_group" {

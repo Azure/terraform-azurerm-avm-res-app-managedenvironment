@@ -678,6 +678,40 @@ variable "workload_profile" {
   }))
   default     = null
   description = "DEPRECATED: Renamed to `workload_profiles` (list). Will be removed in a future major release."
+
+  validation {
+    condition     = var.workload_profile == null ? true : can([for wp in var.workload_profile : regex("^[a-zA-Z][a-zA-Z0-9_-]{0,13}[a-zA-Z0-9]$", wp.name)])
+    error_message = "Invalid value for workload profile name. It must start with a letter, contain only letters, numbers, underscores, or dashes, and not end with an underscore or dash. Maximum 15 characters."
+  }
+  validation {
+    condition = var.workload_profile == null ? true : alltrue([
+      for wp in var.workload_profile : contains([
+        "Consumption",
+        "Flexible",
+        "D4",
+        "D8",
+        "D16",
+        "D32",
+        "E4",
+        "E8",
+        "E16",
+        "E32",
+        "DC4",
+        "DC8",
+        "DC16",
+        "DC32",
+        "DC48",
+        "DC64",
+        "DC96",
+        "NC24-A100",
+        "NC48-A100",
+        "NC96-A100",
+        "Consumption-GPU-NC24-A100",
+        "Consumption-GPU-NC8as-T4",
+      ], wp.workload_profile_type)
+    ])
+    error_message = "Invalid value for workload_profile_type. Valid options are 'Consumption', 'Flexible', 'D4', 'D8', 'D16', 'D32', 'E4', 'E8', 'E16', 'E32', 'DC4', 'DC8', 'DC16', 'DC32', 'DC48', 'DC64', 'DC96', 'NC24-A100', 'NC48-A100', 'NC96-A100', 'Consumption-GPU-NC24-A100', and 'Consumption-GPU-NC8as-T4'."
+  }
 }
 
 variable "workload_profiles" {
@@ -709,12 +743,12 @@ Examples:
 DESCRIPTION
 
   validation {
-    condition     = var.workload_profiles == null ? true : can([for wp in var.workload_profiles : regex("^[a-zA-Z][a-zA-Z0-9_-]{0,14}[a-zA-Z0-9]$", wp.name)])
+    condition     = var.workload_profiles == null ? true : can([for wp in var.workload_profiles : regex("^[a-zA-Z][a-zA-Z0-9_-]{0,13}[a-zA-Z0-9]$", wp.name)])
     error_message = "Invalid value for workload profile name. It must start with a letter, contain only letters, numbers, underscores, or dashes, and not end with an underscore or dash. Maximum 15 characters."
   }
   validation {
-    condition = var.workload_profile == null ? true : alltrue([
-      for wp in var.workload_profile : contains([
+    condition = var.workload_profiles == null ? true : alltrue([
+      for wp in var.workload_profiles : contains([
         "Consumption",
         "Flexible",
         "D4",
