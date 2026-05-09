@@ -96,6 +96,7 @@ module "managedenvironment" {
     "my-dapr-component" = {
       component_type          = "state.azure.blobstorage"
       dapr_components_version = "v1"
+      ignore_errors           = true
       location                = azurerm_resource_group.this.location
       name                    = "my-dapr-component"
     }
@@ -123,5 +124,11 @@ module "managedenvironment" {
     infrastructure_subnet_id = azurerm_subnet.this.id
     internal                 = true
   }
+  workload_profiles = [
+    {
+      name                  = "Consumption"
+      workload_profile_type = "Consumption"
+    }
+  ]
   zone_redundant = true
 }
