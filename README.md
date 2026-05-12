@@ -296,8 +296,8 @@ Default: `{}`
 
 ### <a name="input_enable_telemetry"></a> [enable\_telemetry](#input\_enable\_telemetry)
 
-Description: This variable controls whether or not telemetry is enabled for the module.  
-For more information see <https://aka.ms/avm/telemetryinfo>.  
+Description: This variable controls whether or not telemetry is enabled for the module.
+For more information see <https://aka.ms/avm/telemetryinfo>.
 If it is set to false, then no telemetry will be collected.
 
 Type: `bool`
@@ -306,8 +306,8 @@ Default: `true`
 
 ### <a name="input_infrastructure_resource_group_name"></a> [infrastructure\_resource\_group\_name](#input\_infrastructure\_resource\_group\_name)
 
-Description: Name of the platform-managed resource group created for the Managed Environment to host infrastructure resources.  
-If a subnet ID is provided, this resource group will be created in the same subscription as the subnet.  
+Description: Name of the platform-managed resource group created for the Managed Environment to host infrastructure resources.
+If a subnet ID is provided, this resource group will be created in the same subscription as the subnet.
 If not specified, then one will be generated automatically, in the form `ME_<app_managed_environment_name>_<resource_group>_<location>`.
 
 Type: `string`
@@ -352,10 +352,10 @@ Default: `null`
 
 Description:   The resource ID of the Log Analytics Workspace to link this Container Apps Managed Environment to.
 
-  This is the suggested mechanism to link a Log Analytics Workspace to a Container Apps Managed Environment, as it  
+  This is the suggested mechanism to link a Log Analytics Workspace to a Container Apps Managed Environment, as it
   avoids having to pass the primary shared key directly.
 
-  This requires at least `Microsoft.OperationalInsights/workspaces/sharedkeys/read` over the Log Analytics Workspace resource,  
+  This requires at least `Microsoft.OperationalInsights/workspaces/sharedkeys/read` over the Log Analytics Workspace resource,
   as the key is fetched by the module (i.e. this mirrors the behaviour of the AzureRM provider).
 
   An alternative mechanism is to supply `log_analytics_workspace_primary_shared_key` directly.
@@ -372,7 +372,7 @@ Default: `null`
 
 ### <a name="input_log_analytics_workspace_customer_id"></a> [log\_analytics\_workspace\_customer\_id](#input\_log\_analytics\_workspace\_customer\_id)
 
-Description:   The Customer ID for the Log Analytics Workspace to link this Container Apps Managed Environment to.  
+Description:   The Customer ID for the Log Analytics Workspace to link this Container Apps Managed Environment to.
   If specifying this, you must also specify `log_analytics_workspace_primary_shared_key`.
 
   This scenario is useful where you do not have permissions to directly look up the shared key.
@@ -395,7 +395,7 @@ Default: `"log-analytics"`
 
 Description:   Optional direct mechanism to supply the primary shared key for Log Analytics.
 
-  The alternative method is to use the `log_analytics_workspace.resource_id`, and the module will make a POST request to  
+  The alternative method is to use the `log_analytics_workspace.resource_id`, and the module will make a POST request to
   fetch the key, in which case this variable can be left as `null`.
 
 Type: `string`
@@ -476,15 +476,15 @@ Default: `null`
 
 Description: Enable mutual TLS (mTLS) authentication for peer-to-peer communication between Container Apps within the environment.
 
-When enabled, Container Apps within the environment will use mTLS to mutually authenticate each other. Azure Container Apps  
+When enabled, Container Apps within the environment will use mTLS to mutually authenticate each other. Azure Container Apps
 automatically manages the certificates required for this authentication.
 
 This is different from `peer_traffic_encryption_enabled`:
 - `peer_authentication_enabled` (this variable) - Enables mutual TLS authentication (both parties verify each other's identity)
 - `peer_traffic_encryption_enabled` - Enables traffic encryption only (encrypts the channel but doesn't enforce mutual authentication)
 
-**Note:** Applications within a Container Apps environment are automatically authenticated when peer-to-peer encryption is enabled.  
-However, the Container Apps runtime doesn't support authorization for access control between applications using the built-in  
+**Note:** Applications within a Container Apps environment are automatically authenticated when peer-to-peer encryption is enabled.
+However, the Container Apps runtime doesn't support authorization for access control between applications using the built-in
 peer-to-peer encryption. For client-to-app mTLS (client certificate authentication), configure at the individual container app level.
 
 Defaults to `false`.
@@ -521,7 +521,7 @@ Description: THIS IS A VARIABLE USED FOR A PREVIEW SERVICE/FEATURE, MICROSOFT MA
 
 Controls whether the Container Apps environment accepts traffic from public networks.
 
-When set to `false`, the environment can only be accessed through private endpoints or virtual network integration.  
+When set to `false`, the environment can only be accessed through private endpoints or virtual network integration.
 This is useful for creating fully private environments that are not accessible from the internet.
 
 **Prerequisites for disabling public access:**
@@ -530,7 +530,7 @@ This is useful for creating fully private environments that are not accessible f
 
 **Note:** This feature requires API version 2024-10-02-preview or later. This module uses API version 2025-02-02-preview.
 
-**Important:** If `internal_load_balancer_enabled` is `true`, Azure does not allow public network access to be `Enabled`.  
+**Important:** If `internal_load_balancer_enabled` is `true`, Azure does not allow public network access to be `Enabled`.
 In that case this module will force `publicNetworkAccess` to `Disabled`.
 
 Defaults to `true` (public access enabled).
@@ -635,14 +635,14 @@ Default: `null`
 
 ### <a name="input_workload_profile"></a> [workload\_profile](#input\_workload\_profile)
 
-Description:   
-This lists the workload profiles that will be configured for the Managed Environment.  
+Description:
+This lists the workload profiles that will be configured for the Managed Environment.
 This is in addition to the default Consumption Plan workload profile.
 
  - `maximum_count` - (Optional) The maximum number of instances of workload profile that can be deployed in the Container App Environment.  Required for Dedicated profile types.
  - `minimum_count` - (Optional) The minimum number of instances of workload profile that can be deployed in the Container App Environment.  Required for Dedicated profile types.
  - `name` - (Required) The name of the workload profile.
- - `workload_profile_type` - (Required) Workload profile type for the workloads to run on. Possible values include `D4`, `D8`, `D16`, `D32`, `E4`, `E8`, `E16` and `E32`.
+ - `workload_profile_type` - (Required) Workload profile type for the workloads to run on. Possible values include `Consumption`, `D4`, `D8`, `D16`, `D32`, `E4`, `E8`, `E16` and `E32`.
 
 Examples:
 
