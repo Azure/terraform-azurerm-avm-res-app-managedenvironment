@@ -18,29 +18,19 @@ variable "java_components" {
   }))
   default     = {}
   description = <<DESCRIPTION
-Map of instances for the submodule with the following attributes:
+Map of Java components to create on the Container Apps Managed Environment. The map key is deliberately arbitrary to avoid issues where map keys may be unknown at plan time.
 
-**configurations**
-List of Java Components configuration properties
+Each Java component supports the following:
 
-**scale**
-Java component scaling configurations
+- `name` - (Required) The name of the Java component resource.
+- `component_type` - (Required) The Java component type.
+- `configurations` - (Optional) Configuration properties for the Java component.
+- `ingress` - (Optional) Ingress configuration for the Java component.
+- `service_binds` - (Optional) Service bindings for the Java component.
 
-- `max_replicas` - Optional. Maximum number of Java component replicas
-- `min_replicas` - Optional. Minimum number of Java component replicas. Defaults to 1 if not set
+`scale` supports the following:
 
-**name**
-The name of the resource.
-
-**component_type**
-The componentType of the resource.
-
-**ingress**
-Java Component Ingress configurations.
-
-
-
-**service_binds**
-List of Java Components that are bound to the Java component
+- `max_replicas` - (Optional) The maximum number of Java component replicas.
+- `min_replicas` - (Optional) The minimum number of Java component replicas.
 DESCRIPTION
 }

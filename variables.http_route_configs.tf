@@ -28,14 +28,12 @@ variable "http_route_configs" {
   }))
   default     = {}
   description = <<DESCRIPTION
-Map of instances for the submodule with the following attributes:
-**name**
-The name of the resource.
+Map of HTTP route configurations to create on the Container Apps Managed Environment. The map key is deliberately arbitrary to avoid issues where map keys may be unknown at plan time.
 
-**custom_domains**
-Custom domain bindings for Http Routes' hostnames.
+Each HTTP route configuration supports the following:
 
-**rules**
-Routing Rules for the Http Route resource.
+- `name` - (Required) The name of the HTTP route configuration resource.
+- `custom_domains` - (Optional) Custom domain bindings for the HTTP route hostnames.
+- `rules` - (Optional) Routing rules for the HTTP route configuration.
 DESCRIPTION
 }

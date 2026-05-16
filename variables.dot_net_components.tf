@@ -13,17 +13,13 @@ variable "dot_net_components" {
   }))
   default     = {}
   description = <<DESCRIPTION
-Map of instances for the submodule with the following attributes:
+Map of .NET components to create on the Container Apps Managed Environment. The map key is deliberately arbitrary to avoid issues where map keys may be unknown at plan time.
 
-**component_type**
-Type of the .NET Component.
+Each .NET component supports the following:
 
-**configurations**
-List of .NET Components configuration properties
-
-**service_binds**
-List of .NET Components that are bound to the .NET component
-**name**
-The name of the resource.
+- `name` - (Required) The name of the .NET component resource.
+- `component_type` - (Optional) The .NET component type.
+- `configurations` - (Optional) Configuration properties for the .NET component.
+- `service_binds` - (Optional) Service bindings for the .NET component.
 DESCRIPTION
 }

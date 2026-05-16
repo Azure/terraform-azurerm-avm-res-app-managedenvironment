@@ -8,21 +8,14 @@ variable "managed_certificates" {
   }))
   default     = {}
   description = <<DESCRIPTION
-Map of instances for the submodule with the following attributes:
+Map of managed certificates to create on the Container Apps Managed Environment. The map key is deliberately arbitrary to avoid issues where map keys may be unknown at plan time.
 
-**name**
-The name of the resource.
+Each managed certificate supports the following:
 
-**location**
-The location of the resource.
-
-**tags**
-(Optional) Tags of the resource.
-
-**domain_control_validation**
-Selected type of domain control validation for managed certificates.
-
-**subject_name**
-Subject name of the certificate.
+- `name` - (Required) The name of the managed certificate resource.
+- `location` - (Required) The location for the managed certificate resource.
+- `subject_name` - (Optional) The subject name for the certificate.
+- `domain_control_validation` - (Optional) The selected domain control validation method.
+- `tags` - (Optional) Tags to apply to the managed certificate resource.
 DESCRIPTION
 }

@@ -9,11 +9,11 @@ variable "maintenance_configurations" {
   }))
   default     = {}
   description = <<DESCRIPTION
-Map of instances for the submodule with the following attributes:
+Map of maintenance configurations to create on the Container Apps Managed Environment. The map key is deliberately arbitrary to avoid issues where map keys may be unknown at plan time.
 
-**scheduled_entries**
-List of maintenance schedules for a managed environment.
-**name**
-The name of the resource.
+Each maintenance configuration supports the following:
+
+- `name` - (Required) The name of the maintenance configuration resource.
+- `scheduled_entries` - (Required) The list of maintenance schedules for the managed environment.
 DESCRIPTION
 }
