@@ -21,38 +21,26 @@ variable "dapr_subscriptions" {
   }))
   default     = {}
   description = <<DESCRIPTION
-Map of instances for the submodule with the following attributes:
+Map of Dapr subscriptions to create on the Container Apps Managed Environment. The map key is deliberately arbitrary to avoid issues where map keys may be unknown at plan time.
 
-**bulk_subscribe**
-Bulk subscription options
+Each Dapr subscription supports the following:
 
-- `enabled` - Enable bulk subscription
-- `max_await_duration_ms` - Maximum duration in milliseconds to wait before a bulk message is sent to the app.
-- `max_messages_count` - Maximum number of messages to deliver in a bulk message.
+- `name` - (Required) The name of the Dapr subscription resource.
+- `dead_letter_topic` - (Optional) The dead-letter topic name.
+- `metadata` - (Optional) Metadata for the subscription.
+- `pubsub_name` - (Optional) The Dapr PubSub component name.
+- `scopes` - (Optional) Application scopes to restrict the subscription to specific apps.
+- `topic` - (Optional) The topic name.
 
+`bulk_subscribe` supports the following:
 
-**metadata**
-Subscription metadata
+- `enabled` - (Optional) Whether bulk subscription delivery is enabled.
+- `max_await_duration_ms` - (Optional) The maximum duration in milliseconds to wait before a bulk message is sent to the app.
+- `max_messages_count` - (Optional) The maximum number of messages to deliver in a bulk message.
 
-**pubsub_name**
-Dapr PubSub component name
+`routes` supports the following:
 
-**topic**
-Topic name
-**name**
-The name of the resource.
-
-**dead_letter_topic**
-Deadletter topic name
-
-**routes**
-Subscription routes
-
-- `default` - The default path to deliver events that do not match any of the rules.
-- `rules` - The list of Dapr PubSub Event Subscription Route Rules.
-
-
-**scopes**
-Application scopes to restrict the subscription to specific apps.
+- `default` - (Optional) The default path to deliver events that do not match any route rules.
+- `rules` - (Optional) The list of Dapr PubSub event subscription route rules.
 DESCRIPTION
 }

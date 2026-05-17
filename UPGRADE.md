@@ -1,40 +1,33 @@
 # Upgrade Guide
 
-This document describes breaking changes when upgrading this module between versions.
+This document describes adopter-facing changes when upgrading this module between versions.
+
+It is intentionally focused on migration work you may need to do in your configuration. New functionality belongs in release notes and is not repeated here.
 
 ---
 
 ## 0.4.0 to 0.5.0 (Unreleased)
 
-### Variable Renames
+### What is handled automatically
 
-The following root-module variables have been renamed or restructured:
+The following changes are handled by compatibility shims or `moved` blocks and do **not** require immediate action:
 
-| Old Variable | New Variable / Location | Notes |
-|---|---|---|
-| `zone_redundancy_enabled` | `zone_redundant` | Boolean, same semantics |
-| `workload_profile` (set) | `workload_profiles` (list) | Same shape, now a list instead of set |
-| `peer_authentication_enabled` (bool) | `peer_authentication` (object) | `peer_authentication = { mtls = { enabled = true } }` |
-| `peer_traffic_encryption_enabled` (bool) | `peer_traffic_configuration` (object) | `peer_traffic_configuration = { encryption = { enabled = true } }` |
-| `public_network_access_enabled` (bool) | `public_network_access` (string) | `"Enabled"` or `"Disabled"` |
-| `internal_load_balancer_enabled` (bool) | `vnet_configuration.internal` (bool) | Set inside `vnet_configuration` object |
-| `infrastructure_subnet_id` (string) | `vnet_configuration.infrastructure_subnet_id` (string) | Set inside `vnet_configuration` object |
-| `infrastructure_resource_group_name` | `infrastructure_resource_group` | Renamed |
-| `custom_domain_certificate_password` | `certificate_password` (ephemeral) + `certificate_password_version` | Now ephemeral; version tracker required |
-| `custom_domain_dns_suffix` | `custom_domain_configuration.dns_suffix` | Moved into `custom_domain_configuration` object |
-| `custom_domain_certificate_key_vault_url` | `custom_domain_configuration.certificate_key_vault_properties.key_vault_url` | Moved into nested object |
-| `custom_domain_certificate_key_vault_identity` | `custom_domain_configuration.certificate_key_vault_properties.identity` | Moved into nested object |
-| `custom_domain_certificate_value` | `custom_domain_configuration.certificate_value` | Moved into `custom_domain_configuration` object |
-| `dapr_application_insights_connection_string` | `dapr_ai_connection_string` (ephemeral) + `dapr_ai_connection_string_version` | Now ephemeral; version tracker required |
-| `log_analytics_workspace_customer_id` | `app_logs_configuration.log_analytics_configuration.customer_id` | Moved into `app_logs_configuration` object |
-| `log_analytics_workspace_destination` | `app_logs_configuration.destination` | Moved into `app_logs_configuration` object |
-| `log_analytics_workspace_primary_shared_key` | `shared_key` (ephemeral) + `shared_key_version` | Now ephemeral; version tracker required |
+- singular submodule addresses renamed to plural:
+  - `module.certificate` -> `module.certificates`
+  - `module.dapr_component` -> `module.dapr_components`
+  - `module.managed_certificate` -> `module.managed_certificates`
+  - `module.storage` -> `module.storages`
+- legacy root variables that now map to newer nested inputs still continue to work for now through deprecation fallbacks
 
-### Breaking Schema Changes
+You should still migrate off deprecated inputs over time, but they are not the primary breaking item in this upgrade.
 
-#### `storages`
+### Main migration work
 
-The `storages` variable schema has changed from a flat structure to a nested one matching the azapi resource body:
+The main adopter-visible changes in this upgrade are schema changes in child-resource maps and the introduction of write-only values with version trackers.
+
+#### 1. Storage definitions are now nested
+
+The `storages` input no longer uses the older flat shape. Azure Files settings now live under `azure_file`, and the storage account key is modeled separately with a version tracker.
 
 **Before:**
 
@@ -54,21 +47,27 @@ storages = {
 ```hcl
 storages = {
   "my-storage" = {
-    name     = "my-storage"
+    name = "my-storage"
+
     azure_file = {
       access_mode  = "ReadWrite"
       account_name = "mystorageaccount"
       share_name   = "myshare"
     }
-    account_key         = "..."  # ephemeral
+
+    account_key         = "..."
     account_key_version = 1
   }
 }
 ```
 
-#### `dapr_components`
+#### 2. Dapr component secrets and version fields changed shape
 
-The `version` key has been renamed to `dapr_components_version`. The `secret` block (singular, set) has been replaced by `secrets` (list).
+The `dapr_components` input now uses:
+
+- `dapr_components_version` instead of `version`
+- `secrets` instead of `secret`
+- `secrets_version` for write-only secret updates
 
 **Before:**
 
@@ -102,19 +101,24 @@ dapr_components = {
 }
 ```
 
-#### `certificates`
+#### 3. Certificates now use the AzAPI-oriented schema
 
-The `certificates` variable has been restructured to support the azapi resource body pattern with ephemeral `password` and `value` fields:
+The `certificates` input has been restructured around the AzAPI body shape.
 
-**Before (via `var.certificates` inline schema):**
+The main changes are:
+
+- `name` and `location` are now explicit
+- uploaded certificate values are modeled as `password` / `value`
+- write-only certificate data now uses version trackers
+- Key Vault references now sit under `certificate_key_vault_properties`
+
+**Before:**
 
 ```hcl
 certificates = {
   "my-cert" = {
-    certificate_password              = "..."
-    certificate_value                 = "..."
-    subject_name                      = "..."
-    ...
+    certificate_password = "..."
+    certificate_value    = "..."
   }
 }
 ```
@@ -126,11 +130,12 @@ certificates = {
   "my-cert" = {
     name             = "my-cert"
     location         = "eastus"
-    password         = "..."   # ephemeral
+    password         = "..."
     password_version = 1
-    value            = "..."   # ephemeral (base64 PFX/PEM)
+    value            = "..."
     value_version    = 1
-    certificate_key_vault_properties = {   # optional
+
+    certificate_key_vault_properties = {
       identity      = "..."
       key_vault_url = "..."
     }
@@ -138,14 +143,16 @@ certificates = {
 }
 ```
 
-#### `managed_certificates`
+#### 4. Managed certificates now require explicit resource metadata
+
+The `managed_certificates` input now includes `name` and `location` in each entry.
 
 **Before:**
 
 ```hcl
 managed_certificates = {
   "my-cert" = {
-    subject_name              = "..."
+    subject_name              = "example.com"
     domain_control_validation = "HTTP"
   }
 }
@@ -158,41 +165,49 @@ managed_certificates = {
   "my-cert" = {
     name                      = "my-cert"
     location                  = "eastus"
-    subject_name              = "..."
+    subject_name              = "example.com"
     domain_control_validation = "HTTP"
   }
 }
 ```
 
-### Ephemeral Variables and Version Trackers
+### Write-only values and version trackers
 
-Several variables are now marked as `ephemeral = true`, meaning their values are not stored in Terraform state. Each ephemeral variable requires a corresponding `_version` variable that must be incremented when the secret value changes (to trigger re-application).
+Several sensitive values are now modeled as write-only inputs. When you use them, you must also set the corresponding version tracker and increment that version when the secret value changes.
 
-| Ephemeral Variable | Version Tracker |
+| Write-only value | Version tracker |
 |---|---|
 | `shared_key` | `shared_key_version` |
 | `certificate_password` | `certificate_password_version` |
+| `certificate_value` | `certificate_value_version` |
 | `dapr_ai_connection_string` | `dapr_ai_connection_string_version` |
 | `dapr_ai_instrumentation_key` | `dapr_ai_instrumentation_key_version` |
+| `account_key` | `account_key_version` |
+| `secrets` | `secrets_version` |
 
-### Log Analytics Backward Compatibility
+### Deprecated inputs you should plan to migrate
 
-The `log_analytics_workspace` variable (resource ID-based) is preserved for backward compatibility. It continues to auto-fetch the primary shared key and customer ID.
+The older root inputs below still have compatibility handling in this branch, but should be treated as deprecated migration paths rather than long-term configuration:
 
-The following variables are removed; use `app_logs_configuration` instead:
+- `zone_redundancy_enabled` -> `zone_redundant`
+- `workload_profile` -> `workload_profiles`
+- `peer_authentication_enabled` -> `peer_authentication`
+- `peer_traffic_encryption_enabled` -> `peer_traffic_configuration`
+- `public_network_access_enabled` -> `public_network_access`
+- `internal_load_balancer_enabled` -> `vnet_configuration.internal`
+- `infrastructure_subnet_id` -> `vnet_configuration.infrastructure_subnet_id`
+- `infrastructure_resource_group_name` -> `infrastructure_resource_group`
+- `custom_domain_dns_suffix` -> `custom_domain_configuration.dns_suffix`
+- `custom_domain_certificate_key_vault_url` -> `custom_domain_configuration.certificate_key_vault_properties.key_vault_url`
+- `custom_domain_certificate_key_vault_identity` -> `custom_domain_configuration.certificate_key_vault_properties.identity`
+- `custom_domain_certificate_value` -> `custom_domain_configuration.certificate_value`
+- `log_analytics_workspace_customer_id` -> `app_logs_configuration.log_analytics_configuration.customer_id`
+- `log_analytics_workspace_destination` -> `app_logs_configuration.destination`
+- `log_analytics_workspace_primary_shared_key` -> `shared_key`
 
-- `log_analytics_workspace_customer_id` → `app_logs_configuration.log_analytics_configuration.customer_id`
-- `log_analytics_workspace_destination` → `app_logs_configuration.destination`
-- `log_analytics_workspace_primary_shared_key` → `shared_key` (ephemeral)
+### Provider / API changes
 
-### Provider Version Changes
-
-| Provider | Before | After |
-|---|---|---|
-| `azapi` | `~> 2.6` | `~> 2.7` |
-
-### API Version Change
-
-The main resource API version has been upgraded from `2025-02-02-preview` to `2025-07-01` (GA).
+- AzAPI provider requirement is now `~> 2.7`
+- The root managed environment resource now uses `Microsoft.App/managedEnvironments@2025-10-02-preview`
 
 ---

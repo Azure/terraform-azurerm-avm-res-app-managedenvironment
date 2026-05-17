@@ -21,34 +21,30 @@ variable "storages" {
   }))
   default     = {}
   description = <<DESCRIPTION
-Map of instances for the submodule with the following attributes:
+Map of storage definitions to create on the Container Apps Managed Environment. The map key is deliberately arbitrary to avoid issues where map keys may be unknown at plan time.
 
-**azure_file**
-Azure file properties
+Each storage definition supports the following:
 
-- `access_mode` - Access mode for storage
-- `account_key` - Storage account key for azure file.
-- `account_key_vault_properties` - Storage account key stored as an Azure Key Vault secret.
-  - `identity` - Resource ID of a managed identity to authenticate with Azure Key Vault, or System to use a system-assigned identity.
-  - `key_vault_url` - URL pointing to the Azure Key Vault secret.
-- `account_name` - Storage account name for azure file.
-- `share_name` - Azure file share name.
+- `name` - (Required) The name of the storage resource.
+- `account_key` - (Optional) The storage account key for the Azure file share.
+- `account_key_version` - (Optional) Version tracker for `account_key`. Must be set when `account_key` is provided.
 
+`azure_file` supports the following:
 
-**nfs_azure_file**
-NFS Azure file properties
+- `access_mode` - (Optional) The access mode for the Azure file share.
+- `account_key` - (Optional) The storage account key for the Azure file share.
+- `account_name` - (Optional) The storage account name.
+- `share_name` - (Optional) The Azure file share name.
 
-- `access_mode` - Access mode for storage
-- `server` - Server for NFS azure file. Specify the Azure storage account server address.
-- `share_name` - NFS Azure file share name.
+`azure_file.account_key_vault_properties` supports the following:
 
+- `identity` - (Optional) Resource ID of a managed identity to authenticate with Azure Key Vault, or `System` to use a system-assigned identity.
+- `key_vault_url` - (Optional) URL pointing to the Azure Key Vault secret that holds the storage account key.
 
-**account_key**
-Storage account key for azure file.
+`nfs_azure_file` supports the following:
 
-**account_key_version**
-Version tracker for account_key. Must be set when account_key is provided.
-**name**
-The name of the resource.
+- `access_mode` - (Optional) The access mode for the NFS Azure file share.
+- `server` - (Optional) The Azure storage account server address.
+- `share_name` - (Optional) The NFS Azure file share name.
 DESCRIPTION
 }

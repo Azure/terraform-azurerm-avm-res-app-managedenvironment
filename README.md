@@ -4,10 +4,17 @@
 
 This module is used to manage Container Apps Managed Environments.
 
-This module is composite and includes sub modules that can be used independently for deploying sub resources. These are:
+This module is composite and includes submodules that can be used independently for deploying sub-resources. These are:
 
-- **dapr\_component** - creation of Dapr components.
-- **storage** - presentation of Azure Files Storage.
+- **certificates** - creation of environment certificates.
+- **dapr\_components** - creation of Dapr components.
+- **dapr\_subscriptions** - creation of Dapr subscriptions.
+- **dot\_net\_components** - creation of .NET components.
+- **http\_route\_configs** - creation of HTTP route configurations.
+- **java\_components** - creation of Java components.
+- **maintenance\_configurations** - creation of maintenance configurations.
+- **managed\_certificates** - creation of managed certificates.
+- **storages** - presentation of Azure Files storage.
 
 > Major version Zero (0.y.z) is for initial development. Anything MAY change at any time. A module SHOULD NOT be considered stable till at least it is major version one (1.0.0) or greater. Changes will always be via new versions being published and no changes will be made to existing published versions. For more details please go to <https://semver.org/>
 
@@ -90,7 +97,7 @@ Default: `null`
 
 Description: Cluster configuration which enables the log daemon to export app logs to configured destination.
 
-- `destination` - Logs destination, can be `'log-analytics'`, `'azure-monitor'` or `'none'`
+- `destination` - Logs destination, can be `'log-analytics'` or `'azure-monitor'`. Omit `app_logs_configuration` entirely to disable app logs.
 - `log_analytics_configuration` - Log Analytics configuration, must only be provided when destination is configured as `'log-analytics'`
   - `customer_id` - Log analytics customer id
 
@@ -152,33 +159,22 @@ Default: `null`
 
 ### <a name="input_certificates"></a> [certificates](#input\_certificates)
 
-Description: Map of instances for the submodule with the following attributes:
+Description: A map of certificates to create on the Container Apps Managed Environment. The map key is deliberately arbitrary to avoid issues where map keys may be unknown at plan time.
 
-**password**  
-Certificate password.
+Each certificate supports the following:
 
-**password\_version**  
-Version tracker for password. Must be set when password is provided.
-**location**  
-The location of the resource.
+- `name` - (Required) The name of the certificate resource.
+- `location` - (Required) The location for the certificate resource.
+- `tags` - (Optional) Tags to apply to the certificate resource.
+- `password` - (Optional) The certificate password.
+- `password_version` - (Optional) Version tracker for `password`. Must be set when `password` is provided.
+- `value` - (Optional) The PFX or PEM certificate blob.
+- `value_version` - (Optional) Version tracker for `value`. Must be set when `value` is provided.
 
-**tags**
-(Optional) Tags of the resource.
+`certificate_key_vault_properties` supports the following:
 
-**value**  
-PFX or PEM blob
-
-**value\_version**  
-Version tracker for value. Must be set when value is provided.
-
-**name**  
-The name of the resource.
-
-**certificate\_key\_vault\_properties**  
-Properties for a certificate stored in a Key Vault.
-
-- `identity` - Resource ID of a managed identity to authenticate with Azure Key Vault, or System to use a system-assigned identity.
-- `key_vault_url` - URL pointing to the Azure Key Vault secret that holds the certificate.
+- `identity` - (Optional) Resource ID of a managed identity to authenticate with Azure Key Vault, or `System` to use a system-assigned identity.
+- `key_vault_url` - (Optional) URL pointing to the Azure Key Vault secret that holds the certificate.
 
 Type:
 
@@ -323,36 +319,31 @@ Default: `null`
 
 ### <a name="input_dapr_components"></a> [dapr\_components](#input\_dapr\_components)
 
-Description: Map of instances for the submodule with the following attributes:
+Description: Map of Dapr components to create on the Container Apps Managed Environment. The map key is deliberately arbitrary to avoid issues where map keys may be unknown at plan time.
 
-**name**  
-The name of the resource.
+Each Dapr component supports the following:
 
-**component\_type**  
-Component type
+- `name` - (Required) The name of the Dapr component resource.
+- `component_type` - (Optional) The Dapr component type.
+- `dapr_components_version` - (Optional) The component version.
+- `ignore_errors` - (Optional) Whether component loading errors should be ignored.
+- `init_timeout` - (Optional) The initialization timeout.
+- `scopes` - (Optional) Names of container apps that can use this Dapr component.
+- `secret_store_component` - (Optional) The name of a Dapr component to retrieve component secrets from.
+- `secrets_version` - (Optional) Version tracker for `secrets`. Must be set when `secrets` is provided.
 
-**metadata**  
-Component metadata
+`metadata` supports the following:
 
-**scopes**  
-Names of container apps that can use this Dapr component
+- `name` - (Optional) The metadata item name.
+- `secret_ref` - (Optional) A secret reference for the metadata item.
+- `value` - (Optional) The metadata item value.
 
-**secret\_store\_component**  
-Name of a Dapr component to retrieve component secrets from
-**ignore\_errors**  
-Boolean describing if the component errors are ignores
+`secrets` supports the following:
 
-**init\_timeout**  
-Initialization timeout
-
-**secrets**  
-Collection of secrets used by a Dapr component
-
-**dapr\_components\_version**  
-Component version
-
-**secrets\_version**  
-Version tracker for secrets. Must be set when secrets is provided.
+- `identity` - (Optional) The managed identity used for Key Vault access.
+- `key_vault_url` - (Optional) The Key Vault secret URL for the secret value.
+- `name` - (Optional) The secret name.
+- `value` - (Optional) The secret value.
 
 Type:
 
@@ -392,37 +383,27 @@ Default: `null`
 
 ### <a name="input_dapr_subscriptions"></a> [dapr\_subscriptions](#input\_dapr\_subscriptions)
 
-Description: Map of instances for the submodule with the following attributes:
+Description: Map of Dapr subscriptions to create on the Container Apps Managed Environment. The map key is deliberately arbitrary to avoid issues where map keys may be unknown at plan time.
 
-**bulk\_subscribe**  
-Bulk subscription options
+Each Dapr subscription supports the following:
 
-- `enabled` - Enable bulk subscription
-- `max_await_duration_ms` - Maximum duration in milliseconds to wait before a bulk message is sent to the app.
-- `max_messages_count` - Maximum number of messages to deliver in a bulk message.
+- `name` - (Required) The name of the Dapr subscription resource.
+- `dead_letter_topic` - (Optional) The dead-letter topic name.
+- `metadata` - (Optional) Metadata for the subscription.
+- `pubsub_name` - (Optional) The Dapr PubSub component name.
+- `scopes` - (Optional) Application scopes to restrict the subscription to specific apps.
+- `topic` - (Optional) The topic name.
 
-**metadata**  
-Subscription metadata
+`bulk_subscribe` supports the following:
 
-**pubsub\_name**  
-Dapr PubSub component name
+- `enabled` - (Optional) Whether bulk subscription delivery is enabled.
+- `max_await_duration_ms` - (Optional) The maximum duration in milliseconds to wait before a bulk message is sent to the app.
+- `max_messages_count` - (Optional) The maximum number of messages to deliver in a bulk message.
 
-**topic**  
-Topic name
-**name**  
-The name of the resource.
+`routes` supports the following:
 
-**dead\_letter\_topic**  
-Deadletter topic name
-
-**routes**  
-Subscription routes
-
-- `default` - The default path to deliver events that do not match any of the rules.
-- `rules` - The list of Dapr PubSub Event Subscription Route Rules.
-
-**scopes**  
-Application scopes to restrict the subscription to specific apps.
+- `default` - (Optional) The default path to deliver events that do not match any route rules.
+- `rules` - (Optional) The list of Dapr PubSub event subscription route rules.
 
 Type:
 
@@ -513,18 +494,14 @@ Default: `null`
 
 ### <a name="input_dot_net_components"></a> [dot\_net\_components](#input\_dot\_net\_components)
 
-Description: Map of instances for the submodule with the following attributes:
+Description: Map of .NET components to create on the Container Apps Managed Environment. The map key is deliberately arbitrary to avoid issues where map keys may be unknown at plan time.
 
-**component\_type**  
-Type of the .NET Component.
+Each .NET component supports the following:
 
-**configurations**  
-List of .NET Components configuration properties
-
-**service\_binds**  
-List of .NET Components that are bound to the .NET component
-**name**  
-The name of the resource.
+- `name` - (Required) The name of the .NET component resource.
+- `component_type` - (Optional) The .NET component type.
+- `configurations` - (Optional) Configuration properties for the .NET component.
+- `service_binds` - (Optional) Service bindings for the .NET component.
 
 Type:
 
@@ -557,15 +534,13 @@ Default: `true`
 
 ### <a name="input_http_route_configs"></a> [http\_route\_configs](#input\_http\_route\_configs)
 
-Description: Map of instances for the submodule with the following attributes:
-**name**  
-The name of the resource.
+Description: Map of HTTP route configurations to create on the Container Apps Managed Environment. The map key is deliberately arbitrary to avoid issues where map keys may be unknown at plan time.
 
-**custom\_domains**  
-Custom domain bindings for Http Routes' hostnames.
+Each HTTP route configuration supports the following:
 
-**rules**  
-Routing Rules for the Http Route resource.
+- `name` - (Required) The name of the HTTP route configuration resource.
+- `custom_domains` - (Optional) Custom domain bindings for the HTTP route hostnames.
+- `rules` - (Optional) Routing rules for the HTTP route configuration.
 
 Type:
 
@@ -659,28 +634,20 @@ Default: `null`
 
 ### <a name="input_java_components"></a> [java\_components](#input\_java\_components)
 
-Description: Map of instances for the submodule with the following attributes:
+Description: Map of Java components to create on the Container Apps Managed Environment. The map key is deliberately arbitrary to avoid issues where map keys may be unknown at plan time.
 
-**configurations**  
-List of Java Components configuration properties
+Each Java component supports the following:
 
-**scale**  
-Java component scaling configurations
+- `name` - (Required) The name of the Java component resource.
+- `component_type` - (Required) The Java component type.
+- `configurations` - (Optional) Configuration properties for the Java component.
+- `ingress` - (Optional) Ingress configuration for the Java component.
+- `service_binds` - (Optional) Service bindings for the Java component.
 
-- `max_replicas` - Optional. Maximum number of Java component replicas
-- `min_replicas` - Optional. Minimum number of Java component replicas. Defaults to 1 if not set
+`scale` supports the following:
 
-**name**  
-The name of the resource.
-
-**component\_type**  
-The componentType of the resource.
-
-**ingress**  
-Java Component Ingress configurations.
-
-**service\_binds**  
-List of Java Components that are bound to the Java component
+- `max_replicas` - (Optional) The maximum number of Java component replicas.
+- `min_replicas` - (Optional) The minimum number of Java component replicas.
 
 Type:
 
@@ -804,12 +771,12 @@ Default: `null`
 
 ### <a name="input_maintenance_configurations"></a> [maintenance\_configurations](#input\_maintenance\_configurations)
 
-Description: Map of instances for the submodule with the following attributes:
+Description: Map of maintenance configurations to create on the Container Apps Managed Environment. The map key is deliberately arbitrary to avoid issues where map keys may be unknown at plan time.
 
-**scheduled\_entries**  
-List of maintenance schedules for a managed environment.
-**name**  
-The name of the resource.
+Each maintenance configuration supports the following:
+
+- `name` - (Required) The name of the maintenance configuration resource.
+- `scheduled_entries` - (Required) The list of maintenance schedules for the managed environment.
 
 Type:
 
@@ -828,22 +795,15 @@ Default: `{}`
 
 ### <a name="input_managed_certificates"></a> [managed\_certificates](#input\_managed\_certificates)
 
-Description: Map of instances for the submodule with the following attributes:
+Description: Map of managed certificates to create on the Container Apps Managed Environment. The map key is deliberately arbitrary to avoid issues where map keys may be unknown at plan time.
 
-**name**  
-The name of the resource.
+Each managed certificate supports the following:
 
-**location**  
-The location of the resource.
-
-**tags**
-(Optional) Tags of the resource.
-
-**domain\_control\_validation**  
-Selected type of domain control validation for managed certificates.
-
-**subject\_name**  
-Subject name of the certificate.
+- `name` - (Required) The name of the managed certificate resource.
+- `location` - (Required) The location for the managed certificate resource.
+- `subject_name` - (Optional) The subject name for the certificate.
+- `domain_control_validation` - (Optional) The selected domain control validation method.
+- `tags` - (Optional) Tags to apply to the managed certificate resource.
 
 Type:
 
@@ -1068,33 +1028,31 @@ Default: `null`
 
 ### <a name="input_storages"></a> [storages](#input\_storages)
 
-Description: Map of instances for the submodule with the following attributes:
+Description: Map of storage definitions to create on the Container Apps Managed Environment. The map key is deliberately arbitrary to avoid issues where map keys may be unknown at plan time.
 
-**azure\_file**  
-Azure file properties
+Each storage definition supports the following:
 
-- `access_mode` - Access mode for storage
-- `account_key` - Storage account key for azure file.
-- `account_key_vault_properties` - Storage account key stored as an Azure Key Vault secret.
-  - `identity` - Resource ID of a managed identity to authenticate with Azure Key Vault, or System to use a system-assigned identity.
-  - `key_vault_url` - URL pointing to the Azure Key Vault secret.
-- `account_name` - Storage account name for azure file.
-- `share_name` - Azure file share name.
+- `name` - (Required) The name of the storage resource.
+- `account_key` - (Optional) The storage account key for the Azure file share.
+- `account_key_version` - (Optional) Version tracker for `account_key`. Must be set when `account_key` is provided.
 
-**nfs\_azure\_file**  
-NFS Azure file properties
+`azure_file` supports the following:
 
-- `access_mode` - Access mode for storage
-- `server` - Server for NFS azure file. Specify the Azure storage account server address.
-- `share_name` - NFS Azure file share name.
+- `access_mode` - (Optional) The access mode for the Azure file share.
+- `account_key` - (Optional) The storage account key for the Azure file share.
+- `account_name` - (Optional) The storage account name.
+- `share_name` - (Optional) The Azure file share name.
 
-**account\_key**  
-Storage account key for azure file.
+`azure_file.account_key_vault_properties` supports the following:
 
-**account\_key\_version**  
-Version tracker for account\_key. Must be set when account\_key is provided.
-**name**  
-The name of the resource.
+- `identity` - (Optional) Resource ID of a managed identity to authenticate with Azure Key Vault, or `System` to use a system-assigned identity.
+- `key_vault_url` - (Optional) URL pointing to the Azure Key Vault secret that holds the storage account key.
+
+`nfs_azure_file` supports the following:
+
+- `access_mode` - (Optional) The access mode for the NFS Azure file share.
+- `server` - (Optional) The Azure storage account server address.
+- `share_name` - (Optional) The NFS Azure file share name.
 
 Type:
 

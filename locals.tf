@@ -94,13 +94,10 @@ locals {
       )
     )
   )
-  # Azure rejects publicNetworkAccess=Enabled when the environment has an internal load balancer.
-  # Also accepts the deprecated public_network_access_enabled bool as a fallback.
+  # Accepts the deprecated public_network_access_enabled bool as a fallback.
   effective_public_network_access = (
-    local.effective_vnet_configuration != null && local.effective_vnet_configuration.internal == true ? "Disabled" : (
-      var.public_network_access != null ? var.public_network_access : (
-        var.public_network_access_enabled != null ? (var.public_network_access_enabled ? "Enabled" : "Disabled") : null
-      )
+    var.public_network_access != null ? var.public_network_access : (
+      var.public_network_access_enabled != null ? (var.public_network_access_enabled ? "Enabled" : "Disabled") : null
     )
   )
   # Effective Log Analytics shared key — use explicit ephemeral var if provided, then deprecated
@@ -125,7 +122,7 @@ locals {
       appInsightsConfiguration = var.app_insights_configuration == null ? null : {}
       appLogsConfiguration = local.effective_app_logs_configuration == null ? null : {
         destination = local.effective_app_logs_configuration.destination
-        logAnalyticsConfiguration = try(local.effective_app_logs_configuration.log_analytics_configuration, null) == null ? null : {
+        logAnalyticsConfiguration = local.effective_app_logs_configuration.destination != "log-analytics" || try(local.effective_app_logs_configuration.log_analytics_configuration, null) == null ? null : {
           customerId         = try(local.effective_app_logs_configuration.log_analytics_configuration.customer_id, null)
           dynamicJsonColumns = try(local.effective_app_logs_configuration.log_analytics_configuration.dynamic_json_columns, null)
         }
@@ -252,4 +249,3 @@ locals {
     } : {}
   }
 }
-

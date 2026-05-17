@@ -1,14 +1,16 @@
 resource "azapi_resource" "this_environment" {
-  location       = var.location
-  name           = var.name
-  parent_id      = local.parent_id
-  type           = "Microsoft.App/managedEnvironments@2025-10-02-preview"
-  body           = local.resource_body
-  create_headers = var.enable_telemetry ? { "User-Agent" : local.avm_azapi_header } : null
-  delete_headers = var.enable_telemetry ? { "User-Agent" : local.avm_azapi_header } : null
-  read_headers   = var.enable_telemetry ? { "User-Agent" : local.avm_azapi_header } : null
+  location             = var.location
+  name                 = var.name
+  parent_id            = local.parent_id
+  type                 = "Microsoft.App/managedEnvironments@2025-10-02-preview"
+  body                 = local.resource_body
+  create_headers       = var.enable_telemetry ? { "User-Agent" : local.avm_azapi_header } : null
+  delete_headers       = var.enable_telemetry ? { "User-Agent" : local.avm_azapi_header } : null
+  ignore_null_property = true
+  read_headers         = var.enable_telemetry ? { "User-Agent" : local.avm_azapi_header } : null
   replace_triggers_refs = [
     "kind",
+    "properties.infrastructureResourceGroup",
     "properties.vnetConfiguration.infrastructureSubnetId",
     "properties.vnetConfiguration.internal",
     "properties.zoneRedundant",
@@ -36,7 +38,7 @@ resource "azapi_resource" "this_environment" {
       appInsightsConfiguration = var.app_insights_configuration == null ? null : {
         connectionString = var.connection_string
       }
-      appLogsConfiguration = local.effective_app_logs_configuration == null ? null : {
+      appLogsConfiguration = local.effective_app_logs_configuration == null || local.effective_app_logs_configuration.destination != "log-analytics" || local.log_analytics_key == null ? null : {
         logAnalyticsConfiguration = {
           sharedKey = local.log_analytics_key
         }
@@ -56,9 +58,8 @@ resource "azapi_resource" "this_environment" {
       }
     }
   }
-  sensitive_body_version = {
+  sensitive_body_version = local.effective_app_logs_configuration != null && local.effective_app_logs_configuration.destination == "log-analytics" ? null : {
     "properties.appInsightsConfiguration.connectionString"                                     = var.connection_string_version
-    "properties.appLogsConfiguration.logAnalyticsConfiguration.sharedKey"                      = var.shared_key_version
     "properties.customDomainConfiguration.certificatePassword"                                 = var.certificate_password_version
     "properties.customDomainConfiguration.certificateValue"                                    = var.certificate_value_version
     "properties.daprAIConnectionString"                                                        = var.dapr_ai_connection_string_version
@@ -84,6 +85,24 @@ resource "azapi_resource" "this_environment" {
       delete = timeouts.value.delete
       read   = timeouts.value.read
       update = timeouts.value.update
+    }
+  }
+
+  lifecycle {
+    precondition {
+      condition = local.effective_app_logs_configuration == null || local.effective_app_logs_configuration.destination != "log-analytics" || (
+        try(local.effective_app_logs_configuration.log_analytics_configuration.customer_id, null) != null &&
+        local.log_analytics_key != null
+      )
+      error_message = "When app_logs_configuration.destination is \"log-analytics\", both a customer_id and shared_key are required. Set log_analytics_workspace.resource_id or provide app_logs_configuration.log_analytics_configuration.customer_id together with shared_key."
+    }
+    precondition {
+      condition = !(
+        local.effective_vnet_configuration != null &&
+        local.effective_vnet_configuration.internal == true &&
+        local.effective_public_network_access == "Enabled"
+      )
+      error_message = "public_network_access cannot be \"Enabled\" when vnet_configuration.internal is true. Set public_network_access to \"Disabled\" or disable the internal load balancer."
     }
   }
 }
@@ -144,4 +163,3 @@ resource "azurerm_monitor_diagnostic_setting" "this" {
     }
   }
 }
-
