@@ -43,11 +43,19 @@ variable "app_logs_configuration" {
   description = <<DESCRIPTION
 Cluster configuration which enables the log daemon to export app logs to configured destination.
 
-- `destination` - Logs destination, can be `'log-analytics'`, `'azure-monitor'` or `'none'`
+- `destination` - Logs destination, can be `'log-analytics'` or `'azure-monitor'`. Omit `app_logs_configuration` entirely to disable app logs.
 - `log_analytics_configuration` - Log Analytics configuration, must only be provided when destination is configured as `'log-analytics'`
   - `customer_id` - Log analytics customer id
 
 DESCRIPTION
+
+  validation {
+    condition = var.app_logs_configuration == null || var.app_logs_configuration.destination == null || contains([
+      "log-analytics",
+      "azure-monitor",
+    ], var.app_logs_configuration.destination)
+    error_message = "app_logs_configuration.destination must be \"log-analytics\" or \"azure-monitor\". Omit app_logs_configuration to disable app logs."
+  }
 }
 
 variable "availability_zones" {

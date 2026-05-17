@@ -1,3 +1,3 @@
 # Default example without Log Analytics
 
-This deploys the module with log analytics not configured (`log_analytics_workspace_destination = "none"`).
+This deploys the module with app logs not configured by omitting `app_logs_configuration`.
