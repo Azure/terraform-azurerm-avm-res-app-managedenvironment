@@ -1,105 +1,11 @@
-# Deprecated input variables — backward-compatibility shims for the azurerm-style API.
+# Deprecated input shims for the previous azurerm-style API.
 #
-# Each variable is nullable (default = null), so omitting it has no effect.
-# When set, it acts as a fallback for the new variable name; the new variable takes priority.
+# New inputs take precedence. Deprecated inputs are nullable fallbacks that preserve
+# compatibility while callers migrate.
 #
-# Check blocks emit WARNING messages (not errors) when a deprecated variable is supplied.
-# They do not prevent plan/apply from succeeding — they are informational only.
-#
-# Note: Terraform 1.15 will introduce a native `deprecated` attribute on input variables
-# (https://github.com/hashicorp/terraform/issues/42119). Once that ships, these variables
-# should be migrated to use the built-in mechanism and this file can be simplified.
-#
-# Ephemeral deprecated variables (custom_domain_certificate_password,
-# dapr_application_insights_connection_string, log_analytics_workspace_primary_shared_key)
-# cannot use check blocks because ephemeral values are not permitted in check conditions.
-# They are wired in via locals.tf without a runtime warning.
-
-# ── Simple renames ──────────────────────────────────────────────────────────────
-
-
-
-# ── Type changes ────────────────────────────────────────────────────────────────
-
-
-
-# ── Flat → nested migrations ─────────────────────────────────────────────────
-
-
-
-
-
-
-
-
-
-# ── Log analytics ───────────────────────────────────────────────────────────────
-
-
-
-# ── Ephemeral deprecated variables ─────────────────────────────────────────────
-# Check blocks cannot reference ephemeral values. These fall back silently.
-
-
-
-
-# ── Check blocks (non-ephemeral deprecated variables only) ──────────────────────
-
-check "deprecated_zone_redundancy_enabled" {
-  assert {
-    condition     = var.zone_redundancy_enabled == null
-    error_message = "Variable `zone_redundancy_enabled` is deprecated. Rename to `zone_redundant`."
-  }
-}
-
-check "deprecated_infrastructure_resource_group_name" {
-  assert {
-    condition     = var.infrastructure_resource_group_name == null
-    error_message = "Variable `infrastructure_resource_group_name` is deprecated. Rename to `infrastructure_resource_group`."
-  }
-}
-
-check "deprecated_public_network_access_enabled" {
-  assert {
-    condition     = var.public_network_access_enabled == null
-    error_message = "Variable `public_network_access_enabled` is deprecated. Use `public_network_access` (\"Enabled\" or \"Disabled\") instead."
-  }
-}
-
-check "deprecated_workload_profile" {
-  assert {
-    condition     = var.workload_profile == null
-    error_message = "Variable `workload_profile` (set) is deprecated. Rename to `workload_profiles` (list)."
-  }
-}
-
-check "deprecated_internal_load_balancer_enabled" {
-  assert {
-    condition     = var.internal_load_balancer_enabled == null
-    error_message = "Variable `internal_load_balancer_enabled` is deprecated. Use `vnet_configuration = { internal = true }` instead."
-  }
-}
-
-check "deprecated_infrastructure_subnet_id" {
-  assert {
-    condition     = var.infrastructure_subnet_id == null
-    error_message = "Variable `infrastructure_subnet_id` is deprecated. Use `vnet_configuration = { infrastructure_subnet_id = \"...\" }` instead."
-  }
-}
-
-check "deprecated_peer_authentication_enabled" {
-  assert {
-    condition     = var.peer_authentication_enabled == null
-    error_message = "Variable `peer_authentication_enabled` is deprecated. Use `peer_authentication = { mtls = { enabled = true } }` instead."
-  }
-}
-
-check "deprecated_peer_traffic_encryption_enabled" {
-  assert {
-    condition     = var.peer_traffic_encryption_enabled == null
-    error_message = "Variable `peer_traffic_encryption_enabled` is deprecated. Use `peer_traffic_configuration = { encryption = { enabled = true } }` instead."
-  }
-}
+# Non-ephemeral deprecated inputs warn via check blocks below. Ephemeral deprecated
+# inputs cannot be referenced from check conditions, so those continue to fall back
+# silently through locals.tf.
 
 check "deprecated_custom_domain_dns_suffix" {
   assert {
@@ -129,6 +35,27 @@ check "deprecated_custom_domain_certificate_value" {
   }
 }
 
+check "deprecated_infrastructure_resource_group_name" {
+  assert {
+    condition     = var.infrastructure_resource_group_name == null
+    error_message = "Variable `infrastructure_resource_group_name` is deprecated. Rename to `infrastructure_resource_group`."
+  }
+}
+
+check "deprecated_infrastructure_subnet_id" {
+  assert {
+    condition     = var.infrastructure_subnet_id == null
+    error_message = "Variable `infrastructure_subnet_id` is deprecated. Use `vnet_configuration = { infrastructure_subnet_id = \"...\" }` instead."
+  }
+}
+
+check "deprecated_internal_load_balancer_enabled" {
+  assert {
+    condition     = var.internal_load_balancer_enabled == null
+    error_message = "Variable `internal_load_balancer_enabled` is deprecated. Use `vnet_configuration = { internal = true }` instead."
+  }
+}
+
 check "deprecated_log_analytics_workspace_customer_id" {
   assert {
     condition     = var.log_analytics_workspace_customer_id == null
@@ -140,5 +67,40 @@ check "deprecated_log_analytics_workspace_destination" {
   assert {
     condition     = var.log_analytics_workspace_destination == null
     error_message = "Variable `log_analytics_workspace_destination` is deprecated. Use `app_logs_configuration.destination` instead."
+  }
+}
+
+check "deprecated_peer_authentication_enabled" {
+  assert {
+    condition     = var.peer_authentication_enabled == null
+    error_message = "Variable `peer_authentication_enabled` is deprecated. Use `peer_authentication = { mtls = { enabled = true } }` instead."
+  }
+}
+
+check "deprecated_peer_traffic_encryption_enabled" {
+  assert {
+    condition     = var.peer_traffic_encryption_enabled == null
+    error_message = "Variable `peer_traffic_encryption_enabled` is deprecated. Use `peer_traffic_configuration = { encryption = { enabled = true } }` instead."
+  }
+}
+
+check "deprecated_public_network_access_enabled" {
+  assert {
+    condition     = var.public_network_access_enabled == null
+    error_message = "Variable `public_network_access_enabled` is deprecated. Use `public_network_access` (\"Enabled\" or \"Disabled\") instead."
+  }
+}
+
+check "deprecated_workload_profile" {
+  assert {
+    condition     = var.workload_profile == null
+    error_message = "Variable `workload_profile` (set) is deprecated. Rename to `workload_profiles` (list)."
+  }
+}
+
+check "deprecated_zone_redundancy_enabled" {
+  assert {
+    condition     = var.zone_redundancy_enabled == null
+    error_message = "Variable `zone_redundancy_enabled` is deprecated. Rename to `zone_redundant`."
   }
 }

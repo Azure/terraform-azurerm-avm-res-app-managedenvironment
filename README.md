@@ -1222,10 +1222,6 @@ Description: A map of dapr components connected to this environment. The map key
 
 Description: The default domain of the Container Apps Managed Environment.
 
-### <a name="output_deprecation_warnings"></a> [deprecation\_warnings](#output\_deprecation\_warnings)
-
-Description: Deprecation warnings for any deprecated input variables that are currently set. Empty when no deprecated variables are in use. Check blocks in deprecations.tf also emit these as plan/apply warnings.
-
 ### <a name="output_docker_bridge_cidr"></a> [docker\_bridge\_cidr](#output\_docker\_bridge\_cidr)
 
 Description: The Docker bridge CIDR of the Container Apps Managed Environment.
