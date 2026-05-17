@@ -58,14 +58,19 @@ resource "azapi_resource" "this_environment" {
       }
     }
   }
-  sensitive_body_version = local.effective_app_logs_configuration != null && local.effective_app_logs_configuration.destination == "log-analytics" ? null : {
-    "properties.appInsightsConfiguration.connectionString"                                     = var.connection_string_version
-    "properties.customDomainConfiguration.certificatePassword"                                 = var.certificate_password_version
-    "properties.customDomainConfiguration.certificateValue"                                    = var.certificate_value_version
-    "properties.daprAIConnectionString"                                                        = var.dapr_ai_connection_string_version
-    "properties.daprAIInstrumentationKey"                                                      = var.dapr_ai_instrumentation_key_version
-    "properties.openTelemetryConfiguration.destinationsConfiguration.dataDogConfiguration.key" = var.key_version
-  }
+  sensitive_body_version = merge(
+    {
+      "properties.appInsightsConfiguration.connectionString"                                     = var.connection_string_version
+      "properties.customDomainConfiguration.certificatePassword"                                 = var.certificate_password_version
+      "properties.customDomainConfiguration.certificateValue"                                    = var.certificate_value_version
+      "properties.daprAIConnectionString"                                                        = var.dapr_ai_connection_string_version
+      "properties.daprAIInstrumentationKey"                                                      = var.dapr_ai_instrumentation_key_version
+      "properties.openTelemetryConfiguration.destinationsConfiguration.dataDogConfiguration.key" = var.key_version
+    },
+    local.effective_app_logs_configuration != null && local.effective_app_logs_configuration.destination == "log-analytics" && var.shared_key != null ? {
+      "properties.appLogsConfiguration.logAnalyticsConfiguration.sharedKey" = var.shared_key_version
+    } : {}
+  )
   tags           = var.tags
   update_headers = var.enable_telemetry ? { "User-Agent" : local.avm_azapi_header } : null
 

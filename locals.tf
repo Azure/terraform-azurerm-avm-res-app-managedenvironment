@@ -67,11 +67,6 @@ locals {
 }
 
 locals {
-  # Deprecated var.workload_profile (set) fallback — tolist() ordering is not guaranteed for sets.
-  # var.workload_profiles (list) takes priority when both are set.
-  _workload_profiles_input = var.workload_profiles != null ? var.workload_profiles : (
-    var.workload_profile != null ? tolist(var.workload_profile) : null
-  )
   # Resource ID maps for outputs
   certificate_resource_ids    = { for ck, cv in module.certificates : ck => { id = cv.resource_id } }
   dapr_component_resource_ids = { for dk, dv in module.dapr_components : dk => { id = dv.resource_id } }
@@ -99,6 +94,11 @@ locals {
     var.public_network_access != null ? var.public_network_access : (
       var.public_network_access_enabled != null ? (var.public_network_access_enabled ? "Enabled" : "Disabled") : null
     )
+  )
+  # Deprecated var.workload_profile (set) fallback — tolist() ordering is not guaranteed for sets.
+  # var.workload_profiles (list) takes priority when both are set.
+  effective_workload_profiles_input = var.workload_profiles != null ? var.workload_profiles : (
+    var.workload_profile != null ? tolist(var.workload_profile) : null
   )
   # Effective Log Analytics shared key — use explicit ephemeral var if provided, then deprecated
   # fallback, then auto-fetch from log_analytics_workspace resource ID.
@@ -206,9 +206,9 @@ locals {
   # Workload profiles idempotency fix: when dedicated profiles are specified, always add a Consumption
   # profile to avoid drift on subsequent runs (Azure creates one implicitly).
   workload_profiles = (
-    local._workload_profiles_input != null && length(local._workload_profiles_input) > 0 ? concat(
+    local.effective_workload_profiles_input != null && length(local.effective_workload_profiles_input) > 0 ? concat(
       [
-        for wp in local._workload_profiles_input : {
+        for wp in local.effective_workload_profiles_input : {
           name                = wp.name
           workloadProfileType = wp.workload_profile_type
           minimumCount        = wp.minimum_count
