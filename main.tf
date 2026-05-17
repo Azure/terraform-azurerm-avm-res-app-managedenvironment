@@ -67,7 +67,7 @@ resource "azapi_resource" "this_environment" {
       "properties.daprAIInstrumentationKey"                                                      = var.dapr_ai_instrumentation_key_version
       "properties.openTelemetryConfiguration.destinationsConfiguration.dataDogConfiguration.key" = var.key_version
     },
-    local.effective_app_logs_configuration != null && local.effective_app_logs_configuration.destination == "log-analytics" && var.shared_key != null ? {
+    local.effective_app_logs_configuration != null && local.effective_app_logs_configuration.destination == "log-analytics" && var.shared_key_version != null ? {
       "properties.appLogsConfiguration.logAnalyticsConfiguration.sharedKey" = var.shared_key_version
     } : {}
   )
