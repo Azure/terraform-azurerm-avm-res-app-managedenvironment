@@ -2,24 +2,11 @@
 
 This document describes adopter-facing changes when upgrading this module between versions.
 
-It is intentionally focused on migration work you may need to do in your configuration. New functionality belongs in release notes and is not repeated here.
+It is intentionally focused on migration work you may need to do in your configuration.
 
 ---
 
 ## 0.4.0 to 0.5.0 (Unreleased)
-
-### What is handled automatically
-
-The following changes are handled by compatibility shims or `moved` blocks and do **not** require immediate action:
-
-- singular submodule addresses renamed to plural:
-  - `module.certificate` -> `module.certificates`
-  - `module.dapr_component` -> `module.dapr_components`
-  - `module.managed_certificate` -> `module.managed_certificates`
-  - `module.storage` -> `module.storages`
-- legacy root variables that now map to newer nested inputs still continue to work for now through deprecation fallbacks
-
-You should still migrate off deprecated inputs over time, but they are not the primary breaking item in this upgrade.
 
 ### Main migration work
 
@@ -187,7 +174,7 @@ Several sensitive values are now modeled as write-only inputs. When you use them
 
 ### Deprecated inputs you should plan to migrate
 
-The older root inputs below still have compatibility handling in this branch, but should be treated as deprecated migration paths rather than long-term configuration:
+The older root inputs below still have compatibility handling in this release, but they will surface as check warnings and you should plan to move to the new equivalents:
 
 - `zone_redundancy_enabled` -> `zone_redundant`
 - `workload_profile` -> `workload_profiles`
