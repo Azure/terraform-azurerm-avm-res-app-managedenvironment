@@ -9,6 +9,12 @@ output "custom_domain_verification_id" {
   value       = try(azapi_resource.this_environment.output.properties.customDomainConfiguration.customDomainVerificationId, null)
 }
 
+output "dapr_ai_instrumentation_key" {
+  description = "The Dapr AI instrumentation key of the Container Apps Managed Environment."
+  sensitive   = true
+  value       = try(azapi_resource.this_environment.output.properties.daprAIInstrumentationKey, null)
+}
+
 output "dapr_component_resource_ids" {
   description = "A map of dapr components connected to this environment. The map key is the supplied input to var.dapr_components. The map value is the azurerm-formatted version of the entire dapr_components resource."
   value       = local.dapr_component_resource_ids
@@ -24,9 +30,9 @@ output "docker_bridge_cidr" {
   value       = try(azapi_resource.this_environment.output.properties.vnetConfiguration.dockerBridgeCidr, null)
 }
 
-output "id" {
-  description = "The ID of the container app management environment resource."
-  value       = azapi_resource.this_environment.id
+output "event_stream_endpoint" {
+  description = "The event stream endpoint of the Container Apps Managed Environment."
+  value       = try(azapi_resource.this_environment.output.properties.eventStreamEndpoint, null)
 }
 
 output "infrastructure_resource_group" {
@@ -57,6 +63,11 @@ output "platform_reserved_cidr" {
 output "platform_reserved_dns_ip_address" {
   description = "The platform reserved DNS IP address of the Container Apps Managed Environment."
   value       = try(azapi_resource.this_environment.output.properties.vnetConfiguration.platformReservedDnsIP, null)
+}
+
+output "resource" {
+  description = "The full resource object of the Container Apps Managed Environment."
+  value       = azapi_resource.this_environment
 }
 
 output "resource_id" {

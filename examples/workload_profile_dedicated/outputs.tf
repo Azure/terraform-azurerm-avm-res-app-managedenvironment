@@ -14,7 +14,7 @@ output "docker_bridge_cidr" {
 }
 
 output "id" {
-  description = "The resource ID of the Container Apps Managed Environment."
+  description = "DEPRECATED: Use 'resource_id' instead. The resource ID of the Container Apps Managed Environment."
   value       = module.managedenvironment.id
 }
 

@@ -101,31 +101,43 @@ module "managedenvironment" {
   resource_group_name = azurerm_resource_group.this.name
   dapr_components = {
     "my-dapr-component" = {
-      component_type = "state.azure.blobstorage"
-      version        = "v1"
+      component_type          = "state.azure.blobstorage"
+      dapr_components_version = "v1"
+      ignore_errors           = true
+      location                = azurerm_resource_group.this.location
+      name                    = "my-dapr-component"
     }
   }
-  infrastructure_resource_group_name = "rg-managed-${module.naming.container_app_environment.name_unique}"
-  infrastructure_subnet_id           = azurerm_subnet.this.id
-  internal_load_balancer_enabled     = true
-  log_analytics_workspace            = { resource_id = azurerm_log_analytics_workspace.this.id }
+  infrastructure_resource_group = "rg-managed-${module.naming.container_app_environment.name_unique}"
+  log_analytics_workspace       = { resource_id = azurerm_log_analytics_workspace.this.id }
   managed_identities = {
     system_assigned            = true
     user_assigned_resource_ids = [azurerm_user_assigned_identity.this.id]
   }
   storages = {
     "mycontainerappstorage" = {
-      account_name = azurerm_storage_account.this.name
-      share_name   = azurerm_storage_share.this.name
-      access_key   = azurerm_storage_account.this.primary_access_key
-      access_mode  = "ReadOnly"
+      azure_file = {
+        access_mode  = "ReadOnly"
+        account_name = azurerm_storage_account.this.name
+        share_name   = azurerm_storage_share.this.name
+      }
+      account_key         = azurerm_storage_account.this.primary_access_key
+      account_key_version = 1
+      location            = azurerm_resource_group.this.location
+      name                = "mycontainerappstorage"
     }
   }
-  workload_profile = [{
-    name                  = "Consumption"
-    workload_profile_type = "Consumption"
-  }]
-  zone_redundancy_enabled = true
+  vnet_configuration = {
+    infrastructure_subnet_id = azurerm_subnet.this.id
+    internal                 = true
+  }
+  workload_profiles = [
+    {
+      name                  = "Consumption"
+      workload_profile_type = "Consumption"
+    }
+  ]
+  zone_redundant = true
 }
 ```
 
@@ -179,7 +191,7 @@ Description: The Docker bridge CIDR of the Container Apps Managed Environment.
 
 ### <a name="output_id"></a> [id](#output\_id)
 
-Description: The resource ID of the Container Apps Managed Environment.
+Description: DEPRECATED: Use 'resource\_id' instead. The resource ID of the Container Apps Managed Environment.
 
 ### <a name="output_infrastructure_resource_group"></a> [infrastructure\_resource\_group](#output\_infrastructure\_resource\_group)
 

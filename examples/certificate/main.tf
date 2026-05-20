@@ -84,5 +84,5 @@ module "managedenvironment" {
     user_assigned_resource_ids = [azurerm_user_assigned_identity.this.id]
   }
   # zone redundancy must be disabled unless we supply a subnet for vnet integration.
-  zone_redundancy_enabled = false
+  zone_redundant = false
 }

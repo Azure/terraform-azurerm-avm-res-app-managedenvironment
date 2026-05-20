@@ -59,7 +59,7 @@ module "managedenvironment" {
   resource_group_name     = azurerm_resource_group.this.name
   log_analytics_workspace = { resource_id = azurerm_log_analytics_workspace.this.id }
   # zone redundancy must be disabled unless we supply a subnet for vnet integration.
-  zone_redundancy_enabled = false
+  zone_redundant = false
 }
 ```
 
@@ -96,7 +96,7 @@ The following outputs are exported:
 
 ### <a name="output_id"></a> [id](#output\_id)
 
-Description: The resource ID of the Container Apps Managed Environment.
+Description: DEPRECATED: Use 'resource\_id' instead. The resource ID of the Container Apps Managed Environment.
 
 ### <a name="output_name"></a> [name](#output\_name)
 

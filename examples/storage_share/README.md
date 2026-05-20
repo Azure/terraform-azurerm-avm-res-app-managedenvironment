@@ -69,26 +69,30 @@ resource "azurerm_storage_share" "this" {
 module "managedenvironment" {
   source = "../../"
 
-  location                                   = azurerm_resource_group.this.location
-  name                                       = module.naming.container_app_environment.name_unique
-  resource_group_name                        = azurerm_resource_group.this.name
-  log_analytics_workspace_customer_id        = azurerm_log_analytics_workspace.this.workspace_id
-  log_analytics_workspace_primary_shared_key = azurerm_log_analytics_workspace.this.primary_shared_key
+  location                = azurerm_resource_group.this.location
+  name                    = module.naming.container_app_environment.name_unique
+  resource_group_name     = azurerm_resource_group.this.name
+  log_analytics_workspace = { resource_id = azurerm_log_analytics_workspace.this.id }
   storages = {
     "mycontainerappstorage" = {
-      account_name = azurerm_storage_account.this.name
-      share_name   = azurerm_storage_share.this.name
-      access_key   = azurerm_storage_account.this.primary_access_key
-      access_mode  = "ReadOnly"
+      azure_file = {
+        access_mode  = "ReadOnly"
+        account_name = azurerm_storage_account.this.name
+        share_name   = azurerm_storage_share.this.name
+      }
+      account_key         = azurerm_storage_account.this.primary_access_key
+      account_key_version = 1
+      location            = azurerm_resource_group.this.location
+      name                = "mycontainerappstorage"
     }
   }
   # zone redundancy must be disabled unless we supply a subnet for vnet integration.
-  zone_redundancy_enabled = false
+  zone_redundant = false
 }
 
 moved {
   from = module.managedenvironment.azapi_resource.storages["mycontainerappstorage"]
-  to   = module.managedenvironment.module.storage["mycontainerappstorage"].azapi_resource.this
+  to   = module.managedenvironment.module.storages["mycontainerappstorage"].azapi_resource.this
 }
 ```
 
