@@ -8,6 +8,9 @@ resource "azapi_resource" "this_environment" {
   delete_headers       = var.enable_telemetry ? { "User-Agent" : local.avm_azapi_header } : null
   ignore_null_property = true
   read_headers         = var.enable_telemetry ? { "User-Agent" : local.avm_azapi_header } : null
+  retry = {
+    error_message_regex = ["ContainerAppEnvironmentDisabled"]
+  }
   replace_triggers_refs = [
     "kind",
     "properties.infrastructureResourceGroup",
@@ -94,6 +97,8 @@ resource "azapi_resource" "this_environment" {
   }
 
   lifecycle {
+    replace_triggered_by = [terraform_data.infrastructure_subnet_id]
+
     precondition {
       condition = local.effective_app_logs_configuration == null || local.effective_app_logs_configuration.destination != "log-analytics" || (
         try(local.effective_app_logs_configuration.log_analytics_configuration.customer_id, null) != null &&
@@ -110,6 +115,10 @@ resource "azapi_resource" "this_environment" {
       error_message = "public_network_access cannot be \"Enabled\" when vnet_configuration.internal is true. Set public_network_access to \"Disabled\" or disable the internal load balancer."
     }
   }
+}
+
+resource "terraform_data" "infrastructure_subnet_id" {
+  input = try(local.effective_vnet_configuration.infrastructure_subnet_id, null)
 }
 
 resource "azurerm_management_lock" "this" {
@@ -160,11 +169,11 @@ resource "azurerm_monitor_diagnostic_setting" "this" {
       category_group = enabled_log.value
     }
   }
-  dynamic "metric" {
+  dynamic "enabled_metric" {
     for_each = each.value.metric_categories
 
     content {
-      category = metric.value
+      category = enabled_metric.value
     }
   }
 }
