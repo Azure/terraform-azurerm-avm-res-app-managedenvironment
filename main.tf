@@ -32,6 +32,14 @@ resource "azapi_resource" "this_environment" {
     "properties.vnetConfiguration.platformReservedCidr",
     "properties.vnetConfiguration.platformReservedDnsIP",
   ]
+  # Retry on transient errors raised against environments that have been
+  # scaled to zero ("sleeping"). The control plane returns
+  # ContainerAppEnvironmentDisabled until the environment finishes waking.
+  retry = {
+    error_message_regex = [
+      "ContainerAppEnvironmentDisabled",
+    ]
+  }
   schema_validation_enabled = true
   sensitive_body = {
     properties = {
@@ -81,14 +89,6 @@ resource "azapi_resource" "this_environment" {
       type         = identity.value.type
       identity_ids = identity.value.user_assigned_resource_ids
     }
-  }
-  # Retry on transient errors raised against environments that have been
-  # scaled to zero ("sleeping"). The control plane returns
-  # ContainerAppEnvironmentDisabled until the environment finishes waking.
-  retry = {
-    error_message_regex = [
-      "ContainerAppEnvironmentDisabled",
-    ]
   }
   dynamic "timeouts" {
     for_each = var.timeouts == null ? [] : [var.timeouts]
