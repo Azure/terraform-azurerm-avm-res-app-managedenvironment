@@ -32,6 +32,14 @@ resource "azapi_resource" "this_environment" {
     "properties.vnetConfiguration.platformReservedCidr",
     "properties.vnetConfiguration.platformReservedDnsIP",
   ]
+  # Retry on transient errors raised against environments that have been
+  # scaled to zero ("sleeping"). The control plane returns
+  # ContainerAppEnvironmentDisabled until the environment finishes waking.
+  retry = {
+    error_message_regex = [
+      "ContainerAppEnvironmentDisabled",
+    ]
+  }
   schema_validation_enabled = true
   sensitive_body = {
     properties = {
@@ -141,7 +149,7 @@ resource "azurerm_monitor_diagnostic_setting" "this" {
   target_resource_id             = azapi_resource.this_environment.id
   eventhub_authorization_rule_id = each.value.event_hub_authorization_rule_resource_id
   eventhub_name                  = each.value.event_hub_name
-  log_analytics_destination_type = each.value.log_analytics_destination_type
+  log_analytics_destination_type = each.value.log_analytics_destination_type == "Dedicated" ? null : each.value.log_analytics_destination_type
   log_analytics_workspace_id     = each.value.workspace_resource_id
   partner_solution_id            = each.value.marketplace_partner_resource_id
   storage_account_id             = each.value.storage_account_resource_id
@@ -160,11 +168,11 @@ resource "azurerm_monitor_diagnostic_setting" "this" {
       category_group = enabled_log.value
     }
   }
-  dynamic "metric" {
+  dynamic "enabled_metric" {
     for_each = each.value.metric_categories
 
     content {
-      category = metric.value
+      category = enabled_metric.value
     }
   }
 }
