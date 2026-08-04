@@ -70,9 +70,9 @@ DESCRIPTION
 
 variable "certificate_password" {
   type        = string
-  ephemeral   = true
   default     = null
   description = "Certificate password for custom domain. Ephemeral — not stored in state."
+  ephemeral   = true
 }
 
 variable "certificate_password_version" {
@@ -88,9 +88,9 @@ variable "certificate_password_version" {
 
 variable "certificate_value" {
   type        = string
-  ephemeral   = true
   default     = null
   description = "PFX or PEM blob for the custom domain certificate. Ephemeral — not stored in state. Use `certificate_value_version` to track changes. Takes precedence over `custom_domain_configuration.certificate_value`."
+  ephemeral   = true
 }
 
 variable "certificate_value_version" {
@@ -106,9 +106,9 @@ variable "certificate_value_version" {
 
 variable "connection_string" {
   type        = string
-  ephemeral   = true
   default     = null
   description = "Application Insights connection string for `app_insights_configuration`. Ephemeral — not stored in state. Use `connection_string_version` to track changes."
+  ephemeral   = true
 }
 
 variable "connection_string_version" {
@@ -135,10 +135,10 @@ variable "custom_domain_certificate_key_vault_url" {
 }
 
 variable "custom_domain_certificate_password" {
-  ephemeral   = true
   type        = string
   default     = null
   description = "DEPRECATED: Use `certificate_password` (ephemeral) + `certificate_password_version` instead. Will be removed in a future major release."
+  ephemeral   = true
 }
 
 variable "custom_domain_certificate_value" {
@@ -177,9 +177,9 @@ variable "custom_domain_dns_suffix" {
 
 variable "dapr_ai_connection_string" {
   type        = string
-  ephemeral   = true
   default     = null
   description = "Application Insights connection string used by Dapr to export Service to Service communication telemetry. Ephemeral — not stored in state."
+  ephemeral   = true
 }
 
 variable "dapr_ai_connection_string_version" {
@@ -195,9 +195,9 @@ variable "dapr_ai_connection_string_version" {
 
 variable "dapr_ai_instrumentation_key" {
   type        = string
-  ephemeral   = true
   default     = null
   description = "Azure Monitor instrumentation key used by Dapr to export Service to Service communication telemetry. Ephemeral — not stored in state."
+  ephemeral   = true
 }
 
 variable "dapr_ai_instrumentation_key_version" {
@@ -212,10 +212,10 @@ variable "dapr_ai_instrumentation_key_version" {
 }
 
 variable "dapr_application_insights_connection_string" {
-  ephemeral   = true
   type        = string
   default     = null
   description = "DEPRECATED: Use `dapr_ai_connection_string` (ephemeral) + `dapr_ai_connection_string_version` instead. Will be removed in a future major release."
+  ephemeral   = true
 }
 
 variable "dapr_configuration" {
@@ -358,9 +358,9 @@ variable "keda_configuration" {
 
 variable "key" {
   type        = string
-  ephemeral   = true
   default     = null
   description = "DataDog API key for `open_telemetry_configuration.destinations_configuration.data_dog_configuration`. Ephemeral — not stored in state. Use `key_version` to track changes."
+  ephemeral   = true
 }
 
 variable "key_version" {
@@ -432,10 +432,10 @@ variable "log_analytics_workspace_destination" {
 }
 
 variable "log_analytics_workspace_primary_shared_key" {
-  ephemeral   = true
   type        = string
   default     = null
   description = "DEPRECATED: Use `shared_key` (ephemeral) + `shared_key_version` instead. Will be removed in a future major release."
+  ephemeral   = true
 }
 
 variable "managed_identities" {
@@ -607,7 +607,6 @@ DESCRIPTION
 
 variable "shared_key" {
   type        = string
-  ephemeral   = true
   default     = null
   description = <<DESCRIPTION
 Log analytics primary shared key. Ephemeral — not stored in state.
@@ -615,6 +614,7 @@ Log analytics primary shared key. Ephemeral — not stored in state.
 The preferred mechanism is to specify `log_analytics_workspace.resource_id`, in which case this can be left as `null`.
 
 DESCRIPTION
+  ephemeral   = true
 }
 
 variable "shared_key_version" {
