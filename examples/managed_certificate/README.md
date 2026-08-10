@@ -133,44 +133,8 @@ Source: Azure/naming/azurerm
 
 Version: 0.4.0
 
-## Domain Validation Methods
+<!-- markdownlint-disable-next-line MD041 -->
+## Data Collection
 
-Azure supports three domain validation methods:
-
-### 1. CNAME Validation (Recommended)
-
-Create a CNAME record pointing to the Azure validation endpoint:
-
-```
-_acme-challenge.yourdomain.com CNAME <validation-endpoint>
-```
-
-### 2. TXT Validation
-
-Create a TXT record with the validation token:
-
-```
-_acme-challenge.yourdomain.com TXT <validation-token>
-```
-
-### 3. HTTP Validation
-
-Host a validation file at:
-
-```
-http://yourdomain.com/.well-known/acme-challenge/<token>
-```
-
-## Certificate Lifecycle
-
-- **Provisioning**: Takes several minutes after DNS validation completes
-- **Renewal**: Automatically renewed by Azure before expiration
-- **Validation**: Azure periodically re-validates domain ownership
-
-## Important Notes
-
-- DNS propagation can take up to 48 hours (typically much faster)
-- The managed environment must be created before certificates can be provisioned
-- Changes to validation configuration may trigger re-validation
-- Managed certificates are free and automatically renewed by Azure
+The software may collect information about you and your use of the software and send it to Microsoft. Microsoft may use this information to provide services and improve our products and services. You may turn off the telemetry as described in the repository. There are also some features in the software that may enable you and Microsoft to collect data from users of your applications. If you use these features, you must comply with applicable law, including providing appropriate notices to users of your applications together with a copy of Microsoft’s privacy statement. Our privacy statement is located at <https://go.microsoft.com/fwlink/?LinkID=824704>. You can learn more about data collection and use in the help documentation and our privacy statement. Your use of the software operates as your consent to these practices.
 <!-- END_TF_DOCS -->

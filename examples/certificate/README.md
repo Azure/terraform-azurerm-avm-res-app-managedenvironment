@@ -170,38 +170,8 @@ Source: Azure/naming/azurerm
 
 Version: 0.4.0
 
-## Certificate Options
+<!-- markdownlint-disable-next-line MD041 -->
+## Data Collection
 
-This example demonstrates two patterns:
-
-### 1. Direct Certificate Upload
-
-Use `certificate_value` (base64-encoded) and `certificate_password` for direct upload:
-
-```hcl
-certificates = {
-  "example-cert" = {
-    certificate_value    = filebase64("./mycert.pfx")
-    certificate_password = "MyPassword123!"
-  }
-}
-```
-
-### 2. Key Vault Reference
-
-Use `key_vault_secret_id` to reference a certificate stored in Azure Key Vault:
-
-```hcl
-certificates = {
-  "example-cert" = {
-    key_vault_secret_id = "https://myvault.vault.azure.net/secrets/mycert/version"
-  }
-}
-```
-
-## Security Considerations
-
-- Certificate passwords are sensitive and should be stored securely (e.g., Azure Key Vault, environment variables)
-- Key Vault references require appropriate RBAC or access policy permissions
-- Always use managed identity when possible for Key Vault authentication
+The software may collect information about you and your use of the software and send it to Microsoft. Microsoft may use this information to provide services and improve our products and services. You may turn off the telemetry as described in the repository. There are also some features in the software that may enable you and Microsoft to collect data from users of your applications. If you use these features, you must comply with applicable law, including providing appropriate notices to users of your applications together with a copy of Microsoft’s privacy statement. Our privacy statement is located at <https://go.microsoft.com/fwlink/?LinkID=824704>. You can learn more about data collection and use in the help documentation and our privacy statement. Your use of the software operates as your consent to these practices.
 <!-- END_TF_DOCS -->
