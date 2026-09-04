@@ -49,8 +49,6 @@ resource "azurerm_log_analytics_workspace" "this" {
   resource_group_name = azurerm_resource_group.this.name
 }
 
-
-
 module "managedenvironment" {
   source = "../../"
 

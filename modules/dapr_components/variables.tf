@@ -88,11 +88,11 @@ variable "secrets" {
     name          = optional(string)
     value         = optional(string)
   }))
-  ephemeral   = true
   default     = null
   description = <<DESCRIPTION
 Collection of secrets used by a Dapr component
 DESCRIPTION
+  ephemeral   = true
 }
 
 variable "secrets_version" {
