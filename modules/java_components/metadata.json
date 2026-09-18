@@ -1,0 +1,7 @@
+{
+  "$schema": "https://raw.githubusercontent.com/Azure/azure-verified-modules-tools/main/src/Avm.Authoring/Resources/Schemas/v1/avm-module-metadata.schema.json",
+  "moduleDisplayName": "Container Apps Environment Java Components",
+  "moduleDescription": "Manages a Java managed component (Eureka Server, Spring Cloud Config, etc.) for a Container Apps Managed Environment.",
+  "canonicalType": "Microsoft.App/managedEnvironments/javaComponents",
+  "telemetryIdPrefix": "46d3xtrf.res.f813e4c"
+}
