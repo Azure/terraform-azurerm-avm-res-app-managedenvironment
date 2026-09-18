@@ -101,6 +101,7 @@ module "managedenvironment" {
       name                    = "my-dapr-component"
     }
   }
+  enable_telemetry              = var.enable_telemetry
   infrastructure_resource_group = "rg-managed-${module.naming.container_app_environment.name_unique}"
   log_analytics_workspace       = { resource_id = azurerm_log_analytics_workspace.this.id }
   managed_identities = {

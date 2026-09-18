@@ -48,6 +48,7 @@ module "managedenvironment" {
   location                = azurerm_resource_group.this.location
   name                    = module.naming.container_app_environment.name_unique
   resource_group_name     = azurerm_resource_group.this.name
+  enable_telemetry        = var.enable_telemetry
   log_analytics_workspace = { resource_id = azurerm_log_analytics_workspace.this.id }
   # zone redundancy must be disabled unless we supply a subnet for vnet integration.
   zone_redundant = false
