@@ -689,7 +689,7 @@ variable "workload_profile" {
     condition = var.workload_profile == null ? true : alltrue([
       for wp in var.workload_profile : contains([
         "Consumption",
-        "Flexible",
+        "Flex",
         "D4",
         "D8",
         "D16",
@@ -712,7 +712,16 @@ variable "workload_profile" {
         "Consumption-GPU-NC8as-T4",
       ], wp.workload_profile_type)
     ])
-    error_message = "Invalid value for workload_profile_type. Valid options are 'Consumption', 'Flexible', 'D4', 'D8', 'D16', 'D32', 'E4', 'E8', 'E16', 'E32', 'DC4', 'DC8', 'DC16', 'DC32', 'DC48', 'DC64', 'DC96', 'NC24-A100', 'NC48-A100', 'NC96-A100', 'Consumption-GPU-NC24-A100', and 'Consumption-GPU-NC8as-T4'."
+    error_message = "Invalid value for workload_profile_type. Valid options are 'Consumption', 'Flex', 'D4', 'D8', 'D16', 'D32', 'E4', 'E8', 'E16', 'E32', 'DC4', 'DC8', 'DC16', 'DC32', 'DC48', 'DC64', 'DC96', 'NC24-A100', 'NC48-A100', 'NC96-A100', 'Consumption-GPU-NC24-A100', and 'Consumption-GPU-NC8as-T4'."
+  }
+  validation {
+    condition = var.workload_profile == null ? true : alltrue([
+      for wp in var.workload_profile :
+      wp.workload_profile_type != "Flex" ||
+      wp.name == "Flex"
+    ])
+
+    error_message = "When workload_profile_type is 'Flex', workload_profile name must be 'Flex'."
   }
 }
 
@@ -730,7 +739,7 @@ Workload profiles configured for the Managed Environment. This is in addition to
 - `maximum_count` - (Optional) The maximum number of instances of workload profile that can be deployed in the Container App Environment. Required for Dedicated profile types.
 - `minimum_count` - (Optional) The minimum number of instances of workload profile that can be deployed in the Container App Environment. Required for Dedicated profile types.
 - `name` - (Required) The name of the workload profile.
-- `workload_profile_type` - (Required) Workload profile type for the workloads to run on. Current documented values are `Consumption`, `Flexible`, `D4`, `D8`, `D16`, `D32`, `E4`, `E8`, `E16`, `E32`, `DC4`, `DC8`, `DC16`, `DC32`, `DC48`, `DC64`, `DC96`, `NC24-A100`, `NC48-A100`, `NC96-A100`, `Consumption-GPU-NC24-A100`, and `Consumption-GPU-NC8as-T4`.
+- `workload_profile_type` - (Required) Workload profile type for the workloads to run on. Current documented values are `Consumption`, `Flex`, `D4`, `D8`, `D16`, `D32`, `E4`, `E8`, `E16`, `E32`, `DC4`, `DC8`, `DC16`, `DC32`, `DC48`, `DC64`, `DC96`, `NC24-A100`, `NC48-A100`, `NC96-A100`, `Consumption-GPU-NC24-A100`, and `Consumption-GPU-NC8as-T4`.
 Examples:
 
 ```hcl
@@ -752,7 +761,7 @@ DESCRIPTION
     condition = var.workload_profiles == null ? true : alltrue([
       for wp in var.workload_profiles : contains([
         "Consumption",
-        "Flexible",
+        "Flex",
         "D4",
         "D8",
         "D16",
@@ -775,7 +784,16 @@ DESCRIPTION
         "Consumption-GPU-NC8as-T4",
       ], wp.workload_profile_type)
     ])
-    error_message = "Invalid value for workload_profile_type. Valid options are 'Consumption', 'Flexible', 'D4', 'D8', 'D16', 'D32', 'E4', 'E8', 'E16', 'E32', 'DC4', 'DC8', 'DC16', 'DC32', 'DC48', 'DC64', 'DC96', 'NC24-A100', 'NC48-A100', 'NC96-A100', 'Consumption-GPU-NC24-A100', and 'Consumption-GPU-NC8as-T4'."
+    error_message = "Invalid value for workload_profile_type. Valid options are 'Consumption', 'Flex', 'D4', 'D8', 'D16', 'D32', 'E4', 'E8', 'E16', 'E32', 'DC4', 'DC8', 'DC16', 'DC32', 'DC48', 'DC64', 'DC96', 'NC24-A100', 'NC48-A100', 'NC96-A100', 'Consumption-GPU-NC24-A100', and 'Consumption-GPU-NC8as-T4'."
+  }
+  validation {
+    condition = var.workload_profiles == null ? true : alltrue([
+      for wp in var.workload_profiles :
+      wp.workload_profile_type != "Flex" ||
+      wp.name == "Flex"
+    ])
+
+    error_message = "When workload_profile_type is 'Flex', workload_profiles name must be 'Flex'."
   }
 }
 
