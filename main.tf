@@ -4,10 +4,7 @@ resource "azapi_resource" "this_environment" {
   parent_id            = local.parent_id
   type                 = "Microsoft.App/managedEnvironments@2025-10-02-preview"
   body                 = local.resource_body
-  create_headers       = var.enable_telemetry ? { "User-Agent" : local.avm_azapi_header } : null
-  delete_headers       = var.enable_telemetry ? { "User-Agent" : local.avm_azapi_header } : null
   ignore_null_property = true
-  read_headers         = var.enable_telemetry ? { "User-Agent" : local.avm_azapi_header } : null
   replace_triggers_refs = [
     "kind",
     "properties.infrastructureResourceGroup",
@@ -79,8 +76,7 @@ resource "azapi_resource" "this_environment" {
       "properties.appLogsConfiguration.logAnalyticsConfiguration.sharedKey" = coalesce(var.shared_key_version, 1)
     } : {}
   )
-  tags           = var.tags
-  update_headers = var.enable_telemetry ? { "User-Agent" : local.avm_azapi_header } : null
+  tags = var.tags
 
   dynamic "identity" {
     for_each = local.managed_identities.system_assigned_user_assigned

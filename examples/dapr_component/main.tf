@@ -64,6 +64,7 @@ module "managedenvironment" {
       name                    = "my-dapr-component"
     }
   }
+  enable_telemetry        = var.enable_telemetry
   log_analytics_workspace = { resource_id = azurerm_log_analytics_workspace.this.id }
   # zone redundancy must be disabled unless we supply a subnet for vnet integration.
   zone_redundant = false

@@ -51,10 +51,10 @@ resource "azurerm_virtual_network" "this" {
 }
 
 resource "azurerm_subnet" "this" {
-  address_prefixes     = ["192.168.0.0/23"]
   name                 = module.naming.subnet.name_unique
   resource_group_name  = azurerm_resource_group.this.name
   virtual_network_name = azurerm_virtual_network.this.name
+  address_prefixes     = ["192.168.0.0/23"]
 
   delegation {
     name = "Microsoft.App.environments"
@@ -101,6 +101,7 @@ module "managedenvironment" {
       name                    = "my-dapr-component"
     }
   }
+  enable_telemetry              = var.enable_telemetry
   infrastructure_resource_group = "rg-managed-${module.naming.container_app_environment.name_unique}"
   log_analytics_workspace       = { resource_id = azurerm_log_analytics_workspace.this.id }
   managed_identities = {

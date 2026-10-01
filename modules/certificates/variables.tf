@@ -46,11 +46,11 @@ DESCRIPTION
 
 variable "password" {
   type        = string
-  ephemeral   = true
   default     = null
   description = <<DESCRIPTION
 Certificate password.
 DESCRIPTION
+  ephemeral   = true
 }
 
 variable "password_version" {
@@ -77,11 +77,11 @@ DESCRIPTION
 
 variable "value" {
   type        = any
-  ephemeral   = true
   default     = null
   description = <<DESCRIPTION
 PFX or PEM blob
 DESCRIPTION
+  ephemeral   = true
 }
 
 variable "value_version" {

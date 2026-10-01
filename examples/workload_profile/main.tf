@@ -51,10 +51,10 @@ resource "azurerm_virtual_network" "this" {
 }
 
 resource "azurerm_subnet" "this" {
-  address_prefixes     = ["192.168.0.0/23"]
   name                 = module.naming.subnet.name_unique
   resource_group_name  = azurerm_resource_group.this.name
   virtual_network_name = azurerm_virtual_network.this.name
+  address_prefixes     = ["192.168.0.0/23"]
 
   delegation {
     name = "Microsoft.App.environments"
@@ -72,6 +72,7 @@ module "managedenvironment" {
   location                = azurerm_resource_group.this.location
   name                    = module.naming.container_app_environment.name_unique
   resource_group_name     = azurerm_resource_group.this.name
+  enable_telemetry        = var.enable_telemetry
   log_analytics_workspace = { resource_id = azurerm_log_analytics_workspace.this.id }
   vnet_configuration = {
     infrastructure_subnet_id = azurerm_subnet.this.id

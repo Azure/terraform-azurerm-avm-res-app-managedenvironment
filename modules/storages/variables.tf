@@ -14,11 +14,11 @@ DESCRIPTION
 
 variable "account_key" {
   type        = string
-  ephemeral   = true
   default     = null
   description = <<DESCRIPTION
 Storage account key for azure file.
 DESCRIPTION
+  ephemeral   = true
 }
 
 variable "account_key_version" {

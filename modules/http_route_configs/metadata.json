@@ -1,0 +1,7 @@
+{
+  "$schema": "https://raw.githubusercontent.com/Azure/azure-verified-modules-tools/main/src/Avm.Authoring/Resources/Schemas/v1/avm-module-metadata.schema.json",
+  "moduleDisplayName": "Container Apps Environment HTTP Route Configurations",
+  "moduleDescription": "Manages HTTP routing rules (traffic splitting, path-based routing) for a Container Apps Managed Environment.",
+  "canonicalType": "Microsoft.App/managedEnvironments/httpRouteConfigs",
+  "telemetryIdPrefix": "46d3xtrf.res.6a5fe61"
+}

@@ -1,0 +1,7 @@
+{
+  "$schema": "https://raw.githubusercontent.com/Azure/azure-verified-modules-tools/main/src/Avm.Authoring/Resources/Schemas/v1/avm-module-metadata.schema.json",
+  "moduleDisplayName": "Container Apps Environment Maintenance Configurations",
+  "moduleDescription": "Manages a planned maintenance window for a Container Apps Managed Environment.",
+  "canonicalType": "Microsoft.App/managedEnvironments/maintenanceConfigurations",
+  "telemetryIdPrefix": "46d3xtrf.res.223c906"
+}
