@@ -2,6 +2,7 @@ module "dapr_subscriptions" {
   source   = "./modules/dapr_subscriptions"
   for_each = var.dapr_subscriptions
 
+  location          = var.location
   name              = each.value.name
   parent_id         = azapi_resource.this_environment.id
   bulk_subscribe    = each.value.bulk_subscribe
