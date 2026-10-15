@@ -3,6 +3,7 @@ module "java_components" {
   for_each = var.java_components
 
   component_type   = each.value.component_type
+  location         = var.location
   name             = each.value.name
   parent_id        = azapi_resource.this_environment.id
   configurations   = each.value.configurations

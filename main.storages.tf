@@ -2,6 +2,7 @@ module "storages" {
   source   = "./modules/storages"
   for_each = var.storages
 
+  location            = var.location
   name                = each.value.name
   parent_id           = azapi_resource.this_environment.id
   account_key         = each.value.account_key

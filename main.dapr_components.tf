@@ -2,6 +2,7 @@ module "dapr_components" {
   source   = "./modules/dapr_components"
   for_each = var.dapr_components
 
+  location                = var.location
   name                    = each.value.name
   parent_id               = azapi_resource.this_environment.id
   component_type          = each.value.component_type
