@@ -1,9 +1,10 @@
 resource "azapi_resource" "this" {
-  location  = var.location
-  name      = var.name
-  parent_id = var.parent_id
-  type      = "Microsoft.App/managedEnvironments/certificates@2025-10-02-preview"
-  body      = local.resource_body
+  location            = var.location
+  name                = var.name
+  parent_id           = var.parent_id
+  type                = var.resource_types.app_managed_environments_certificates
+  body                = local.resource_body
+  ignore_body_changes = length(var.ignore_body_changes.app_managed_environments_certificates) > 0 ? var.ignore_body_changes.app_managed_environments_certificates : null
   replace_triggers_refs = [
     "properties.certificateKeyVaultProperties.keyVaultUrl",
     "properties.certificateKeyVaultProperties.identity",
@@ -19,6 +20,7 @@ resource "azapi_resource" "this" {
     "properties.thumbprint",
     "properties.valid",
   ]
+  retry = var.retry
   sensitive_body = {
     properties = {
       password = var.password
@@ -30,4 +32,15 @@ resource "azapi_resource" "this" {
     "properties.value"    = var.value_version
   }
   tags = var.tags
+
+  dynamic "timeouts" {
+    for_each = var.timeouts == null ? [] : [var.timeouts]
+
+    content {
+      create = timeouts.value.create
+      delete = timeouts.value.delete
+      read   = timeouts.value.read
+      update = timeouts.value.update
+    }
+  }
 }

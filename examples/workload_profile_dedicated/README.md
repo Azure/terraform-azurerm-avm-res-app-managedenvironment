@@ -6,27 +6,12 @@ This deploys a Container Apps Managed Environment using a workload profile with 
 
 ```hcl
 terraform {
-  required_version = ">= 1.9, < 2.0"
+  required_version = ">= 1.12, < 2.0"
 
   required_providers {
-    # ignore this because we want to force the use of AzAPI v1 within the module without having it used in this example.
-    # tflint-ignore: terraform_unused_required_providers
     azapi = {
       source  = "Azure/azapi"
-      version = "~> 2.0"
-    }
-    azurerm = {
-      source  = "hashicorp/azurerm"
-      version = "~> 4.0"
-    }
-  }
-}
-
-provider "azurerm" {
-  resource_provider_registrations = "none"
-  features {
-    resource_group {
-      prevent_deletion_if_contains_resources = false
+      version = "~> 2.12"
     }
   }
 }
@@ -38,98 +23,142 @@ module "naming" {
 }
 
 # This is required for resource modules
-resource "azurerm_resource_group" "this" {
+resource "azapi_resource" "resource_group" {
   location = "australiaeast"
   name     = module.naming.resource_group.name_unique
+  type     = "Microsoft.Resources/resourceGroups@2024-03-01"
 }
 
-resource "azurerm_log_analytics_workspace" "this" {
-  location            = azurerm_resource_group.this.location
-  name                = module.naming.log_analytics_workspace.name_unique
-  resource_group_name = azurerm_resource_group.this.name
-}
-
-# Create the vnet to use with vnet integration
-resource "azurerm_virtual_network" "this" {
-  location            = azurerm_resource_group.this.location
-  name                = module.naming.virtual_network.name_unique
-  resource_group_name = azurerm_resource_group.this.name
-  address_space       = ["192.168.0.0/23"]
-}
-
-resource "azurerm_subnet" "this" {
-  name                 = module.naming.subnet.name_unique
-  resource_group_name  = azurerm_resource_group.this.name
-  virtual_network_name = azurerm_virtual_network.this.name
-  address_prefixes     = ["192.168.0.0/23"]
-
-  delegation {
-    name = "Microsoft.App.environments"
-
-    service_delegation {
-      name    = "Microsoft.App/environments"
-      actions = ["Microsoft.Network/virtualNetworks/subnets/join/action"]
+resource "azapi_resource" "log_analytics_workspace" {
+  location  = azapi_resource.resource_group.location
+  name      = module.naming.log_analytics_workspace.name_unique
+  parent_id = azapi_resource.resource_group.id
+  type      = "Microsoft.OperationalInsights/workspaces@2023-09-01"
+  body = {
+    properties = {
+      retentionInDays = 30
+      sku = {
+        name = "PerGB2018"
+      }
     }
   }
 }
 
-resource "azurerm_storage_account" "this" {
-  account_replication_type = "ZRS"
-  account_tier             = "Standard"
-  location                 = azurerm_resource_group.this.location
-  name                     = module.naming.storage_account.name_unique
-  resource_group_name      = azurerm_resource_group.this.name
+# Create the vnet to use with vnet integration
+resource "azapi_resource" "virtual_network" {
+  location  = azapi_resource.resource_group.location
+  name      = module.naming.virtual_network.name_unique
+  parent_id = azapi_resource.resource_group.id
+  type      = "Microsoft.Network/virtualNetworks@2024-05-01"
+  body = {
+    properties = {
+      addressSpace = {
+        addressPrefixes = ["192.168.0.0/23"]
+      }
+      subnets = [
+        {
+          name = module.naming.subnet.name_unique
+          properties = {
+            addressPrefix = "192.168.0.0/23"
+            delegations = [
+              {
+                name = "Microsoft.App.environments"
+                properties = {
+                  serviceName = "Microsoft.App/environments"
+                }
+              }
+            ]
+          }
+        }
+      ]
+    }
+  }
 }
 
-resource "azurerm_storage_share" "this" {
-  name               = "sharename"
-  quota              = 5
-  storage_account_id = azurerm_storage_account.this.id
+# Container Apps mounts Azure Files with the account key, so shared key access must stay enabled.
+resource "azapi_resource" "storage_account" {
+  location  = azapi_resource.resource_group.location
+  name      = module.naming.storage_account.name_unique
+  parent_id = azapi_resource.resource_group.id
+  type      = "Microsoft.Storage/storageAccounts@2024-01-01"
+  body = {
+    kind = "StorageV2"
+    properties = {
+      allowBlobPublicAccess    = false
+      allowSharedKeyAccess     = true
+      minimumTlsVersion        = "TLS1_2"
+      supportsHttpsTrafficOnly = true
+    }
+    sku = {
+      name = "Standard_ZRS"
+    }
+  }
 }
 
-resource "azurerm_user_assigned_identity" "this" {
-  location            = azurerm_resource_group.this.location
-  name                = module.naming.user_assigned_identity.name_unique
-  resource_group_name = azurerm_resource_group.this.name
+resource "azapi_resource" "file_share" {
+  name      = "sharename"
+  parent_id = "${azapi_resource.storage_account.id}/fileServices/default"
+  type      = "Microsoft.Storage/storageAccounts/fileServices/shares@2024-01-01"
+  body = {
+    properties = {
+      shareQuota = 5
+    }
+  }
+}
+
+data "azapi_resource_action" "storage_account_keys" {
+  action                           = "listKeys"
+  method                           = "POST"
+  resource_id                      = azapi_resource.storage_account.id
+  type                             = "Microsoft.Storage/storageAccounts@2024-01-01"
+  response_export_values           = []
+  sensitive_response_export_values = ["keys"]
+}
+
+resource "azapi_resource" "user_assigned_identity" {
+  location  = azapi_resource.resource_group.location
+  name      = module.naming.user_assigned_identity.name_unique
+  parent_id = azapi_resource.resource_group.id
+  type      = "Microsoft.ManagedIdentity/userAssignedIdentities@2023-01-31"
 }
 
 module "managedenvironment" {
   source = "../../"
 
-  location            = azurerm_resource_group.this.location
+  location            = azapi_resource.resource_group.location
   name                = module.naming.container_app_environment.name_unique
-  resource_group_name = azurerm_resource_group.this.name
+  resource_group_name = azapi_resource.resource_group.name
   dapr_components = {
     "my-dapr-component" = {
       component_type          = "state.azure.blobstorage"
       dapr_components_version = "v1"
       ignore_errors           = true
-      location                = azurerm_resource_group.this.location
+      location                = azapi_resource.resource_group.location
       name                    = "my-dapr-component"
     }
   }
   enable_telemetry              = var.enable_telemetry
   infrastructure_resource_group = "rg-managed-${module.naming.container_app_environment.name_unique}"
-  log_analytics_workspace       = { resource_id = azurerm_log_analytics_workspace.this.id }
+  log_analytics_workspace       = { resource_id = azapi_resource.log_analytics_workspace.id }
   managed_identities = {
     system_assigned            = true
-    user_assigned_resource_ids = [azurerm_user_assigned_identity.this.id]
+    user_assigned_resource_ids = [azapi_resource.user_assigned_identity.id]
   }
   storages = {
     "mycontainerappstorage" = {
       azure_file = {
         access_mode  = "ReadOnly"
-        account_name = azurerm_storage_account.this.name
-        share_name   = azurerm_storage_share.this.name
+        account_name = azapi_resource.storage_account.name
+        share_name   = azapi_resource.file_share.name
       }
-      account_key         = azurerm_storage_account.this.primary_access_key
+      account_key         = data.azapi_resource_action.storage_account_keys.sensitive_output.keys[0].value
       account_key_version = 1
-      location            = azurerm_resource_group.this.location
+      location            = azapi_resource.resource_group.location
       name                = "mycontainerappstorage"
     }
   }
   vnet_configuration = {
-    infrastructure_subnet_id = azurerm_subnet.this.id
+    infrastructure_subnet_id = "${azapi_resource.virtual_network.id}/subnets/${module.naming.subnet.name_unique}"
     internal                 = true
   }
   workload_profiles = [
@@ -147,23 +176,21 @@ module "managedenvironment" {
 
 The following requirements are needed by this module:
 
-- <a name="requirement_terraform"></a> [terraform](#requirement\_terraform) (>= 1.9, < 2.0)
+- <a name="requirement_terraform"></a> [terraform](#requirement\_terraform) (>= 1.12, < 2.0)
 
-- <a name="requirement_azapi"></a> [azapi](#requirement\_azapi) (~> 2.0)
-
-- <a name="requirement_azurerm"></a> [azurerm](#requirement\_azurerm) (~> 4.0)
+- <a name="requirement_azapi"></a> [azapi](#requirement\_azapi) (~> 2.12)
 
 ## Resources
 
 The following resources are used by this module:
 
-- [azurerm_log_analytics_workspace.this](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/log_analytics_workspace) (resource)
-- [azurerm_resource_group.this](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/resource_group) (resource)
-- [azurerm_storage_account.this](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/storage_account) (resource)
-- [azurerm_storage_share.this](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/storage_share) (resource)
-- [azurerm_subnet.this](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/subnet) (resource)
-- [azurerm_user_assigned_identity.this](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/user_assigned_identity) (resource)
-- [azurerm_virtual_network.this](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/virtual_network) (resource)
+- [azapi_resource.file_share](https://registry.terraform.io/providers/Azure/azapi/latest/docs/resources/resource) (resource)
+- [azapi_resource.log_analytics_workspace](https://registry.terraform.io/providers/Azure/azapi/latest/docs/resources/resource) (resource)
+- [azapi_resource.resource_group](https://registry.terraform.io/providers/Azure/azapi/latest/docs/resources/resource) (resource)
+- [azapi_resource.storage_account](https://registry.terraform.io/providers/Azure/azapi/latest/docs/resources/resource) (resource)
+- [azapi_resource.user_assigned_identity](https://registry.terraform.io/providers/Azure/azapi/latest/docs/resources/resource) (resource)
+- [azapi_resource.virtual_network](https://registry.terraform.io/providers/Azure/azapi/latest/docs/resources/resource) (resource)
+- [azapi_resource_action.storage_account_keys](https://registry.terraform.io/providers/Azure/azapi/latest/docs/data-sources/resource_action) (data source)
 
 <!-- markdownlint-disable MD013 -->
 ## Required Inputs

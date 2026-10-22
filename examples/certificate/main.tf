@@ -1,25 +1,14 @@
 terraform {
-  required_version = ">= 1.9, < 2.0"
+  required_version = ">= 1.12, < 2.0"
 
   required_providers {
-    # ignore this because we want to force the use of AzAPI v1 within the module without having it used in this example.
-    # tflint-ignore: terraform_unused_required_providers
     azapi = {
       source  = "Azure/azapi"
-      version = "~> 2.0"
+      version = "~> 2.12"
     }
-    azurerm = {
-      source  = "hashicorp/azurerm"
-      version = "~> 4.0"
-    }
-  }
-}
-
-provider "azurerm" {
-  resource_provider_registrations = "none"
-  features {
-    resource_group {
-      prevent_deletion_if_contains_resources = false
+    random = {
+      source  = "hashicorp/random"
+      version = "~> 3.5"
     }
   }
 }
@@ -31,58 +20,90 @@ module "naming" {
 }
 
 # This is required for resource modules
-resource "azurerm_resource_group" "this" {
+resource "azapi_resource" "resource_group" {
   location = "australiaeast"
   name     = module.naming.resource_group.name_unique
+  type     = "Microsoft.Resources/resourceGroups@2024-03-01"
 }
 
-resource "azurerm_log_analytics_workspace" "this" {
-  location            = azurerm_resource_group.this.location
-  name                = module.naming.log_analytics_workspace.name_unique
-  resource_group_name = azurerm_resource_group.this.name
+resource "azapi_resource" "log_analytics_workspace" {
+  location  = azapi_resource.resource_group.location
+  name      = module.naming.log_analytics_workspace.name_unique
+  parent_id = azapi_resource.resource_group.id
+  type      = "Microsoft.OperationalInsights/workspaces@2023-09-01"
+  body = {
+    properties = {
+      retentionInDays = 30
+      sku = {
+        name = "PerGB2018"
+      }
+    }
+  }
 }
 
 # Example: Create a Key Vault for certificate storage
-resource "azurerm_key_vault" "this" {
-  location                   = azurerm_resource_group.this.location
-  name                       = module.naming.key_vault.name_unique
-  resource_group_name        = azurerm_resource_group.this.name
-  sku_name                   = "standard"
-  tenant_id                  = data.azurerm_client_config.current.tenant_id
-  enable_rbac_authorization  = true
-  purge_protection_enabled   = false
-  soft_delete_retention_days = 7
+# Purge protection stays disabled by omitting enablePurgeProtection, because the API does not accept false.
+resource "azapi_resource" "key_vault" {
+  location  = azapi_resource.resource_group.location
+  name      = module.naming.key_vault.name_unique
+  parent_id = azapi_resource.resource_group.id
+  type      = "Microsoft.KeyVault/vaults@2023-07-01"
+  body = {
+    properties = {
+      accessPolicies            = []
+      enableRbacAuthorization   = true
+      enableSoftDelete          = true
+      softDeleteRetentionInDays = 7
+      sku = {
+        family = "A"
+        name   = "standard"
+      }
+      tenantId = data.azapi_client_config.current.tenant_id
+    }
+  }
 }
 
-data "azurerm_client_config" "current" {}
+data "azapi_client_config" "current" {}
 
 # Example managed identity for Key Vault access
-resource "azurerm_user_assigned_identity" "this" {
-  location            = azurerm_resource_group.this.location
-  name                = "${module.naming.user_assigned_identity.name_unique}-env"
-  resource_group_name = azurerm_resource_group.this.name
+resource "azapi_resource" "user_assigned_identity" {
+  location               = azapi_resource.resource_group.location
+  name                   = "${module.naming.user_assigned_identity.name_unique}-env"
+  parent_id              = azapi_resource.resource_group.id
+  type                   = "Microsoft.ManagedIdentity/userAssignedIdentities@2023-01-31"
+  response_export_values = ["properties.principalId", "properties.clientId"]
 }
 
+resource "random_uuid" "role_assignment_kv_secrets_user" {}
+
 # Grant the managed identity permission to read certificates from Key Vault
-resource "azurerm_role_assignment" "kv_secrets_user" {
-  principal_id         = azurerm_user_assigned_identity.this.principal_id
-  scope                = azurerm_key_vault.this.id
-  role_definition_name = "Key Vault Secrets User"
+# (4633458b-17de-408a-b874-0445c86b69e6 is the built-in Key Vault Secrets User role).
+resource "azapi_resource" "role_assignment_kv_secrets_user" {
+  name      = random_uuid.role_assignment_kv_secrets_user.result
+  parent_id = azapi_resource.key_vault.id
+  type      = "Microsoft.Authorization/roleAssignments@2022-04-01"
+  body = {
+    properties = {
+      principalId      = azapi_resource.user_assigned_identity.output.properties.principalId
+      principalType    = "ServicePrincipal"
+      roleDefinitionId = "/subscriptions/${data.azapi_client_config.current.subscription_id}/providers/Microsoft.Authorization/roleDefinitions/4633458b-17de-408a-b874-0445c86b69e6"
+    }
+  }
 }
 
 module "managedenvironment" {
   source = "../../"
 
-  location            = azurerm_resource_group.this.location
+  location            = azapi_resource.resource_group.location
   name                = module.naming.container_app_environment.name_unique
-  resource_group_name = azurerm_resource_group.this.name
+  resource_group_name = azapi_resource.resource_group.name
   enable_telemetry    = var.enable_telemetry
   log_analytics_workspace = {
-    resource_id = azurerm_log_analytics_workspace.this.id
+    resource_id = azapi_resource.log_analytics_workspace.id
   }
   # Configure managed identity for Key Vault access
   managed_identities = {
-    user_assigned_resource_ids = [azurerm_user_assigned_identity.this.id]
+    user_assigned_resource_ids = [azapi_resource.user_assigned_identity.id]
   }
   # zone redundancy must be disabled unless we supply a subnet for vnet integration.
   zone_redundant = false

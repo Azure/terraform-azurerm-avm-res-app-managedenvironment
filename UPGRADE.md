@@ -6,7 +6,25 @@ It is intentionally focused on migration work you may need to do in your configu
 
 ---
 
-## 0.4.0 to 0.5.0 (Unreleased)
+## 0.5.x to 0.6.0
+
+No input changes are needed. The lock, role assignments and diagnostic settings move from the AzureRM provider to AzAPI in place, and the module no longer requires the AzureRM provider. It now requires the `hashicorp/time` provider, so run `terraform init -upgrade`.
+
+Before planning:
+
+- Change a `ReadOnly` lock to `CanNotDelete`, or remove it, until the upgrade is applied.
+- Move cross-tenant role assignments, which set `delegated_managed_identity_resource_id`, with `terraform state rm` and an `import` block, as described in the README.
+
+The plan must not destroy or replace anything except the AVM telemetry deployments. See [Upgrading from 0.5.x or earlier](README.md#upgrading-from-05x-or-earlier) for the changes to expect.
+
+### New inputs
+
+- `resource_types`, `retry` and `ignore_body_changes`, with a slot for each submodule.
+- `lock.notes` and `role_assignments[*].name`.
+
+---
+
+## 0.4.0 to 0.5.0
 
 ### Main migration work
 

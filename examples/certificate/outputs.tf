@@ -5,7 +5,7 @@ output "certificate_resource_ids" {
 
 output "key_vault_id" {
   description = "The resource ID of the Key Vault (for certificate storage)"
-  value       = azurerm_key_vault.this.id
+  value       = azapi_resource.key_vault.id
 }
 
 output "managed_environment_id" {
@@ -15,5 +15,5 @@ output "managed_environment_id" {
 
 output "managed_identity_id" {
   description = "The resource ID of the managed identity (for Key Vault access)"
-  value       = azurerm_user_assigned_identity.this.id
+  value       = azapi_resource.user_assigned_identity.id
 }

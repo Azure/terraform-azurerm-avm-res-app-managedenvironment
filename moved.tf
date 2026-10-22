@@ -25,3 +25,26 @@ moved {
   from = module.storage
   to   = module.storages
 }
+
+# The environment is the module's primary resource, so it is named `this`.
+moved {
+  from = azapi_resource.this_environment
+  to   = azapi_resource.this
+}
+
+# The lock, role assignments and diagnostic settings moved from the AzureRM provider to AzAPI. They are
+# adopted in place and updated with the same settings.
+moved {
+  from = azurerm_management_lock.this
+  to   = azapi_resource.lock
+}
+
+moved {
+  from = azurerm_role_assignment.this
+  to   = azapi_resource.role_assignments
+}
+
+moved {
+  from = azurerm_monitor_diagnostic_setting.this
+  to   = azapi_resource.diagnostic_settings
+}
