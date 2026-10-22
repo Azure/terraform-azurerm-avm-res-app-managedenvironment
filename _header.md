@@ -32,17 +32,19 @@ The lock, role assignments and diagnostic settings are now AzAPI resources, and 
    }
    ```
 
-1. Run `terraform init -upgrade`, then `terraform plan`. The plan must not destroy or replace anything except the AVM telemetry deployments, which are replaced whenever the module version changes. It moves the environment without changes, updates the lock, role assignments and diagnostic settings in place with the same settings, and adds:
+1. Run `terraform init -upgrade`, then `terraform plan`. The plan must not destroy or replace anything. It moves the environment without changes, updates the lock, role assignments and diagnostic settings in place with the same settings, and adds:
    - a `random_uuid` for each role assignment, which only exists in the state. The assignments keep their names;
    - `time_sleep.lock_removal`, when a lock is set;
-   - the interfaces utility module's telemetry resources, when telemetry is enabled.
+   - the AVM telemetry resources, when telemetry is enabled. The previous telemetry resources are removed from the state without being destroyed.
 
    Child resources, such as Dapr components and storages, are updated in place to record the `retry` setting they now share with the environment. Only the state changes; nothing is sent to Azure.
+1. Apply the plan. Later plans report no changes, except that, when telemetry is enabled, each plan updates the AVM telemetry deployments to record the apply.
 
 Other changes:
 
 - `resource_types`, `retry` and `ignore_body_changes` cover the environment, its lock, role assignments and diagnostic settings, and each submodule. `retry` retries `ContainerAppEnvironmentDisabled` by default, as the environment always did, and now applies to the child resources too. `timeouts` now applies to every resource.
 - `lock` accepts `notes`, and `role_assignments` accepts `name`.
 - Role names are matched, ignoring case, against the role definitions that can be assigned in the resource group, and an unknown name fails during plan. Use the ID of a custom role that can only be assigned on the environment.
+- Diagnostic settings compare only the configured log and metric categories, because Azure also returns every other category group as disabled. A category enabled outside Terraform is therefore not reported as a change.
 
 > Major version Zero (0.y.z) is for initial development. Anything MAY change at any time. A module SHOULD NOT be considered stable till at least it is major version one (1.0.0) or greater. Changes will always be via new versions being published and no changes will be made to existing published versions. For more details please go to <https://semver.org/>

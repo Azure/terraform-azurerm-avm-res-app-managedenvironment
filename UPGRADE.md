@@ -15,7 +15,7 @@ Before planning:
 - Change a `ReadOnly` lock to `CanNotDelete`, or remove it, until the upgrade is applied.
 - Move cross-tenant role assignments, which set `delegated_managed_identity_resource_id`, with `terraform state rm` and an `import` block, as described in the README.
 
-The plan must not destroy or replace anything except the AVM telemetry deployments. See [Upgrading from 0.5.x or earlier](README.md#upgrading-from-05x-or-earlier) for the changes to expect.
+The plan must not destroy or replace anything. See [Upgrading from 0.5.x or earlier](README.md#upgrading-from-05x-or-earlier) for the changes to expect.
 
 ### New inputs
 
