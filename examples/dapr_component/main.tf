@@ -1,25 +1,10 @@
 terraform {
-  required_version = ">= 1.9, < 2.0"
+  required_version = ">= 1.12, < 2.0"
 
   required_providers {
-    # ignore this because we want to force the use of AzAPI v1 within the module without having it used in this example.
-    # tflint-ignore: terraform_unused_required_providers
     azapi = {
       source  = "Azure/azapi"
-      version = "~> 2.0"
-    }
-    azurerm = {
-      source  = "hashicorp/azurerm"
-      version = "~> 4.0"
-    }
-  }
-}
-
-provider "azurerm" {
-  resource_provider_registrations = "none"
-  features {
-    resource_group {
-      prevent_deletion_if_contains_resources = false
+      version = "~> 2.12"
     }
   }
 }
@@ -31,31 +16,49 @@ module "naming" {
 }
 
 # This is required for resource modules
-resource "azurerm_resource_group" "this" {
+resource "azapi_resource" "resource_group" {
   location = "australiaeast"
   name     = module.naming.resource_group.name_unique
+  type     = "Microsoft.Resources/resourceGroups@2024-03-01"
 }
 
-resource "azurerm_log_analytics_workspace" "this" {
-  location            = azurerm_resource_group.this.location
-  name                = module.naming.log_analytics_workspace.name_unique
-  resource_group_name = azurerm_resource_group.this.name
+resource "azapi_resource" "log_analytics_workspace" {
+  location  = azapi_resource.resource_group.location
+  name      = module.naming.log_analytics_workspace.name_unique
+  parent_id = azapi_resource.resource_group.id
+  type      = "Microsoft.OperationalInsights/workspaces@2023-09-01"
+  body = {
+    properties = {
+      retentionInDays = 30
+      sku = {
+        name = "PerGB2018"
+      }
+    }
+  }
 }
 
-resource "azurerm_application_insights" "this" {
-  application_type    = "web"
-  location            = azurerm_resource_group.this.location
-  name                = module.naming.application_insights.name_unique
-  resource_group_name = azurerm_resource_group.this.name
+resource "azapi_resource" "application_insights" {
+  location  = azapi_resource.resource_group.location
+  name      = module.naming.application_insights.name_unique
+  parent_id = azapi_resource.resource_group.id
+  type      = "Microsoft.Insights/components@2020-02-02"
+  body = {
+    kind = "web"
+    properties = {
+      Application_Type    = "web"
+      WorkspaceResourceId = azapi_resource.log_analytics_workspace.id
+    }
+  }
+  response_export_values = ["properties.ConnectionString", "properties.InstrumentationKey"]
 }
 
 module "managedenvironment" {
   source = "../../"
 
-  location                          = azurerm_resource_group.this.location
+  location                          = azapi_resource.resource_group.location
   name                              = module.naming.container_app_environment.name_unique
-  resource_group_name               = azurerm_resource_group.this.name
-  dapr_ai_connection_string         = azurerm_application_insights.this.connection_string
+  resource_group_name               = azapi_resource.resource_group.name
+  dapr_ai_connection_string         = azapi_resource.application_insights.output.properties.ConnectionString
   dapr_ai_connection_string_version = 1
   dapr_components = {
     "my-dapr-component" = {
@@ -65,7 +68,7 @@ module "managedenvironment" {
     }
   }
   enable_telemetry        = var.enable_telemetry
-  log_analytics_workspace = { resource_id = azurerm_log_analytics_workspace.this.id }
+  log_analytics_workspace = { resource_id = azapi_resource.log_analytics_workspace.id }
   # zone redundancy must be disabled unless we supply a subnet for vnet integration.
   zone_redundant = false
 }

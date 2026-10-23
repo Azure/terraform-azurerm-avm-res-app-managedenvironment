@@ -6,13 +6,13 @@ output "certificate_resource_ids" {
 output "custom_domain_verification_id" {
   description = "The custom domain verification ID of the Container Apps Managed Environment."
   sensitive   = true
-  value       = try(azapi_resource.this_environment.output.properties.customDomainConfiguration.customDomainVerificationId, null)
+  value       = try(azapi_resource.this.output.properties.customDomainConfiguration.customDomainVerificationId, null)
 }
 
 output "dapr_ai_instrumentation_key" {
   description = "The Dapr AI instrumentation key of the Container Apps Managed Environment."
   sensitive   = true
-  value       = try(azapi_resource.this_environment.output.properties.daprAIInstrumentationKey, null)
+  value       = try(azapi_resource.this.output.properties.daprAIInstrumentationKey, null)
 }
 
 output "dapr_component_resource_ids" {
@@ -22,22 +22,22 @@ output "dapr_component_resource_ids" {
 
 output "default_domain" {
   description = "The default domain of the Container Apps Managed Environment."
-  value       = azapi_resource.this_environment.output.properties.defaultDomain
+  value       = azapi_resource.this.output.properties.defaultDomain
 }
 
 output "docker_bridge_cidr" {
   description = "The Docker bridge CIDR of the Container Apps Managed Environment."
-  value       = try(azapi_resource.this_environment.output.properties.vnetConfiguration.dockerBridgeCidr, null)
+  value       = try(azapi_resource.this.output.properties.vnetConfiguration.dockerBridgeCidr, null)
 }
 
 output "event_stream_endpoint" {
   description = "The event stream endpoint of the Container Apps Managed Environment."
-  value       = try(azapi_resource.this_environment.output.properties.eventStreamEndpoint, null)
+  value       = try(azapi_resource.this.output.properties.eventStreamEndpoint, null)
 }
 
 output "infrastructure_resource_group" {
   description = "The infrastructure resource group of the Container Apps Managed Environment."
-  value       = try(azapi_resource.this_environment.output.properties.infrastructureResourceGroup, null)
+  value       = try(azapi_resource.this.output.properties.infrastructureResourceGroup, null)
 }
 
 output "managed_certificate_resource_ids" {
@@ -47,37 +47,37 @@ output "managed_certificate_resource_ids" {
 
 output "managed_identities" {
   description = "The managed identities assigned to the Container Apps Managed Environment."
-  value       = try(azapi_resource.this_environment.output.identity, {})
+  value       = try(azapi_resource.this.output.identity, {})
 }
 
 output "name" {
   description = "The name of the resource"
-  value       = azapi_resource.this_environment.name
+  value       = azapi_resource.this.name
 }
 
 output "platform_reserved_cidr" {
   description = "The platform reserved CIDR of the Container Apps Managed Environment."
-  value       = try(azapi_resource.this_environment.output.properties.vnetConfiguration.platformReservedCidr, null)
+  value       = try(azapi_resource.this.output.properties.vnetConfiguration.platformReservedCidr, null)
 }
 
 output "platform_reserved_dns_ip_address" {
   description = "The platform reserved DNS IP address of the Container Apps Managed Environment."
-  value       = try(azapi_resource.this_environment.output.properties.vnetConfiguration.platformReservedDnsIP, null)
+  value       = try(azapi_resource.this.output.properties.vnetConfiguration.platformReservedDnsIP, null)
 }
 
 output "resource" {
   description = "The full resource object of the Container Apps Managed Environment."
-  value       = azapi_resource.this_environment
+  value       = azapi_resource.this
 }
 
 output "resource_id" {
   description = "The ID of the container app management environment resource."
-  value       = azapi_resource.this_environment.id
+  value       = azapi_resource.this.id
 }
 
 output "static_ip_address" {
   description = "The static IP address of the Container Apps Managed Environment."
-  value       = azapi_resource.this_environment.output.properties.staticIp
+  value       = azapi_resource.this.output.properties.staticIp
 }
 
 output "storage_resource_ids" {
