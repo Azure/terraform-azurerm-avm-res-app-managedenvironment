@@ -12,7 +12,14 @@ resource "azapi_resource" "this" {
   retry = var.retry
   sensitive_body = {
     properties = {
-      secrets = var.secrets
+      secrets = var.secrets == null ? null : [
+        for secret in var.secrets : {
+          identity    = secret.identity
+          keyVaultUrl = secret.key_vault_url
+          name        = secret.name
+          value       = secret.value
+        }
+      ]
     }
   }
   sensitive_body_version = {
